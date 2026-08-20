@@ -1,9 +1,10 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
  *
- * <p>This is the Level-5 increment: tasks come in three types (todo, deadline and
+ * <p>This is the Level-6 increment: tasks come in three types (todo, deadline and
  * event), and can be listed, marked as done, and marked as not done again.
  * Anything Billy cannot make sense of is reported as a {@link BillyException}
  * rather than crashing. Typing {@value #EXIT_COMMAND} ends the conversation.
@@ -66,14 +67,13 @@ public class Billy {
     private static final String KNOWN_COMMANDS =
             "I understand: todo, deadline, event, list, mark, unmark, bye.";
 
-    /** The most tasks Billy can hold, as the list is a fixed-size array. */
-    private static final int MAX_TASKS = 100;
-
-    /** Stored tasks. Only the first {@code taskCount} slots hold real values. */
-    private static final Task[] tasks = new Task[MAX_TASKS];
-
-    /** How many slots of {@link #tasks} are currently in use. */
-    private static int taskCount = 0;
+    /**
+     * Stored tasks, in the order the user added them.
+     *
+     * <p>An {@link ArrayList} grows as needed, so there is no limit on how many
+     * tasks Billy can hold, and it tracks its own size.
+     */
+    private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
         greet();
@@ -219,34 +219,29 @@ public class Billy {
         return new String[] {before, after};
     }
 
-    /**
-     * Stores an already-built task.
-     *
-     * @throws BillyException if the list is already full
-     */
-    private static void addTask(Task task) throws BillyException {
-        if (taskCount == MAX_TASKS) {
-            throw new BillyException(
-                    "My memory is full at " + MAX_TASKS + " tasks. Time to get some done!");
-        }
-        tasks[taskCount] = task;
-        taskCount++;
-        reply("Got it. I've added this task:\n  " + task
-                + "\nNow you have " + taskCount + (taskCount == 1 ? " task" : " tasks")
-                + " in the list.");
+    /** Stores an already-built task and confirms it. */
+    private static void addTask(Task task) {
+        tasks.add(task);
+        reply("Got it. I've added this task:\n  " + task + "\n" + taskCountSummary());
+    }
+
+    /** Describes how many tasks are now stored, e.g. {@code Now you have 3 tasks in the list.} */
+    private static String taskCountSummary() {
+        int count = tasks.size();
+        return "Now you have " + count + (count == 1 ? " task" : " tasks") + " in the list.";
     }
 
     /** Prints every stored task, numbered from 1. */
     private static void listTasks() {
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             reply("Your list is empty. Nothing to do... suspicious.");
             return;
         }
         System.out.println(DIVIDER);
         System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
-            // Array indices start at 0, but people count from 1.
-            System.out.println((i + 1) + "." + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            // List indices start at 0, but people count from 1.
+            System.out.println((i + 1) + "." + tasks.get(i));
         }
         System.out.println(DIVIDER);
     }
@@ -263,7 +258,7 @@ public class Billy {
      */
     private static void setTaskDone(String argument, boolean done) throws BillyException {
         int index = parseTaskNumber(argument);
-        Task task = tasks[index];
+        Task task = tasks.get(index);
         String confirmation;
         if (done) {
             task.markAsDone();
@@ -291,12 +286,12 @@ public class Billy {
             throw new BillyException("I need a task number, like 'mark 2'.");
         }
 
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             throw new BillyException("Your list is empty, so there's nothing to change.");
         }
-        if (taskNumber < 1 || taskNumber > taskCount) {
-            throw new BillyException(
-                    "There's no task " + taskNumber + " on your list. You have " + taskCount + ".");
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new BillyException("There's no task " + taskNumber
+                    + " on your list. You have " + tasks.size() + ".");
         }
         return taskNumber - 1;
     }
