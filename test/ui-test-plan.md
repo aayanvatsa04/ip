@@ -625,3 +625,25 @@ Here are the tasks in your list:
 ____________________________________________________________
 {{FAREWELL}}
 ```
+
+## TC-17 Anything after `bye` is ignored
+
+**Aim:** Verify that the exit command is recognised from its first word like every other command, so `bye now` ends the session rather than being reported as unknown. The line after it must not run, which proves the session really ended.
+
+**Input:**
+```text
+todo read book
+bye now
+todo this must never run
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+{{FAREWELL}}
+```

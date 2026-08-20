@@ -3,9 +3,9 @@
  *
  * <p>Using an enum rather than loose {@code String} constants means the set of
  * commands is fixed and known to the compiler: a command can only be one of these
- * values, a typo in a name will not compile, and a switch over a command can be
- * checked for completeness. The list of keywords shown to the user is built from
- * these values, so it cannot fall out of step with what Billy actually accepts.
+ * values, and a misspelt name is a compile error instead of a command that quietly
+ * never matches. The list of keywords shown to the user is built from these values,
+ * so it cannot fall out of step with what Billy actually accepts.
  *
  * <p>The order below is the order the keywords are listed to the user.
  */

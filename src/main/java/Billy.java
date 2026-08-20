@@ -7,7 +7,7 @@ import java.util.Scanner;
  * <p>This is the Level-6 increment: tasks come in three types (todo, deadline and
  * event), and can be listed, marked as done, and marked as not done again.
  * Anything Billy cannot make sense of is reported as a {@link BillyException}
- * rather than crashing. Typing {@value #EXIT_COMMAND} ends the conversation.
+ * rather than crashing. Typing {@code bye} ends the conversation.
  */
 public class Billy {
 
@@ -23,30 +23,6 @@ public class Billy {
             + "| |_) | | | | |_| |\n"
             + "|____/|_|_|_|\\__, |\n"
             + "             |___/ ";
-
-    /** The command that makes Billy stop reading input and exit. */
-    private static final String EXIT_COMMAND = "bye";
-
-    /** The command that makes Billy print everything stored so far. */
-    private static final String LIST_COMMAND = "list";
-
-    /** The command that marks a task as done, e.g. {@code mark 2}. */
-    private static final String MARK_COMMAND = "mark";
-
-    /** The command that marks a task as not done again, e.g. {@code unmark 2}. */
-    private static final String UNMARK_COMMAND = "unmark";
-
-    /** The command that adds a task with no date attached, e.g. {@code todo borrow book}. */
-    private static final String TODO_COMMAND = "todo";
-
-    /** The command that adds a task with a due date, e.g. {@code deadline return book /by Sunday}. */
-    private static final String DEADLINE_COMMAND = "deadline";
-
-    /** The command that adds a task spanning a period, e.g. {@code event meeting /from 2pm /to 4pm}. */
-    private static final String EVENT_COMMAND = "event";
-
-    /** The command that removes a task from the list, e.g. {@code delete 3}. */
-    private static final String DELETE_COMMAND = "delete";
 
     /** Separates a deadline's description from its due date. */
     private static final String BY_SEPARATOR = "/by";
@@ -65,10 +41,6 @@ public class Billy {
 
     /** Shown alongside an error to remind the user how an event is typed. */
     private static final String EVENT_USAGE = "Try: event project meeting /from Mon 2pm /to 4pm";
-
-    /** Listed when the user types a keyword Billy does not recognise. */
-    private static final String KNOWN_COMMANDS =
-            "I understand: todo, deadline, event, list, mark, unmark, delete, bye.";
 
     /**
      * Stored tasks, in the order the user added them.
@@ -100,19 +72,19 @@ public class Billy {
      * so this is the single place that turns a failure into a message on screen.
      * Because the loop continues afterwards, a mistake never ends the conversation.
      *
-     * <p>Stops when the user types {@value #EXIT_COMMAND}, or when there is no
-     * more input to read (for example, if the user presses Ctrl+D).
+     * <p>Stops when the user types {@code bye}, or when there is no more input to
+     * read (for example, if the user presses Ctrl+D).
      */
     private static void runCommandLoop() {
         // try-with-resources closes the Scanner automatically, even if we break out early.
         try (Scanner scanner = new Scanner(System.in)) {
             while (scanner.hasNextLine()) {
-                String command = scanner.nextLine().trim();
-                if (command.equalsIgnoreCase(EXIT_COMMAND)) {
-                    break;
-                }
+                String line = scanner.nextLine().trim();
                 try {
-                    handleCommand(command);
+                    // handleCommand reports whether the conversation should carry on.
+                    if (!handleCommand(line)) {
+                        break;
+                    }
                 } catch (BillyException e) {
                     reply(e.getMessage());
                 }
@@ -126,29 +98,34 @@ public class Billy {
      * <p>The first word decides the action. A word Billy does not recognise is
      * reported as an error, so a mistyped command is never stored as a task.
      *
+     * @param line one whole line as the user typed it, already trimmed
+     * @return {@code true} to carry on reading commands, {@code false} once the
+     *         user has said goodbye
      * @throws BillyException if the command cannot be carried out as typed
      */
-    private static void handleCommand(String command) throws BillyException {
-        if (command.isEmpty()) {
+    private static boolean handleCommand(String line) throws BillyException {
+        if (line.isEmpty()) {
             throw new BillyException("You'll have to give me something to work with!");
         }
 
         // Split into the keyword and everything after it, e.g. "mark 2" -> "mark", "2".
-        String[] parts = command.split("\\s+", 2);
-        String keyword = parts[0].toLowerCase();
+        String[] parts = line.split("\\s+", 2);
+        Command command = Command.fromKeyword(parts[0]);
         String argument = parts.length > 1 ? parts[1] : "";
 
-        switch (keyword) {
-        case LIST_COMMAND -> listTasks();
-        case MARK_COMMAND -> setTaskDone(argument, true);
-        case UNMARK_COMMAND -> setTaskDone(argument, false);
-        case TODO_COMMAND -> addTodo(argument);
-        case DEADLINE_COMMAND -> addDeadline(argument);
-        case EVENT_COMMAND -> addEvent(argument);
-        case DELETE_COMMAND -> deleteTask(argument);
-        default -> throw new BillyException(
-                "I don't know what '" + keyword + "' means. " + KNOWN_COMMANDS);
+        switch (command) {
+        case LIST -> listTasks();
+        case MARK -> setTaskDone(argument, true);
+        case UNMARK -> setTaskDone(argument, false);
+        case TODO -> addTodo(argument);
+        case DEADLINE -> addDeadline(argument);
+        case EVENT -> addEvent(argument);
+        case DELETE -> deleteTask(argument);
+        case BYE -> {
+            return false;
         }
+        }
+        return true;
     }
 
     /**
@@ -242,7 +219,7 @@ public class Billy {
      * @throws BillyException if the argument does not name a task that exists
      */
     private static void deleteTask(String argument) throws BillyException {
-        int index = parseTaskNumber(argument, DELETE_COMMAND);
+        int index = parseTaskNumber(argument, Command.DELETE);
         // remove returns the task it took out, so it can be shown in the confirmation.
         Task removed = tasks.remove(index);
         reply("Noted. I've removed this task:\n  " + removed + "\n" + taskCountSummary());
@@ -266,15 +243,15 @@ public class Billy {
     /**
      * Sets the done status of the task the user named.
      *
-     * <p>Both {@value #MARK_COMMAND} and {@value #UNMARK_COMMAND} share this method,
-     * as they differ only in the status they set and the wording they report.
+     * <p>Both {@code mark} and {@code unmark} share this method, as they differ
+     * only in the status they set and the wording they report.
      *
      * @param argument the text the user typed after the keyword, expected to be a task number
      * @param done the status to set: {@code true} for done, {@code false} for not done
      * @throws BillyException if the argument does not name a task that exists
      */
     private static void setTaskDone(String argument, boolean done) throws BillyException {
-        int index = parseTaskNumber(argument, done ? MARK_COMMAND : UNMARK_COMMAND);
+        int index = parseTaskNumber(argument, done ? Command.MARK : Command.UNMARK);
         Task task = tasks.get(index);
         String confirmation;
         if (done) {
@@ -291,17 +268,18 @@ public class Billy {
      * Converts what the user typed into an index into {@link #tasks}.
      *
      * @param argument the text the user typed after the keyword
-     * @param keyword the command the number belongs to, used to give a fitting example
+     * @param command the command the number belongs to, used to give a fitting example
      * @return the matching 0-based index
      * @throws BillyException if the text is not a number, or names a task that does not exist
      */
-    private static int parseTaskNumber(String argument, String keyword) throws BillyException {
+    private static int parseTaskNumber(String argument, Command command) throws BillyException {
         int taskNumber;
         try {
             taskNumber = Integer.parseInt(argument.trim());
         } catch (NumberFormatException e) {
             // Covers both a missing number ("mark") and a non-number ("mark two").
-            throw new BillyException("I need a task number, like '" + keyword + " 2'.");
+            throw new BillyException(
+                    "I need a task number, like '" + command.getKeyword() + " 2'.");
         }
 
         if (tasks.isEmpty()) {
