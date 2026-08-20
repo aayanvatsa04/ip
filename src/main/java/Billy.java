@@ -45,6 +45,9 @@ public class Billy {
     /** The command that adds a task spanning a period, e.g. {@code event meeting /from 2pm /to 4pm}. */
     private static final String EVENT_COMMAND = "event";
 
+    /** The command that removes a task from the list, e.g. {@code delete 3}. */
+    private static final String DELETE_COMMAND = "delete";
+
     /** Separates a deadline's description from its due date. */
     private static final String BY_SEPARATOR = "/by";
 
@@ -65,7 +68,7 @@ public class Billy {
 
     /** Listed when the user types a keyword Billy does not recognise. */
     private static final String KNOWN_COMMANDS =
-            "I understand: todo, deadline, event, list, mark, unmark, bye.";
+            "I understand: todo, deadline, event, list, mark, unmark, delete, bye.";
 
     /**
      * Stored tasks, in the order the user added them.
@@ -142,6 +145,7 @@ public class Billy {
         case TODO_COMMAND -> addTodo(argument);
         case DEADLINE_COMMAND -> addDeadline(argument);
         case EVENT_COMMAND -> addEvent(argument);
+        case DELETE_COMMAND -> deleteTask(argument);
         default -> throw new BillyException(
                 "I don't know what '" + keyword + "' means. " + KNOWN_COMMANDS);
         }
@@ -231,6 +235,19 @@ public class Billy {
         return "Now you have " + count + (count == 1 ? " task" : " tasks") + " in the list.";
     }
 
+    /**
+     * Removes the task the user named from the list.
+     *
+     * @param argument the text after the keyword, expected to be a task number
+     * @throws BillyException if the argument does not name a task that exists
+     */
+    private static void deleteTask(String argument) throws BillyException {
+        int index = parseTaskNumber(argument, DELETE_COMMAND);
+        // remove returns the task it took out, so it can be shown in the confirmation.
+        Task removed = tasks.remove(index);
+        reply("Noted. I've removed this task:\n  " + removed + "\n" + taskCountSummary());
+    }
+
     /** Prints every stored task, numbered from 1. */
     private static void listTasks() {
         if (tasks.isEmpty()) {
@@ -257,7 +274,7 @@ public class Billy {
      * @throws BillyException if the argument does not name a task that exists
      */
     private static void setTaskDone(String argument, boolean done) throws BillyException {
-        int index = parseTaskNumber(argument);
+        int index = parseTaskNumber(argument, done ? MARK_COMMAND : UNMARK_COMMAND);
         Task task = tasks.get(index);
         String confirmation;
         if (done) {
@@ -274,16 +291,17 @@ public class Billy {
      * Converts what the user typed into an index into {@link #tasks}.
      *
      * @param argument the text the user typed after the keyword
+     * @param keyword the command the number belongs to, used to give a fitting example
      * @return the matching 0-based index
      * @throws BillyException if the text is not a number, or names a task that does not exist
      */
-    private static int parseTaskNumber(String argument) throws BillyException {
+    private static int parseTaskNumber(String argument, String keyword) throws BillyException {
         int taskNumber;
         try {
             taskNumber = Integer.parseInt(argument.trim());
         } catch (NumberFormatException e) {
             // Covers both a missing number ("mark") and a non-number ("mark two").
-            throw new BillyException("I need a task number, like 'mark 2'.");
+            throw new BillyException("I need a task number, like '" + keyword + " 2'.");
         }
 
         if (tasks.isEmpty()) {

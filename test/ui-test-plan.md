@@ -389,10 +389,10 @@ Hey there! Billy here, at your service.
 I track todos, deadlines and events. Type 'list' to see them all.
 ____________________________________________________________
 ____________________________________________________________
-I don't know what 'blah' means. I understand: todo, deadline, event, list, mark, unmark, bye.
+I don't know what 'blah' means. I understand: todo, deadline, event, list, mark, unmark, delete, bye.
 ____________________________________________________________
 ____________________________________________________________
-I don't know what 'buy' means. I understand: todo, deadline, event, list, mark, unmark, bye.
+I don't know what 'buy' means. I understand: todo, deadline, event, list, mark, unmark, delete, bye.
 ____________________________________________________________
 ____________________________________________________________
 Your list is empty. Nothing to do... suspicious.
@@ -470,6 +470,152 @@ Your list is empty, so there's nothing to change.
 ____________________________________________________________
 ____________________________________________________________
 Your list is empty, so there's nothing to change.
+____________________________________________________________
+Catch you later! Don't be a stranger.
+____________________________________________________________
+```
+
+## TC-12 Deleting a task renumbers the rest
+
+**Aim:** Verify that `delete` removes the task at the given number, confirms which task went, reports the new count, and that the tasks after it move up so numbering stays consecutive. Mirrors the worked example in the Level-6 requirements.
+
+**Input:**
+```text
+todo read book
+deadline return book /by June 6th
+event project meeting /from Aug 6th 2pm /to 4pm
+todo join sports club
+todo borrow book
+mark 1
+mark 2
+mark 4
+list
+delete 3
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____  _ _ _
+| __ )(_) | |_   _
+|  _ \| | | | | | |
+| |_) | | | | |_| |
+|____/|_|_|_|\__, |
+             |___/
+Hey there! Billy here, at your service.
+I track todos, deadlines and events. Type 'list' to see them all.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: June 6th)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] join sports club
+Now you have 4 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] borrow book
+Now you have 5 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] read book
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [D][X] return book (by: June 6th)
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] join sports club
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][X] return book (by: June 6th)
+3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+4.[T][X] join sports club
+5.[T][ ] borrow book
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+Now you have 4 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][X] return book (by: June 6th)
+3.[T][X] join sports club
+4.[T][ ] borrow book
+____________________________________________________________
+Catch you later! Don't be a stranger.
+____________________________________________________________
+```
+
+## TC-13 Deleting with a bad or missing task number
+
+**Aim:** Verify that deleting from an empty list, deleting without a number, and deleting a number beyond the end are each reported clearly, and that deleting the only task leaves an empty list rather than a broken one.
+
+**Input:**
+```text
+delete 1
+todo read book
+delete
+delete 9
+delete 1
+list
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____  _ _ _
+| __ )(_) | |_   _
+|  _ \| | | | | | |
+| |_) | | | | |_| |
+|____/|_|_|_|\__, |
+             |___/
+Hey there! Billy here, at your service.
+I track todos, deadlines and events. Type 'list' to see them all.
+____________________________________________________________
+____________________________________________________________
+Your list is empty, so there's nothing to change.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+I need a task number, like 'delete 2'.
+____________________________________________________________
+____________________________________________________________
+There's no task 9 on your list. You have 1.
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [T][ ] read book
+Now you have 0 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Your list is empty. Nothing to do... suspicious.
 ____________________________________________________________
 Catch you later! Don't be a stranger.
 ____________________________________________________________
