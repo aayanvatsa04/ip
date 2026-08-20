@@ -3,9 +3,8 @@ import java.util.Scanner;
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
  *
- * <p>This is the Level-2 increment: any text the user types is stored as a task,
- * {@value #LIST_COMMAND} shows everything stored so far, and
- * {@value #EXIT_COMMAND} ends the conversation.
+ * <p>This is the Level-3 increment: tasks can be added, listed, and marked as done.
+ * Typing {@value #EXIT_COMMAND} ends the conversation.
  */
 public class Billy {
 
@@ -28,11 +27,20 @@ public class Billy {
     /** The command that makes Billy print everything stored so far. */
     private static final String LIST_COMMAND = "list";
 
+    /** The command that marks a task as done, e.g. {@code mark 2}. */
+    private static final String MARK_COMMAND = "mark";
+
     /** The most tasks Billy can hold, as the list is a fixed-size array. */
     private static final int MAX_TASKS = 100;
 
-    /** Stored tasks. Only the first {@code taskCount} slots hold real values. */
+    /** Returned by {@link #parseTaskNumber} when the user did not give a usable task number. */
+    private static final int INVALID_TASK_NUMBER = -1;
+
+    /** Stored task descriptions. Only the first {@code taskCount} slots hold real values. */
     private static final String[] tasks = new String[MAX_TASKS];
+
+    /** Done status of each task, matched to {@link #tasks} by position. */
+    private static final boolean[] isDone = new boolean[MAX_TASKS];
 
     /** How many slots of {@link #tasks} are currently in use. */
     private static int taskCount = 0;
@@ -71,12 +79,27 @@ public class Billy {
         }
     }
 
-    /** Works out what the user asked for and carries it out. */
+    /**
+     * Works out what the user asked for and carries it out.
+     *
+     * <p>The first word decides the action; anything that is not a known keyword
+     * is stored as a new task.
+     */
     private static void handleCommand(String command) {
         if (command.isEmpty()) {
             reply("You'll have to give me something to work with!");
-        } else if (command.equalsIgnoreCase(LIST_COMMAND)) {
+            return;
+        }
+
+        // Split into the keyword and everything after it, e.g. "mark 2" -> "mark", "2".
+        String[] parts = command.split("\\s+", 2);
+        String keyword = parts[0].toLowerCase();
+        String argument = parts.length > 1 ? parts[1] : "";
+
+        if (keyword.equals(LIST_COMMAND)) {
             listTasks();
+        } else if (keyword.equals(MARK_COMMAND)) {
+            markTask(argument);
         } else {
             addTask(command);
         }
@@ -89,6 +112,7 @@ public class Billy {
             return;
         }
         tasks[taskCount] = task;
+        isDone[taskCount] = false;
         taskCount++;
         reply("added: " + task);
     }
@@ -100,11 +124,60 @@ public class Billy {
             return;
         }
         System.out.println(DIVIDER);
+        System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
             // Array indices start at 0, but people count from 1.
-            System.out.println((i + 1) + ". " + tasks[i]);
+            System.out.println((i + 1) + "." + formatTask(i));
         }
         System.out.println(DIVIDER);
+    }
+
+    /**
+     * Marks the task the user named as done.
+     *
+     * @param argument the text the user typed after the keyword, expected to be a task number
+     */
+    private static void markTask(String argument) {
+        int index = parseTaskNumber(argument);
+        if (index == INVALID_TASK_NUMBER) {
+            return; // parseTaskNumber has already explained the problem.
+        }
+        isDone[index] = true;
+        reply("Nice! I've marked this task as done:\n  " + formatTask(index));
+    }
+
+    /**
+     * Converts what the user typed into an index into {@link #tasks}.
+     *
+     * @param argument the text the user typed after the keyword
+     * @return the matching 0-based index, or {@link #INVALID_TASK_NUMBER} if the
+     *         text was not a number or not a task that exists
+     */
+    private static int parseTaskNumber(String argument) {
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(argument.trim());
+        } catch (NumberFormatException e) {
+            // Covers both a missing number ("mark") and a non-number ("mark two").
+            reply("I need a task number, like 'mark 2'.");
+            return INVALID_TASK_NUMBER;
+        }
+
+        if (taskNumber < 1 || taskNumber > taskCount) {
+            reply("There's no task " + taskNumber + " on your list. You have " + taskCount + ".");
+            return INVALID_TASK_NUMBER;
+        }
+        return taskNumber - 1;
+    }
+
+    /**
+     * Formats one task as a status box followed by its description, e.g. {@code [X] read book}.
+     *
+     * @param index the 0-based index of the task
+     */
+    private static String formatTask(int index) {
+        String statusBox = isDone[index] ? "[X]" : "[ ]";
+        return statusBox + " " + tasks[index];
     }
 
     /** Prints a single message wrapped in divider lines. */
