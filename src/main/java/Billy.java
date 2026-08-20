@@ -3,8 +3,8 @@ import java.util.Scanner;
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
  *
- * <p>This is the Level-3 increment: tasks can be added, listed, and marked as done.
- * Typing {@value #EXIT_COMMAND} ends the conversation.
+ * <p>This is the Level-3 increment: tasks can be added, listed, marked as done,
+ * and marked as not done again. Typing {@value #EXIT_COMMAND} ends the conversation.
  */
 public class Billy {
 
@@ -29,6 +29,9 @@ public class Billy {
 
     /** The command that marks a task as done, e.g. {@code mark 2}. */
     private static final String MARK_COMMAND = "mark";
+
+    /** The command that marks a task as not done again, e.g. {@code unmark 2}. */
+    private static final String UNMARK_COMMAND = "unmark";
 
     /** The most tasks Billy can hold, as the list is a fixed-size array. */
     private static final int MAX_TASKS = 100;
@@ -99,7 +102,9 @@ public class Billy {
         if (keyword.equals(LIST_COMMAND)) {
             listTasks();
         } else if (keyword.equals(MARK_COMMAND)) {
-            markTask(argument);
+            setTaskDone(argument, true);
+        } else if (keyword.equals(UNMARK_COMMAND)) {
+            setTaskDone(argument, false);
         } else {
             addTask(command);
         }
@@ -133,17 +138,25 @@ public class Billy {
     }
 
     /**
-     * Marks the task the user named as done.
+     * Sets the done status of the task the user named.
+     *
+     * <p>Both {@value #MARK_COMMAND} and {@value #UNMARK_COMMAND} share this method,
+     * as they differ only in the status they set and the wording they report.
      *
      * @param argument the text the user typed after the keyword, expected to be a task number
+     * @param done the status to set: {@code true} for done, {@code false} for not done
      */
-    private static void markTask(String argument) {
+    private static void setTaskDone(String argument, boolean done) {
         int index = parseTaskNumber(argument);
         if (index == INVALID_TASK_NUMBER) {
             return; // parseTaskNumber has already explained the problem.
         }
-        isDone[index] = true;
-        reply("Nice! I've marked this task as done:\n  " + formatTask(index));
+        isDone[index] = done;
+
+        String confirmation = done
+                ? "Nice! I've marked this task as done:"
+                : "OK, I've marked this task as not done yet:";
+        reply(confirmation + "\n  " + formatTask(index));
     }
 
     /**
