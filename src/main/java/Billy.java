@@ -62,6 +62,10 @@ public class Billy {
     /** Shown alongside an error to remind the user how an event is typed. */
     private static final String EVENT_USAGE = "Try: event project meeting /from Mon 2pm /to 4pm";
 
+    /** Listed when the user types a keyword Billy does not recognise. */
+    private static final String KNOWN_COMMANDS =
+            "I understand: todo, deadline, event, list, mark, unmark, bye.";
+
     /** The most tasks Billy can hold, as the list is a fixed-size array. */
     private static final int MAX_TASKS = 100;
 
@@ -116,8 +120,8 @@ public class Billy {
     /**
      * Works out what the user asked for and carries it out.
      *
-     * <p>The first word decides the action; anything that is not a known keyword
-     * is stored as a new task.
+     * <p>The first word decides the action. A word Billy does not recognise is
+     * reported as an error, so a mistyped command is never stored as a task.
      *
      * @throws BillyException if the command cannot be carried out as typed
      */
@@ -138,8 +142,8 @@ public class Billy {
         case TODO_COMMAND -> addTodo(argument);
         case DEADLINE_COMMAND -> addDeadline(argument);
         case EVENT_COMMAND -> addEvent(argument);
-        // Bare text with no keyword is taken as a todo, as it has no date attached.
-        default -> addTodo(command);
+        default -> throw new BillyException(
+                "I don't know what '" + keyword + "' means. " + KNOWN_COMMANDS);
         }
     }
 

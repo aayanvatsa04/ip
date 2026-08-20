@@ -364,12 +364,13 @@ Catch you later! Don't be a stranger.
 ____________________________________________________________
 ```
 
-## TC-09 Text with no keyword becomes a todo
+## TC-09 Unknown commands are rejected
 
-**Aim:** Verify that input not starting with a known keyword is stored as a todo, so it appears in the list with a `[T]` label.
+**Aim:** Verify that a keyword Billy does not recognise is reported, and that nothing is stored as a result, so a typo cannot quietly become a task. The closing `list` confirms the list is still empty.
 
 **Input:**
 ```text
+blah
 buy bread
 list
 bye
@@ -388,13 +389,13 @@ Hey there! Billy here, at your service.
 I track todos, deadlines and events. Type 'list' to see them all.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
-  [T][ ] buy bread
-Now you have 1 task in the list.
+I don't know what 'blah' means. I understand: todo, deadline, event, list, mark, unmark, bye.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
-1.[T][ ] buy bread
+I don't know what 'buy' means. I understand: todo, deadline, event, list, mark, unmark, bye.
+____________________________________________________________
+____________________________________________________________
+Your list is empty. Nothing to do... suspicious.
 ____________________________________________________________
 Catch you later! Don't be a stranger.
 ____________________________________________________________
