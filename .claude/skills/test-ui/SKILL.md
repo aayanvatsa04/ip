@@ -78,10 +78,16 @@ Requirements the runner enforces:
 
 * The heading must start with `TC-` and a number, or the section is ignored.
 * Both an `**Input:**` and an `**Expected output:**` fenced block are required.
-* The input must end with `bye`, or the program waits forever and the case times
-  out.
+* Ending the input with `bye` tests the normal exit. Omitting it is also valid and
+  tests the end-of-input exit, the same path as pressing Ctrl+D.
 * The expected output is the whole session, since each case runs the program from
   scratch. Task numbering therefore restarts at 1 in every case.
+* Write the shared startup and sign-off as `{{GREETING}}` and `{{FAREWELL}}` on a
+  line of their own rather than repeating them. The runner replaces such a line
+  with the matching `## Snippet: NAME` section before comparing, so rewording the
+  greeting is a one-place change. A name with no matching section is an error.
+* Avoid trailing spaces on input lines: they are invisible and editors often strip
+  them on save. Leading and repeated inner spaces are safe to test with.
 * Trailing spaces at the end of a line are ignored, as they are invisible on
   screen. Everything else must match exactly, including blank lines and the
   divider lines.

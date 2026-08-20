@@ -91,6 +91,28 @@ def read_fenced_block(lines: list[str], start: int) -> tuple[list[str], int]:
     raise PlanError(f"line {start + 1}: fenced block was never closed")
 
 
+def expand_snippets(
+    block: list[str], snippets: dict[str, list[str]], where: str
+) -> list[str]:
+    """Replaces any line that is just `{{NAME}}` with the named snippet's lines.
+
+    Lets shared output such as the greeting be written once rather than repeated
+    in every case, so rewording it is a one-place change.
+    """
+    expanded: list[str] = []
+    for line in block:
+        marker = re.match(r"^\s*\{\{([A-Za-z0-9_]+)\}\}\s*$", line)
+        if not marker:
+            expanded.append(line)
+            continue
+        name = marker.group(1)
+        if name not in snippets:
+            known = ", ".join(sorted(snippets)) or "none defined"
+            raise PlanError(f"{where}: unknown snippet {{{{{name}}}}} (known: {known})")
+        expanded.extend(snippets[name])
+    return expanded
+
+
 def parse_plan(path: Path) -> tuple[dict[str, str], list[TestCase]]:
     """Parses the test plan into settings and an ordered list of test cases."""
     if not path.is_file():
@@ -100,6 +122,7 @@ def parse_plan(path: Path) -> tuple[dict[str, str], list[TestCase]]:
     settings, index = parse_front_matter(lines)
 
     cases: list[TestCase] = []
+    snippets: dict[str, list[str]] = {}
     current: TestCase | None = None
 
     while index < len(lines):
@@ -108,6 +131,14 @@ def parse_plan(path: Path) -> tuple[dict[str, str], list[TestCase]]:
 
         if stripped.startswith("## "):
             heading = stripped[3:].strip()
+
+            # A snippet section defines reusable output rather than a test case.
+            snippet = re.match(r"^Snippet:\s*([A-Za-z0-9_]+)$", heading)
+            if snippet:
+                snippets[snippet.group(1)], index = read_fenced_block(lines, index + 1)
+                current = None
+                continue
+
             # Only headings that look like test cases start a case.
             if re.match(r"^TC[-_ ]?\d+", heading, re.IGNORECASE):
                 current = TestCase(title=heading, line_number=index + 1)
@@ -135,6 +166,7 @@ def parse_plan(path: Path) -> tuple[dict[str, str], list[TestCase]]:
         index += 1
 
     for case in cases:
+        case.expected = expand_snippets(case.expected, snippets, case.title)
         if not case.inputs:
             raise PlanError(f"{case.title} (line {case.line_number}): missing an **Input:** block")
         if not case.expected:

@@ -19,9 +19,13 @@ python3 .claude/skills/test-ui/scripts/run-ui-tests.py
 * Every case starts a **fresh run** of the program, so no case can be affected by
   tasks left behind by an earlier one. Task numbering always restarts at 1.
 * The input lines are fed to the program's standard input, one line at a time.
-  Every case must end with `bye`, or the program would wait forever for input.
+  Ending with `bye` tests the normal exit. Leaving it out is also valid and tests
+  the end-of-input exit, the same path as pressing Ctrl+D at the keyboard.
 * The expected output is the **whole** console session, including the startup
-  banner and the farewell, so any change to those is caught too.
+  banner and the farewell, so any change to those is caught too. The banner and
+  greeting are written once as the `GREETING` snippet, and the sign-off as
+  `FAREWELL`; a line reading `{{GREETING}}` is replaced by those lines before
+  comparing.
 * Trailing spaces at the end of a line are ignored when comparing, since they are
   invisible on screen. Everything else must match exactly.
 * Cases run in the order written, and the session stops at the first failure.
@@ -29,9 +33,38 @@ python3 .claude/skills/test-ui/scripts/run-ui-tests.py
 ## Conventions
 
 * Headings must start with `TC-` followed by a number, or the runner will not
-  treat the section as a test case.
+  treat the section as a test case. A `## Snippet: NAME` heading defines reusable
+  output instead of a case.
+* Avoid trailing spaces on input lines: they are invisible, and many editors strip
+  them on save. Leading and repeated inner spaces are safe to test with.
 * The settings at the top of this file name the entry point class and which
   source files to compile.
+
+## Snippet: GREETING
+
+Everything Billy prints on startup, before any command is typed.
+
+```text
+____________________________________________________________
+ ____  _ _ _
+| __ )(_) | |_   _
+|  _ \| | | | | | |
+| |_) | | | | |_| |
+|____/|_|_|_|\__, |
+             |___/
+Hey there! Billy here, at your service.
+I track todos, deadlines and events. Type 'list' to see them all.
+____________________________________________________________
+```
+
+## Snippet: FAREWELL
+
+Billy's sign-off, printed when the conversation ends.
+
+```text
+Catch you later! Don't be a stranger.
+____________________________________________________________
+```
 
 ## TC-01 Greeting and immediate exit
 
@@ -44,18 +77,8 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{GREETING}}
+{{FAREWELL}}
 ```
 
 ## TC-02 Adding one task of each type
@@ -72,16 +95,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] borrow book
@@ -97,8 +111,7 @@ Got it. I've added this task:
   [E][ ] project meeting (from: Mon 2pm to: 4pm)
 Now you have 3 tasks in the list.
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-03 Listing a mix of task types and statuses
@@ -120,16 +133,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] read book
@@ -171,8 +175,7 @@ Here are the tasks in your list:
 4.[T][X] join sports club
 5.[T][ ] borrow book
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-04 Marking and unmarking keeps the task type
@@ -189,16 +192,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Got it. I've added this task:
   [D][ ] pay fees (by: Friday)
@@ -212,8 +206,7 @@ ____________________________________________________________
 OK, I've marked this task as not done yet:
   [D][ ] pay fees (by: Friday)
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-05 Dates are accepted as free text
@@ -228,23 +221,13 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Got it. I've added this task:
   [D][ ] do homework (by: no idea :-p)
 Now you have 1 task in the list.
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-06 Empty list and blank input
@@ -260,24 +243,14 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Your list is empty. Nothing to do... suspicious.
 ____________________________________________________________
 ____________________________________________________________
 You'll have to give me something to work with!
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-07 Invalid task numbers are rejected
@@ -296,16 +269,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] read book
@@ -323,8 +287,7 @@ ____________________________________________________________
 ____________________________________________________________
 There's no task 0 on your list. You have 1.
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-08 Malformed deadline and event commands
@@ -341,16 +304,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 I need '/by' in that command. Try: deadline return book /by Sunday
 ____________________________________________________________
@@ -360,8 +314,7 @@ ____________________________________________________________
 ____________________________________________________________
 I need '/to' in that command. Try: event project meeting /from Mon 2pm /to 4pm
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-09 Unknown commands are rejected
@@ -378,16 +331,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 I don't know what 'blah' means. I understand: todo, deadline, event, list, mark, unmark, delete, bye.
 ____________________________________________________________
@@ -397,8 +341,7 @@ ____________________________________________________________
 ____________________________________________________________
 Your list is empty. Nothing to do... suspicious.
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-10 Missing parts are named specifically
@@ -416,16 +359,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 The description of a todo can't be empty. Try: todo borrow book
 ____________________________________________________________
@@ -438,8 +372,7 @@ ____________________________________________________________
 ____________________________________________________________
 The end time can't be empty. Try: event project meeting /from Mon 2pm /to 4pm
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-11 Marking when the list is empty
@@ -455,24 +388,14 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Your list is empty, so there's nothing to change.
 ____________________________________________________________
 ____________________________________________________________
 Your list is empty, so there's nothing to change.
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-12 Deleting a task renumbers the rest
@@ -497,16 +420,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] read book
@@ -564,8 +478,7 @@ Here are the tasks in your list:
 3.[T][X] join sports club
 4.[T][ ] borrow book
 ____________________________________________________________
-Catch you later! Don't be a stranger.
-____________________________________________________________
+{{FAREWELL}}
 ```
 
 ## TC-13 Deleting with a bad or missing task number
@@ -585,16 +498,7 @@ bye
 
 **Expected output:**
 ```text
-____________________________________________________________
- ____  _ _ _
-| __ )(_) | |_   _
-|  _ \| | | | | | |
-| |_) | | | | |_| |
-|____/|_|_|_|\__, |
-             |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
-____________________________________________________________
+{{GREETING}}
 ____________________________________________________________
 Your list is empty, so there's nothing to change.
 ____________________________________________________________
@@ -617,6 +521,107 @@ ____________________________________________________________
 ____________________________________________________________
 Your list is empty. Nothing to do... suspicious.
 ____________________________________________________________
-Catch you later! Don't be a stranger.
+{{FAREWELL}}
+```
+
+## TC-14 Ending the session by running out of input
+
+**Aim:** Verify that Billy exits cleanly with its farewell when the input ends without `bye`, which is what happens when a user presses Ctrl+D. Guards the `hasNextLine` check that stops the loop from reading past the end of input.
+
+**Input:**
+```text
+todo read book
+list
+```
+
+**Expected output:**
+```text
+{{GREETING}}
 ____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-15 Keywords ignore case and surrounding spaces
+
+**Aim:** Verify that commands are recognised whatever their capitalisation, and that leading or repeated spaces do not stop a command being understood. The task description must keep the capitalisation the user typed, since only the keyword is lowercased.
+
+**Input:**
+```text
+TODO Read Book
+   LiSt
+  MaRk   1
+List
+BYE
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] Read Book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] Read Book
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] Read Book
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] Read Book
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-16 Marking a task that is already done
+
+**Aim:** Verify that marking an already-done task is harmless and simply confirms it again, and that unmarking afterwards still returns the task to not done. Pins down that the status is set outright rather than toggled.
+
+**Input:**
+```text
+todo read book
+mark 1
+mark 1
+unmark 1
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] read book
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] read book
+____________________________________________________________
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+____________________________________________________________
+{{FAREWELL}}
 ```
