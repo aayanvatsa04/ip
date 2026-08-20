@@ -329,7 +329,7 @@ ____________________________________________________________
 
 ## TC-08 Malformed deadline and event commands
 
-**Aim:** Verify that a deadline with no `/by`, a deadline with no description, and an event missing its `/to` all produce usage help rather than storing a broken task.
+**Aim:** Verify that a deadline with no `/by`, a deadline with no description, and an event missing its `/to` each name the specific part that is missing, rather than storing a broken task.
 
 **Input:**
 ```text
@@ -352,16 +352,13 @@ Hey there! Billy here, at your service.
 I track todos, deadlines and events. Type 'list' to see them all.
 ____________________________________________________________
 ____________________________________________________________
-A deadline needs a description and a due date, like:
-  deadline return book /by Sunday
+I need '/by' in that command. Try: deadline return book /by Sunday
 ____________________________________________________________
 ____________________________________________________________
-A deadline needs a description and a due date, like:
-  deadline return book /by Sunday
+The description can't be empty. Try: deadline return book /by Sunday
 ____________________________________________________________
 ____________________________________________________________
-An event needs a description, a start and an end, like:
-  event project meeting /from Mon 2pm /to 4pm
+I need '/to' in that command. Try: event project meeting /from Mon 2pm /to 4pm
 ____________________________________________________________
 Catch you later! Don't be a stranger.
 ____________________________________________________________
@@ -398,6 +395,80 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] buy bread
+____________________________________________________________
+Catch you later! Don't be a stranger.
+____________________________________________________________
+```
+
+## TC-10 Missing parts are named specifically
+
+**Aim:** Verify that when a command has the right shape but a part of it is blank, the error names which part is missing, so the user knows what to correct.
+
+**Input:**
+```text
+todo
+deadline homework /by
+event meeting /from /to 4pm
+event meeting /from Mon /to
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____  _ _ _
+| __ )(_) | |_   _
+|  _ \| | | | | | |
+| |_) | | | | |_| |
+|____/|_|_|_|\__, |
+             |___/
+Hey there! Billy here, at your service.
+I track todos, deadlines and events. Type 'list' to see them all.
+____________________________________________________________
+____________________________________________________________
+The description of a todo can't be empty. Try: todo borrow book
+____________________________________________________________
+____________________________________________________________
+The due date can't be empty. Try: deadline return book /by Sunday
+____________________________________________________________
+____________________________________________________________
+The start time can't be empty. Try: event project meeting /from Mon 2pm /to 4pm
+____________________________________________________________
+____________________________________________________________
+The end time can't be empty. Try: event project meeting /from Mon 2pm /to 4pm
+____________________________________________________________
+Catch you later! Don't be a stranger.
+____________________________________________________________
+```
+
+## TC-11 Marking when the list is empty
+
+**Aim:** Verify that marking or unmarking with nothing stored explains that the list is empty, rather than reporting a task number that could never have worked.
+
+**Input:**
+```text
+mark 1
+unmark 3
+bye
+```
+
+**Expected output:**
+```text
+____________________________________________________________
+ ____  _ _ _
+| __ )(_) | |_   _
+|  _ \| | | | | | |
+| |_) | | | | |_| |
+|____/|_|_|_|\__, |
+             |___/
+Hey there! Billy here, at your service.
+I track todos, deadlines and events. Type 'list' to see them all.
+____________________________________________________________
+____________________________________________________________
+Your list is empty, so there's nothing to change.
+____________________________________________________________
+____________________________________________________________
+Your list is empty, so there's nothing to change.
 ____________________________________________________________
 Catch you later! Don't be a stranger.
 ____________________________________________________________

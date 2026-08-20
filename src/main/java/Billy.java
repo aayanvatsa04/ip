@@ -3,9 +3,10 @@ import java.util.Scanner;
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
  *
- * <p>This is the Level-4 increment: tasks come in three types (todo, deadline and
+ * <p>This is the Level-5 increment: tasks come in three types (todo, deadline and
  * event), and can be listed, marked as done, and marked as not done again.
- * Typing {@value #EXIT_COMMAND} ends the conversation.
+ * Anything Billy cannot make sense of is reported as a {@link BillyException}
+ * rather than crashing. Typing {@value #EXIT_COMMAND} ends the conversation.
  */
 public class Billy {
 
@@ -52,11 +53,17 @@ public class Billy {
     /** Separates an event's start time from its end time. */
     private static final String TO_SEPARATOR = "/to";
 
+    /** Shown alongside an error to remind the user how a todo is typed. */
+    private static final String TODO_USAGE = "Try: todo borrow book";
+
+    /** Shown alongside an error to remind the user how a deadline is typed. */
+    private static final String DEADLINE_USAGE = "Try: deadline return book /by Sunday";
+
+    /** Shown alongside an error to remind the user how an event is typed. */
+    private static final String EVENT_USAGE = "Try: event project meeting /from Mon 2pm /to 4pm";
+
     /** The most tasks Billy can hold, as the list is a fixed-size array. */
     private static final int MAX_TASKS = 100;
-
-    /** Returned by {@link #parseTaskNumber} when the user did not give a usable task number. */
-    private static final int INVALID_TASK_NUMBER = -1;
 
     /** Stored tasks. Only the first {@code taskCount} slots hold real values. */
     private static final Task[] tasks = new Task[MAX_TASKS];
@@ -82,6 +89,10 @@ public class Billy {
     /**
      * Reads commands from the user and acts on them one at a time.
      *
+     * <p>Every problem with a command surfaces here as a {@link BillyException},
+     * so this is the single place that turns a failure into a message on screen.
+     * Because the loop continues afterwards, a mistake never ends the conversation.
+     *
      * <p>Stops when the user types {@value #EXIT_COMMAND}, or when there is no
      * more input to read (for example, if the user presses Ctrl+D).
      */
@@ -93,7 +104,11 @@ public class Billy {
                 if (command.equalsIgnoreCase(EXIT_COMMAND)) {
                     break;
                 }
-                handleCommand(command);
+                try {
+                    handleCommand(command);
+                } catch (BillyException e) {
+                    reply(e.getMessage());
+                }
             }
         }
     }
@@ -103,11 +118,12 @@ public class Billy {
      *
      * <p>The first word decides the action; anything that is not a known keyword
      * is stored as a new task.
+     *
+     * @throws BillyException if the command cannot be carried out as typed
      */
-    private static void handleCommand(String command) {
+    private static void handleCommand(String command) throws BillyException {
         if (command.isEmpty()) {
-            reply("You'll have to give me something to work with!");
-            return;
+            throw new BillyException("You'll have to give me something to work with!");
         }
 
         // Split into the keyword and everything after it, e.g. "mark 2" -> "mark", "2".
@@ -131,11 +147,11 @@ public class Billy {
      * Builds a todo from the user's input and stores it.
      *
      * @param description what the user wants to do
+     * @throws BillyException if the description is missing
      */
-    private static void addTodo(String description) {
+    private static void addTodo(String description) throws BillyException {
         if (description.isBlank()) {
-            reply("A todo needs a description, like:\n  todo borrow book");
-            return;
+            throw new BillyException("The description of a todo can't be empty. " + TODO_USAGE);
         }
         addTask(new Todo(description.trim()));
     }
@@ -144,14 +160,10 @@ public class Billy {
      * Builds a deadline from the user's input and stores it.
      *
      * @param argument the text after the keyword, expected as {@code <description> /by <date>}
+     * @throws BillyException if the due date or the description is missing
      */
-    private static void addDeadline(String argument) {
-        String[] parts = splitOn(argument, BY_SEPARATOR);
-        if (parts == null) {
-            reply("A deadline needs a description and a due date, like:\n"
-                    + "  deadline return book /by Sunday");
-            return;
-        }
+    private static void addDeadline(String argument) throws BillyException {
+        String[] parts = splitOn(argument, BY_SEPARATOR, "description", "due date", DEADLINE_USAGE);
         addTask(new Deadline(parts[0], parts[1]));
     }
 
@@ -160,54 +172,58 @@ public class Billy {
      *
      * @param argument the text after the keyword, expected as
      *                 {@code <description> /from <start> /to <end>}
+     * @throws BillyException if the description, the start or the end is missing
      */
-    private static void addEvent(String argument) {
-        String[] descriptionAndRest = splitOn(argument, FROM_SEPARATOR);
-        if (descriptionAndRest == null) {
-            replyEventUsage();
-            return;
-        }
+    private static void addEvent(String argument) throws BillyException {
+        String[] descriptionAndRest =
+                splitOn(argument, FROM_SEPARATOR, "description", "start time", EVENT_USAGE);
         // The start and end times are still joined together, so split them apart too.
-        String[] startAndEnd = splitOn(descriptionAndRest[1], TO_SEPARATOR);
-        if (startAndEnd == null) {
-            replyEventUsage();
-            return;
-        }
+        String[] startAndEnd =
+                splitOn(descriptionAndRest[1], TO_SEPARATOR, "start time", "end time", EVENT_USAGE);
         addTask(new Event(descriptionAndRest[0], startAndEnd[0], startAndEnd[1]));
-    }
-
-    /** Explains the expected form of an event command. */
-    private static void replyEventUsage() {
-        reply("An event needs a description, a start and an end, like:\n"
-                + "  event project meeting /from Mon 2pm /to 4pm");
     }
 
     /**
      * Splits input around a separator such as {@value #BY_SEPARATOR}.
      *
+     * <p>The two halves are named by the caller so that a failure can say exactly
+     * which part of the command is missing.
+     *
      * @param input the text to split
      * @param separator the marker to split around
-     * @return the two trimmed halves, or {@code null} if the separator is missing
-     *         or either half is empty
+     * @param beforeName what the text before the separator means, e.g. "description"
+     * @param afterName what the text after the separator means, e.g. "due date"
+     * @param usage an example of the command, shown to help the user correct it
+     * @return the two trimmed halves
+     * @throws BillyException if the separator is missing or either half is empty
      */
-    private static String[] splitOn(String input, String separator) {
+    private static String[] splitOn(String input, String separator, String beforeName,
+            String afterName, String usage) throws BillyException {
         int separatorPosition = input.indexOf(separator);
         if (separatorPosition == -1) {
-            return null;
+            throw new BillyException("I need '" + separator + "' in that command. " + usage);
         }
+
         String before = input.substring(0, separatorPosition).trim();
         String after = input.substring(separatorPosition + separator.length()).trim();
-        if (before.isEmpty() || after.isEmpty()) {
-            return null;
+        if (before.isEmpty()) {
+            throw new BillyException("The " + beforeName + " can't be empty. " + usage);
+        }
+        if (after.isEmpty()) {
+            throw new BillyException("The " + afterName + " can't be empty. " + usage);
         }
         return new String[] {before, after};
     }
 
-    /** Stores an already-built task, unless the list is already full. */
-    private static void addTask(Task task) {
+    /**
+     * Stores an already-built task.
+     *
+     * @throws BillyException if the list is already full
+     */
+    private static void addTask(Task task) throws BillyException {
         if (taskCount == MAX_TASKS) {
-            reply("My memory is full at " + MAX_TASKS + " tasks. Time to get some done!");
-            return;
+            throw new BillyException(
+                    "My memory is full at " + MAX_TASKS + " tasks. Time to get some done!");
         }
         tasks[taskCount] = task;
         taskCount++;
@@ -239,12 +255,10 @@ public class Billy {
      *
      * @param argument the text the user typed after the keyword, expected to be a task number
      * @param done the status to set: {@code true} for done, {@code false} for not done
+     * @throws BillyException if the argument does not name a task that exists
      */
-    private static void setTaskDone(String argument, boolean done) {
+    private static void setTaskDone(String argument, boolean done) throws BillyException {
         int index = parseTaskNumber(argument);
-        if (index == INVALID_TASK_NUMBER) {
-            return; // parseTaskNumber has already explained the problem.
-        }
         Task task = tasks[index];
         String confirmation;
         if (done) {
@@ -261,22 +275,24 @@ public class Billy {
      * Converts what the user typed into an index into {@link #tasks}.
      *
      * @param argument the text the user typed after the keyword
-     * @return the matching 0-based index, or {@link #INVALID_TASK_NUMBER} if the
-     *         text was not a number or not a task that exists
+     * @return the matching 0-based index
+     * @throws BillyException if the text is not a number, or names a task that does not exist
      */
-    private static int parseTaskNumber(String argument) {
+    private static int parseTaskNumber(String argument) throws BillyException {
         int taskNumber;
         try {
             taskNumber = Integer.parseInt(argument.trim());
         } catch (NumberFormatException e) {
             // Covers both a missing number ("mark") and a non-number ("mark two").
-            reply("I need a task number, like 'mark 2'.");
-            return INVALID_TASK_NUMBER;
+            throw new BillyException("I need a task number, like 'mark 2'.");
         }
 
+        if (taskCount == 0) {
+            throw new BillyException("Your list is empty, so there's nothing to change.");
+        }
         if (taskNumber < 1 || taskNumber > taskCount) {
-            reply("There's no task " + taskNumber + " on your list. You have " + taskCount + ".");
-            return INVALID_TASK_NUMBER;
+            throw new BillyException(
+                    "There's no task " + taskNumber + " on your list. You have " + taskCount + ".");
         }
         return taskNumber - 1;
     }
