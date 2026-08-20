@@ -3,8 +3,9 @@ import java.util.Scanner;
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
  *
- * <p>This is the Level-3 increment: tasks can be added, listed, marked as done,
- * and marked as not done again. Typing {@value #EXIT_COMMAND} ends the conversation.
+ * <p>This is the Level-4 increment: tasks come in three types (todo, deadline and
+ * event), and can be listed, marked as done, and marked as not done again.
+ * Typing {@value #EXIT_COMMAND} ends the conversation.
  */
 public class Billy {
 
@@ -33,6 +34,24 @@ public class Billy {
     /** The command that marks a task as not done again, e.g. {@code unmark 2}. */
     private static final String UNMARK_COMMAND = "unmark";
 
+    /** The command that adds a task with no date attached, e.g. {@code todo borrow book}. */
+    private static final String TODO_COMMAND = "todo";
+
+    /** The command that adds a task with a due date, e.g. {@code deadline return book /by Sunday}. */
+    private static final String DEADLINE_COMMAND = "deadline";
+
+    /** The command that adds a task spanning a period, e.g. {@code event meeting /from 2pm /to 4pm}. */
+    private static final String EVENT_COMMAND = "event";
+
+    /** Separates a deadline's description from its due date. */
+    private static final String BY_SEPARATOR = "/by";
+
+    /** Separates an event's description from its start time. */
+    private static final String FROM_SEPARATOR = "/from";
+
+    /** Separates an event's start time from its end time. */
+    private static final String TO_SEPARATOR = "/to";
+
     /** The most tasks Billy can hold, as the list is a fixed-size array. */
     private static final int MAX_TASKS = 100;
 
@@ -56,7 +75,7 @@ public class Billy {
         System.out.println(DIVIDER);
         System.out.println(BANNER);
         System.out.println("Hey there! Billy here, at your service.");
-        System.out.println("Tell me anything and I'll remember it. Type 'list' to see it all.");
+        System.out.println("I track todos, deadlines and events. Type 'list' to see them all.");
         System.out.println(DIVIDER);
     }
 
@@ -96,26 +115,105 @@ public class Billy {
         String keyword = parts[0].toLowerCase();
         String argument = parts.length > 1 ? parts[1] : "";
 
-        if (keyword.equals(LIST_COMMAND)) {
-            listTasks();
-        } else if (keyword.equals(MARK_COMMAND)) {
-            setTaskDone(argument, true);
-        } else if (keyword.equals(UNMARK_COMMAND)) {
-            setTaskDone(argument, false);
-        } else {
-            addTask(command);
+        switch (keyword) {
+        case LIST_COMMAND -> listTasks();
+        case MARK_COMMAND -> setTaskDone(argument, true);
+        case UNMARK_COMMAND -> setTaskDone(argument, false);
+        case TODO_COMMAND -> addTodo(argument);
+        case DEADLINE_COMMAND -> addDeadline(argument);
+        case EVENT_COMMAND -> addEvent(argument);
+        // Bare text with no keyword is taken as a todo, as it has no date attached.
+        default -> addTodo(command);
         }
     }
 
-    /** Stores a new task, unless the list is already full. */
-    private static void addTask(String description) {
+    /**
+     * Builds a todo from the user's input and stores it.
+     *
+     * @param description what the user wants to do
+     */
+    private static void addTodo(String description) {
+        if (description.isBlank()) {
+            reply("A todo needs a description, like:\n  todo borrow book");
+            return;
+        }
+        addTask(new Todo(description.trim()));
+    }
+
+    /**
+     * Builds a deadline from the user's input and stores it.
+     *
+     * @param argument the text after the keyword, expected as {@code <description> /by <date>}
+     */
+    private static void addDeadline(String argument) {
+        String[] parts = splitOn(argument, BY_SEPARATOR);
+        if (parts == null) {
+            reply("A deadline needs a description and a due date, like:\n"
+                    + "  deadline return book /by Sunday");
+            return;
+        }
+        addTask(new Deadline(parts[0], parts[1]));
+    }
+
+    /**
+     * Builds an event from the user's input and stores it.
+     *
+     * @param argument the text after the keyword, expected as
+     *                 {@code <description> /from <start> /to <end>}
+     */
+    private static void addEvent(String argument) {
+        String[] descriptionAndRest = splitOn(argument, FROM_SEPARATOR);
+        if (descriptionAndRest == null) {
+            replyEventUsage();
+            return;
+        }
+        // The start and end times are still joined together, so split them apart too.
+        String[] startAndEnd = splitOn(descriptionAndRest[1], TO_SEPARATOR);
+        if (startAndEnd == null) {
+            replyEventUsage();
+            return;
+        }
+        addTask(new Event(descriptionAndRest[0], startAndEnd[0], startAndEnd[1]));
+    }
+
+    /** Explains the expected form of an event command. */
+    private static void replyEventUsage() {
+        reply("An event needs a description, a start and an end, like:\n"
+                + "  event project meeting /from Mon 2pm /to 4pm");
+    }
+
+    /**
+     * Splits input around a separator such as {@value #BY_SEPARATOR}.
+     *
+     * @param input the text to split
+     * @param separator the marker to split around
+     * @return the two trimmed halves, or {@code null} if the separator is missing
+     *         or either half is empty
+     */
+    private static String[] splitOn(String input, String separator) {
+        int separatorPosition = input.indexOf(separator);
+        if (separatorPosition == -1) {
+            return null;
+        }
+        String before = input.substring(0, separatorPosition).trim();
+        String after = input.substring(separatorPosition + separator.length()).trim();
+        if (before.isEmpty() || after.isEmpty()) {
+            return null;
+        }
+        return new String[] {before, after};
+    }
+
+    /** Stores an already-built task, unless the list is already full. */
+    private static void addTask(Task task) {
         if (taskCount == MAX_TASKS) {
             reply("My memory is full at " + MAX_TASKS + " tasks. Time to get some done!");
             return;
         }
-        tasks[taskCount] = new Task(description);
+        tasks[taskCount] = task;
         taskCount++;
-        reply("added: " + description);
+        reply("Got it. I've added this task:\n  " + task
+                + "\nNow you have " + taskCount + (taskCount == 1 ? " task" : " tasks")
+                + " in the list.");
     }
 
     /** Prints every stored task, numbered from 1. */
