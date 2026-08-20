@@ -39,11 +39,8 @@ public class Billy {
     /** Returned by {@link #parseTaskNumber} when the user did not give a usable task number. */
     private static final int INVALID_TASK_NUMBER = -1;
 
-    /** Stored task descriptions. Only the first {@code taskCount} slots hold real values. */
-    private static final String[] tasks = new String[MAX_TASKS];
-
-    /** Done status of each task, matched to {@link #tasks} by position. */
-    private static final boolean[] isDone = new boolean[MAX_TASKS];
+    /** Stored tasks. Only the first {@code taskCount} slots hold real values. */
+    private static final Task[] tasks = new Task[MAX_TASKS];
 
     /** How many slots of {@link #tasks} are currently in use. */
     private static int taskCount = 0;
@@ -110,16 +107,15 @@ public class Billy {
         }
     }
 
-    /** Stores a task, unless the list is already full. */
-    private static void addTask(String task) {
+    /** Stores a new task, unless the list is already full. */
+    private static void addTask(String description) {
         if (taskCount == MAX_TASKS) {
             reply("My memory is full at " + MAX_TASKS + " tasks. Time to get some done!");
             return;
         }
-        tasks[taskCount] = task;
-        isDone[taskCount] = false;
+        tasks[taskCount] = new Task(description);
         taskCount++;
-        reply("added: " + task);
+        reply("added: " + description);
     }
 
     /** Prints every stored task, numbered from 1. */
@@ -132,7 +128,7 @@ public class Billy {
         System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
             // Array indices start at 0, but people count from 1.
-            System.out.println((i + 1) + "." + formatTask(i));
+            System.out.println((i + 1) + "." + tasks[i]);
         }
         System.out.println(DIVIDER);
     }
@@ -151,12 +147,16 @@ public class Billy {
         if (index == INVALID_TASK_NUMBER) {
             return; // parseTaskNumber has already explained the problem.
         }
-        isDone[index] = done;
-
-        String confirmation = done
-                ? "Nice! I've marked this task as done:"
-                : "OK, I've marked this task as not done yet:";
-        reply(confirmation + "\n  " + formatTask(index));
+        Task task = tasks[index];
+        String confirmation;
+        if (done) {
+            task.markAsDone();
+            confirmation = "Nice! I've marked this task as done:";
+        } else {
+            task.markAsNotDone();
+            confirmation = "OK, I've marked this task as not done yet:";
+        }
+        reply(confirmation + "\n  " + task);
     }
 
     /**
@@ -181,16 +181,6 @@ public class Billy {
             return INVALID_TASK_NUMBER;
         }
         return taskNumber - 1;
-    }
-
-    /**
-     * Formats one task as a status box followed by its description, e.g. {@code [X] read book}.
-     *
-     * @param index the 0-based index of the task
-     */
-    private static String formatTask(int index) {
-        String statusBox = isDone[index] ? "[X]" : "[ ]";
-        return statusBox + " " + tasks[index];
     }
 
     /** Prints a single message wrapped in divider lines. */
