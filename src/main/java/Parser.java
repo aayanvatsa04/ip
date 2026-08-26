@@ -48,34 +48,38 @@ public class Parser {
     }
 
     /**
-     * One command as typed: which command it is, and the text that followed it.
+     * Turns one typed line into the command it asks for.
      *
-     * <p>A record because that is all this is — two values that belong together
-     * and never change. Splitting the line once and passing both halves on keeps
-     * the caller from having to take the line apart a second time.
-     *
-     * @param command which command the user named
-     * @param argument everything after the keyword, or empty if nothing followed
-     */
-    public record ParsedCommand(CommandWord command, String argument) {
-    }
-
-    /**
-     * Works out which command a line names, and what was said after it.
+     * <p>Everything a command needs is worked out here, so what comes back is
+     * ready to be carried out and known to be sound. A line that cannot be made
+     * sense of produces an exception instead, never a command that will fail
+     * halfway through.
      *
      * @param line one whole line as the user typed it, already trimmed
-     * @return the command and its argument
-     * @throws BillyException if the line is empty or names no known command
+     * @return the command it asks for
+     * @throws BillyException if the line is empty, names no known command, or is
+     *                        malformed for the command it does name
      */
-    public static ParsedCommand parse(String line) throws BillyException {
+    public static Command parse(String line) throws BillyException {
         if (line.isEmpty()) {
             throw new BillyException("You'll have to give me something to work with!");
         }
         // Split into the keyword and everything after it, e.g. "mark 2" -> "mark", "2".
         String[] parts = line.split("\\s+", 2);
-        CommandWord command = CommandWord.fromKeyword(parts[0]);
+        CommandWord word = CommandWord.fromKeyword(parts[0]);
         String argument = parts.length > 1 ? parts[1] : "";
-        return new ParsedCommand(command, argument);
+
+        return switch (word) {
+        case TODO -> new AddCommand(parseTodo(argument));
+        case DEADLINE -> new AddCommand(parseDeadline(argument));
+        case EVENT -> new AddCommand(parseEvent(argument));
+        case LIST -> new ListCommand();
+        case ON -> new OnCommand(parseDay(argument));
+        case MARK -> new MarkCommand(parseTaskNumber(argument, word), true);
+        case UNMARK -> new MarkCommand(parseTaskNumber(argument, word), false);
+        case DELETE -> new DeleteCommand(parseTaskNumber(argument, word));
+        case BYE -> new ExitCommand();
+        };
     }
 
     /**
@@ -85,7 +89,7 @@ public class Parser {
      * @return the todo it describes
      * @throws BillyException if the description is missing
      */
-    public static Todo parseTodo(String argument) throws BillyException {
+    private static Todo parseTodo(String argument) throws BillyException {
         if (argument.isBlank()) {
             throw new BillyException("The description of a todo can't be empty. " + TODO_USAGE);
         }
@@ -99,7 +103,7 @@ public class Parser {
      * @return the deadline it describes
      * @throws BillyException if the description or the due date is missing or unreadable
      */
-    public static Deadline parseDeadline(String argument) throws BillyException {
+    private static Deadline parseDeadline(String argument) throws BillyException {
         String[] parts = splitOn(argument, BY_SEPARATOR, "description", "due date", DEADLINE_USAGE);
         return new Deadline(parts[0], TaskDate.parse(parts[1]));
     }
@@ -112,7 +116,7 @@ public class Parser {
      * @throws BillyException if any part is missing or unreadable, or if the
      *                        event would end before it starts
      */
-    public static Event parseEvent(String argument) throws BillyException {
+    private static Event parseEvent(String argument) throws BillyException {
         String[] descriptionAndRest =
                 splitOn(argument, FROM_SEPARATOR, "description", "start time", EVENT_USAGE);
         // The start and end times are still joined together, so split them apart too.
@@ -133,7 +137,7 @@ public class Parser {
      * @return the number as the user wrote it, counting from 1
      * @throws BillyException if the text is not a number at all
      */
-    public static int parseTaskNumber(String argument, CommandWord command) throws BillyException {
+    private static int parseTaskNumber(String argument, CommandWord command) throws BillyException {
         try {
             return Integer.parseInt(argument.trim());
         } catch (NumberFormatException e) {
@@ -153,7 +157,7 @@ public class Parser {
      * @return the day it names
      * @throws BillyException if no day is given, or it cannot be read as one
      */
-    public static LocalDate parseDay(String argument) throws BillyException {
+    private static LocalDate parseDay(String argument) throws BillyException {
         if (argument.isBlank()) {
             throw new BillyException("Which day should I look at? " + ON_USAGE);
         }

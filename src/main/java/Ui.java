@@ -29,6 +29,32 @@ public class Ui {
     /** Where the user's commands are read from. */
     private final Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Names a number of tasks with the matching plural, e.g. {@code 1 task} or
+     * {@code 3 tasks}.
+     *
+     * <p>Lives here because it is a matter of wording, and is shared by the
+     * commands that change the list and by the message shown when a saved list
+     * is read, which would otherwise each spell the plural out for themselves.
+     *
+     * @param count how many tasks there are
+     * @return the count with the right noun after it
+     */
+    public static String describeListSize(int count) {
+        return count + (count == 1 ? " task" : " tasks");
+    }
+
+    /**
+     * Says how many tasks are now stored, e.g.
+     * {@code Now you have 3 tasks in the list.}
+     *
+     * @param count how many tasks there are
+     * @return the sentence to append to a confirmation
+     */
+    public static String describeNewListSize(int count) {
+        return "Now you have " + describeListSize(count) + " in the list.";
+    }
+
     /** Prints the startup banner and welcomes the user. */
     public void showWelcome() {
         System.out.println(DIVIDER);

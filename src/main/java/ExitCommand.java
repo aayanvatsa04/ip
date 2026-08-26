@@ -1,0 +1,19 @@
+/**
+ * Ends the conversation.
+ *
+ * <p>Carrying it out does nothing at all: the farewell is printed once the
+ * conversation has finished, not as part of this command, so that it appears
+ * whether the user said goodbye or simply ran out of input.
+ */
+public class ExitCommand extends Command {
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) {
+        // Nothing to do. Saying so is isExit's job.
+    }
+
+    @Override
+    public boolean isExit() {
+        return true;
+    }
+}
