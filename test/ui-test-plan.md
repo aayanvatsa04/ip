@@ -1,6 +1,7 @@
 ---
 main_class: Billy
 source_glob: src/main/java/*.java
+data_file: data/billy.txt
 ---
 
 # Billy text UI test plan
@@ -16,8 +17,20 @@ python3 .claude/skills/test-ui/scripts/run-ui-tests.py
 
 ## How the cases are run
 
-* Every case starts a **fresh run** of the program, so no case can be affected by
-  tasks left behind by an earlier one. Task numbering always restarts at 1.
+* Every case starts a **fresh run** of the program in a **working directory of its
+  own**, so no case can be affected by tasks left behind by an earlier one —
+  neither by what is still in memory, nor by the file the program saved to disk.
+  Task numbering always restarts at 1.
+* Because the working directory is empty, there is no saved data file unless the
+  case asks for one, which is also how the program behaves the first time someone
+  runs it on their computer.
+* A case that needs a saved list to already exist writes it in an optional
+  `**Data file:**` block. The runner plants those lines in `data/billy.txt` inside
+  the case's working directory before the program starts. This is how a damaged
+  file can be tested without damaging one by hand.
+* An input line of exactly `--- restart ---` ends the run and starts another one
+  in the same working directory. The output of both runs is compared as one
+  session, which is how saving in one run and loading in the next is tested.
 * The input lines are fed to the program's standard input, one line at a time.
   Ending with `bye` tests the normal exit. Leaving it out is also valid and tests
   the end-of-input exit, the same path as pressing Ctrl+D at the keyboard.
@@ -644,6 +657,250 @@ ____________________________________________________________
 Got it. I've added this task:
   [T][ ] read book
 Now you have 1 task in the list.
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-18 Tasks are saved and reloaded on the next run
+
+**Aim:** Verify the point of Level 7: the list survives Billy being closed. The first run adds one task of each type and marks one of them; the second run must show the same three tasks, in the same order, with the same done statuses — which also proves that Billy created the `data` folder and the file itself, since the working directory started empty. The `Welcome back` note tells the user why their old tasks are there.
+
+**Input:**
+```text
+todo read book
+deadline return book /by Sunday
+event project meeting /from Mon 2pm /to 4pm
+mark 2
+bye
+--- restart ---
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Sunday)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] project meeting (from: Mon 2pm to: 4pm)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [D][X] return book (by: Sunday)
+____________________________________________________________
+{{FAREWELL}}
+{{GREETING}}
+____________________________________________________________
+Welcome back! I've loaded 3 tasks from your last session.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+2.[D][X] return book (by: Sunday)
+3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-19 Deleting and unmarking are saved too
+
+**Aim:** Verify that saving is triggered by *every* change to the list, not just by adding. A task is deleted and another unmarked in the first run; if either change were left unsaved, the second run would show the old list. Loading exactly one task also checks the singular wording of the `Welcome back` note.
+
+**Input:**
+```text
+todo read book
+todo return book
+mark 1
+mark 2
+delete 2
+unmark 1
+bye
+--- restart ---
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] return book
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] read book
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] return book
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [T][X] return book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [T][ ] read book
+____________________________________________________________
+{{FAREWELL}}
+{{GREETING}}
+____________________________________________________________
+Welcome back! I've loaded 1 task from your last session.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-20 Emptying the list is saved as an empty list
+
+**Aim:** Verify that deleting the last task really empties the saved file rather than leaving the old contents behind. Billy should say nothing about a previous session on the next run, since there is nothing to report — the same as a first run.
+
+**Input:**
+```text
+todo read book
+delete 1
+bye
+--- restart ---
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [T][ ] read book
+Now you have 0 tasks in the list.
+____________________________________________________________
+{{FAREWELL}}
+{{GREETING}}
+____________________________________________________________
+Your list is empty. Nothing to do... suspicious.
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-21 A saved list written by hand is loaded
+
+**Aim:** Verify that Billy reads the documented file format, not merely whatever it happens to write itself. The file here is typed by hand, with the type letter, the done flag and the details of each kind of task, and every one of the three types must come back correctly.
+
+**Data file:**
+```text
+T | 1 | read book
+D | 0 | return book | June 6th
+E | 1 | project meeting | Aug 6th 2pm | 4pm
+```
+
+**Input:**
+```text
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Welcome back! I've loaded 3 tasks from your last session.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: June 6th)
+3.[E][X] project meeting (from: Aug 6th 2pm to: 4pm)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-22 A corrupted file loses only the damaged lines
+
+**Aim:** Verify the stretch goal: a file that has been edited badly must not crash Billy or cost the user the tasks that are still readable. The damaged lines here cover the ways a line can go wrong — an unknown type letter, a done flag that is not 0 or 1, a missing field, and text that is not in the format at all. Billy should load the two good tasks, say how many lines it gave up on, and carry on working normally.
+
+**Data file:**
+```text
+T | 1 | read book
+X | 0 | who knows what this is
+D | 2 | return book | Sunday
+E | 0 | project meeting | Mon 2pm
+this line is not in the format at all
+T | 0 | join sports club
+```
+
+**Input:**
+```text
+list
+todo buy milk
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Welcome back! I've loaded 2 tasks from your last session.
+Heads up: I skipped 4 lines in data/billy.txt that I couldn't understand.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[T][ ] join sports club
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] buy milk
+Now you have 3 tasks in the list.
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-23 An empty saved file is not worth mentioning
+
+**Aim:** Verify that a file left behind by a session that ended with no tasks is treated as an empty list rather than as damage. Blank lines in it should be passed over quietly, with no warning about skipped lines.
+
+**Data file:**
+```text
+
+```
+
+**Input:**
+```text
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Your list is empty. Nothing to do... suspicious.
 ____________________________________________________________
 {{FAREWELL}}
 ```
