@@ -10,6 +10,9 @@ type, and the exact console output expected back. The bundled runner compiles th
 project, replays every case against a fresh run of the program, prints a
 transcript of each session, and stops at the first failure.
 
+Every case runs in a working directory of its own, so the file the program saves
+its tasks to never leaks from one case into the next.
+
 ## Run the tests
 
 1. Run the bundled runner from the repository root:
@@ -80,6 +83,15 @@ Requirements the runner enforces:
 * Both an `**Input:**` and an `**Expected output:**` fenced block are required.
 * Ending the input with `bye` tests the normal exit. Omitting it is also valid and
   tests the end-of-input exit, the same path as pressing Ctrl+D.
+* An input line of exactly `--- restart ---` ends that run of the program and
+  starts another one in the same working directory. The output of every run in the
+  case is compared as one session, which is how behaviour that has to survive a
+  restart — such as saving and loading the task list — is tested.
+* An optional `**Data file:**` fenced block is written to the saved-list file
+  (`data_file` in the plan's settings, default `data/billy.txt`) inside the case's
+  working directory before the program starts. Use it to test loading, including
+  loading a file that has been damaged. Without such a block the case starts with
+  no data file at all, as on a first run.
 * The expected output is the whole session, since each case runs the program from
   scratch. Task numbering therefore restarts at 1 in every case.
 * Write the shared startup and sign-off as `{{GREETING}}` and `{{FAREWELL}}` on a

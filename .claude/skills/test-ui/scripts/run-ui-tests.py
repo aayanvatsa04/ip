@@ -6,6 +6,11 @@ fresh run of the program and compares the console output against the expected
 output. Prints a transcript of every session. Stops at the first failure and
 reports the expected and actual output.
 
+Each case runs in a working directory of its own, so the data file one case
+leaves behind can never reach the next one. Within a case, a `--- restart ---`
+line in the input ends the run and starts another one in the same directory,
+which is how saving and loading are tested.
+
 Only the Python standard library is used, so there is no install step.
 """
 
@@ -26,6 +31,11 @@ DEFAULT_PLAN = "test/ui-test-plan.md"
 DEFAULT_MAIN_CLASS = "Billy"
 DEFAULT_SOURCE_GLOB = "src/main/java/*.java"
 DEFAULT_TIMEOUT_SECONDS = 10
+DEFAULT_DATA_FILE = "data/billy.txt"
+
+# An input line of exactly this ends one run of the program and starts another in
+# the same working directory, so a case can check what survives a restart.
+RESTART_MARKER = "--- restart ---"
 
 RULE = "=" * 72
 THIN_RULE = "-" * 72
@@ -40,6 +50,9 @@ class TestCase:
     inputs: list[str] = field(default_factory=list)
     expected: list[str] = field(default_factory=list)
     line_number: int = 0
+    # Contents to plant in the data file before the case runs, or None to start
+    # with no data file at all.
+    data_file: list[str] | None = None
 
 
 class PlanError(Exception):
@@ -149,7 +162,9 @@ def parse_plan(path: Path) -> tuple[dict[str, str], list[TestCase]]:
             continue
 
         if current is not None:
-            label = re.match(r"^\*\*(Aim|Input|Expected output)[:s]*\*\*:?\s*(.*)$", stripped)
+            label = re.match(
+                r"^\*\*(Aim|Input|Expected output|Data file)[:s]*\*\*:?\s*(.*)$", stripped
+            )
             if label:
                 name = label.group(1).lower()
                 if name == "aim":
@@ -159,6 +174,8 @@ def parse_plan(path: Path) -> tuple[dict[str, str], list[TestCase]]:
                 block, index = read_fenced_block(lines, index + 1)
                 if name == "input":
                     current.inputs = block
+                elif name == "data file":
+                    current.data_file = block
                 else:
                     current.expected = block
                 continue
@@ -209,25 +226,63 @@ def normalise(lines: list[str]) -> list[str]:
     return cleaned
 
 
-def run_case(case: TestCase, classes_dir: Path, main_class: str, timeout: int) -> list[str]:
-    """Runs the program once, feeding it the case's input lines."""
-    stdin_text = "".join(line + "\n" for line in case.inputs)
-    try:
-        result = subprocess.run(
-            ["java", "-cp", str(classes_dir), main_class],
-            input=stdin_text,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-    except subprocess.TimeoutExpired:
-        fail(
-            f"{case.title}: the program did not exit within {timeout}s.\n"
-            f"Does the input end with a command that terminates the program?"
-        )
-    if result.stderr.strip():
-        print(f"stderr from the program:\n{result.stderr}", file=sys.stderr)
-    return result.stdout.splitlines()
+def split_sessions(inputs: list[str]) -> list[list[str]]:
+    """Splits a case's input into one list of lines per run of the program."""
+    sessions: list[list[str]] = [[]]
+    for line in inputs:
+        if line.strip() == RESTART_MARKER:
+            sessions.append([])
+        else:
+            sessions[-1].append(line)
+    return sessions
+
+
+def prepare_work_dir(case: TestCase, work_dir: Path, data_file: str) -> None:
+    """Creates the case's own working directory and plants its data file, if any.
+
+    A directory per case keeps the file one case saves from being loaded by the
+    next, which is what lets every case still claim to start from scratch.
+    """
+    work_dir.mkdir(parents=True, exist_ok=True)
+    if case.data_file is None:
+        return
+    target = work_dir / data_file
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text("".join(line + "\n" for line in case.data_file), encoding="utf-8")
+
+
+def run_case(
+    case: TestCase,
+    classes_dir: Path,
+    main_class: str,
+    timeout: int,
+    work_dir: Path,
+    data_file: str,
+) -> list[str]:
+    """Runs the program once per session in the case, all in the same directory."""
+    prepare_work_dir(case, work_dir, data_file)
+
+    output: list[str] = []
+    for session in split_sessions(case.inputs):
+        stdin_text = "".join(line + "\n" for line in session)
+        try:
+            result = subprocess.run(
+                ["java", "-cp", str(classes_dir), main_class],
+                input=stdin_text,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                cwd=work_dir,
+            )
+        except subprocess.TimeoutExpired:
+            fail(
+                f"{case.title}: the program did not exit within {timeout}s.\n"
+                f"Does the input end with a command that terminates the program?"
+            )
+        if result.stderr.strip():
+            print(f"stderr from the program:\n{result.stderr}", file=sys.stderr)
+        output.extend(result.stdout.splitlines())
+    return output
 
 
 def print_session(case: TestCase, actual: list[str]) -> None:
@@ -300,6 +355,7 @@ def main() -> int:
 
     main_class = args.main or settings.get("main_class", DEFAULT_MAIN_CLASS)
     source_glob = args.sources or settings.get("source_glob", DEFAULT_SOURCE_GLOB)
+    data_file = settings.get("data_file", DEFAULT_DATA_FILE)
 
     if args.only:
         cases = [case for case in cases if args.only.lower() in case.title.lower()]
@@ -316,7 +372,10 @@ def main() -> int:
         compile_sources(repo, source_glob, classes_dir)
 
         for number, case in enumerate(cases, start=1):
-            actual = run_case(case, classes_dir, main_class, args.timeout)
+            work_dir = Path(workspace) / f"case-{number:02d}"
+            actual = run_case(
+                case, classes_dir, main_class, args.timeout, work_dir, data_file
+            )
             print_session(case, actual)
 
             expected_clean = normalise(case.expected)
