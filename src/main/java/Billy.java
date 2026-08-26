@@ -1,8 +1,5 @@
-import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
@@ -19,52 +16,18 @@ import java.util.Scanner;
  * <p>Deadlines and events carry real dates rather than free text, so Billy can
  * tidy up how they are shown and answer {@code on} with the tasks falling on a
  * given day.
+ *
+ * <p>Billy itself now only coordinates: {@link Parser} turns what was typed into
+ * a {@link Command}, which carries itself out against the {@link TaskList}, the
+ * {@link Storage} and the {@link Ui}. Billy neither knows nor cares which
+ * commands exist, so adding one leaves this class untouched.
+ *
+ * <p>A Billy is an object rather than a collection of static methods, so its
+ * helpers are settled once when it is built and cannot be swapped underneath it
+ * afterwards. Two Billys over different files could run without either knowing
+ * about the other.
  */
 public class Billy {
-
-    /** Horizontal line used to visually separate Billy's messages from the rest of the output. */
-    private static final String DIVIDER =
-            "____________________________________________________________";
-
-    /** ASCII art of the chatbot's name, shown once when Billy starts up. */
-    private static final String BANNER =
-            " ____  _ _ _       \n"
-            + "| __ )(_) | |_   _ \n"
-            + "|  _ \\| | | | | | |\n"
-            + "| |_) | | | | |_| |\n"
-            + "|____/|_|_|_|\\__, |\n"
-            + "             |___/ ";
-
-    /** Separates a deadline's description from its due date. */
-    private static final String BY_SEPARATOR = "/by";
-
-    /** Separates an event's description from its start time. */
-    private static final String FROM_SEPARATOR = "/from";
-
-    /** Separates an event's start time from its end time. */
-    private static final String TO_SEPARATOR = "/to";
-
-    /** Shown alongside an error to remind the user how a todo is typed. */
-    private static final String TODO_USAGE = "Try: todo borrow book";
-
-    /** Shown alongside an error to remind the user how a deadline is typed. */
-    private static final String DEADLINE_USAGE =
-            "Try: deadline return book /by 2019-12-02 1800";
-
-    /** Shown alongside an error to remind the user how an event is typed. */
-    private static final String EVENT_USAGE =
-            "Try: event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600";
-
-    /** Shown alongside an error to remind the user how a day is asked about. */
-    private static final String ON_USAGE = "Try: on 2019-12-02";
-
-    /**
-     * Stored tasks, in the order the user added them.
-     *
-     * <p>An {@link ArrayList} grows as needed, so there is no limit on how many
-     * tasks Billy can hold, and it tracks its own size.
-     */
-    private static final ArrayList<Task> tasks = new ArrayList<>();
 
     /**
      * Where the task list is kept between runs.
@@ -77,37 +40,99 @@ public class Billy {
      */
     private static final Path DATA_FILE = Path.of("data", "billy.txt");
 
-    /** Reads the task list from {@link #DATA_FILE} and writes it back again. */
-    private static final Storage storage = new Storage(DATA_FILE);
+    /** Reads the task list from its file and writes it back again. */
+    private final Storage storage;
+
+    /** Says everything the user sees, and reads everything the user types. */
+    private final Ui ui;
+
+    /** The user's tasks, as they stood when Billy started, and as they change. */
+    private final TaskList tasks;
+
+    /**
+     * What stopped the saved list being read, or null if nothing did.
+     *
+     * <p>Remembered rather than reported on the spot, because the greeting has to
+     * come first and a constructor has no business writing to the screen. Its one
+     * job is to leave the object ready to work; saying so is {@link #run()}'s.
+     */
+    private final String loadError;
+
+    /**
+     * Builds a Billy that keeps its tasks in a particular file.
+     *
+     * <p>Whatever goes wrong while reading, Billy is left able to work: a missing,
+     * unreadable or damaged file costs at most the tasks it held, never the
+     * session. That is why the failure is recorded rather than thrown.
+     *
+     * @param filePath where the task list is kept between runs
+     */
+    public Billy(Path filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+
+        TaskList loaded;
+        String failure;
+        try {
+            loaded = new TaskList(storage.load());
+            failure = null;
+        } catch (BillyException e) {
+            loaded = new TaskList();
+            failure = e.getMessage();
+        }
+        tasks = loaded;
+        loadError = failure;
+    }
 
     public static void main(String[] args) {
-        greet();
-        loadSavedTasks();
-        runCommandLoop();
-        sayGoodbye();
+        new Billy(DATA_FILE).run();
     }
 
     /**
-     * Fills the task list with whatever was saved during an earlier run.
+     * Holds the conversation, from the greeting to the farewell.
      *
-     * <p>Whatever goes wrong here, Billy carries on with as much of the list as it
-     * managed to read: a missing, unreadable or damaged file is worth a word to the
-     * user, but it should never stop them from working.
-     *
-     * <p>Nothing is said at all when there is nothing to report, so a first run on
-     * a fresh computer looks exactly as it did before saving existed.
+     * <p>Everything this needs was settled when the object was built, so a Billy
+     * can be made and run separately, and more than one could exist over
+     * different files.
      */
-    private static void loadSavedTasks() {
-        try {
-            tasks.addAll(storage.load());
-        } catch (BillyException e) {
-            reply(e.getMessage());
+    public void run() {
+        ui.showWelcome();
+        reportStartup();
+
+        // Each command says for itself whether it was the last one, so this loop
+        // never has to know which commands exist.
+        boolean isExit = false;
+        while (!isExit && ui.hasNextCommand()) {
+            try {
+                Command command = Parser.parse(ui.readCommand());
+                command.execute(tasks, ui, storage);
+                isExit = command.isExit();
+            } catch (BillyException e) {
+                // Every problem with a command surfaces here, so this is the one
+                // place a failure becomes a message. The loop carries on, so a
+                // mistake never ends the conversation.
+                ui.showError(e.getMessage());
+            }
+        }
+        ui.close();
+        ui.showGoodbye();
+    }
+
+    /**
+     * Says what happened while the saved list was being read.
+     *
+     * <p>Nothing is said when there is nothing to report, so a first run on a
+     * fresh computer looks exactly as it did before saving existed.
+     */
+    private void reportStartup() {
+        if (loadError != null) {
+            ui.showError(loadError);
             return;
         }
 
         ArrayList<String> notes = new ArrayList<>();
         if (!tasks.isEmpty()) {
-            notes.add("Welcome back! I've loaded " + describeTaskCount(tasks.size())
+            notes.add("Welcome back! I've loaded " + Ui.describeListSize(tasks.size())
                     + " from your last session.");
         }
         int skipped = storage.getSkippedLineCount();
@@ -116,321 +141,7 @@ public class Billy {
                     + " in " + storage.getPath() + " that I couldn't understand.");
         }
         if (!notes.isEmpty()) {
-            reply(String.join("\n", notes));
+            ui.show(String.join("\n", notes));
         }
-    }
-
-    /**
-     * Writes the task list to disk, so the next run starts where this one left off.
-     *
-     * <p>Called after every change to the list. A failure is reported rather than
-     * thrown, because the change itself did work: the user should still see the
-     * confirmation, alongside a warning that it will not outlive this session.
-     */
-    private static void saveTasks() {
-        try {
-            storage.save(tasks);
-        } catch (IOException e) {
-            reply("I couldn't save your list to " + storage.getPath() + " ("
-                    + Storage.describeFailure(e) + ").\nThe change is still here, but it will be"
-                    + " lost when Billy closes.");
-        }
-    }
-
-    /** Prints the startup banner and welcomes the user. */
-    private static void greet() {
-        System.out.println(DIVIDER);
-        System.out.println(BANNER);
-        System.out.println("Hey there! Billy here, at your service.");
-        System.out.println("I track todos, deadlines and events. Type 'list' to see them all.");
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Reads commands from the user and acts on them one at a time.
-     *
-     * <p>Every problem with a command surfaces here as a {@link BillyException},
-     * so this is the single place that turns a failure into a message on screen.
-     * Because the loop continues afterwards, a mistake never ends the conversation.
-     *
-     * <p>Stops when the user types {@code bye}, or when there is no more input to
-     * read (for example, if the user presses Ctrl+D).
-     */
-    private static void runCommandLoop() {
-        // try-with-resources closes the Scanner automatically, even if we break out early.
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine().trim();
-                try {
-                    // handleCommand reports whether the conversation should carry on.
-                    if (!handleCommand(line)) {
-                        break;
-                    }
-                } catch (BillyException e) {
-                    reply(e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * Works out what the user asked for and carries it out.
-     *
-     * <p>The first word decides the action. A word Billy does not recognise is
-     * reported as an error, so a mistyped command is never stored as a task.
-     *
-     * @param line one whole line as the user typed it, already trimmed
-     * @return {@code true} to carry on reading commands, {@code false} once the
-     *         user has said goodbye
-     * @throws BillyException if the command cannot be carried out as typed
-     */
-    private static boolean handleCommand(String line) throws BillyException {
-        if (line.isEmpty()) {
-            throw new BillyException("You'll have to give me something to work with!");
-        }
-
-        // Split into the keyword and everything after it, e.g. "mark 2" -> "mark", "2".
-        String[] parts = line.split("\\s+", 2);
-        Command command = Command.fromKeyword(parts[0]);
-        String argument = parts.length > 1 ? parts[1] : "";
-
-        switch (command) {
-        case LIST -> listTasks();
-        case ON -> listTasksOn(argument);
-        case MARK -> setTaskDone(argument, true);
-        case UNMARK -> setTaskDone(argument, false);
-        case TODO -> addTodo(argument);
-        case DEADLINE -> addDeadline(argument);
-        case EVENT -> addEvent(argument);
-        case DELETE -> deleteTask(argument);
-        case BYE -> {
-            return false;
-        }
-        }
-        return true;
-    }
-
-    /**
-     * Builds a todo from the user's input and stores it.
-     *
-     * @param description what the user wants to do
-     * @throws BillyException if the description is missing
-     */
-    private static void addTodo(String description) throws BillyException {
-        if (description.isBlank()) {
-            throw new BillyException("The description of a todo can't be empty. " + TODO_USAGE);
-        }
-        addTask(new Todo(description.trim()));
-    }
-
-    /**
-     * Builds a deadline from the user's input and stores it.
-     *
-     * @param argument the text after the keyword, expected as {@code <description> /by <date>}
-     * @throws BillyException if the due date or the description is missing
-     */
-    private static void addDeadline(String argument) throws BillyException {
-        String[] parts = splitOn(argument, BY_SEPARATOR, "description", "due date", DEADLINE_USAGE);
-        // Reading the date here means a task can never hold one that isn't real.
-        addTask(new Deadline(parts[0], TaskDate.parse(parts[1])));
-    }
-
-    /**
-     * Builds an event from the user's input and stores it.
-     *
-     * @param argument the text after the keyword, expected as
-     *                 {@code <description> /from <start> /to <end>}
-     * @throws BillyException if the description, the start or the end is missing
-     */
-    private static void addEvent(String argument) throws BillyException {
-        String[] descriptionAndRest =
-                splitOn(argument, FROM_SEPARATOR, "description", "start time", EVENT_USAGE);
-        // The start and end times are still joined together, so split them apart too.
-        String[] startAndEnd =
-                splitOn(descriptionAndRest[1], TO_SEPARATOR, "start time", "end time", EVENT_USAGE);
-        addTask(new Event(descriptionAndRest[0], TaskDate.parse(startAndEnd[0]),
-                TaskDate.parse(startAndEnd[1])));
-    }
-
-    /**
-     * Splits input around a separator such as {@value #BY_SEPARATOR}.
-     *
-     * <p>The two halves are named by the caller so that a failure can say exactly
-     * which part of the command is missing.
-     *
-     * @param input the text to split
-     * @param separator the marker to split around
-     * @param beforeName what the text before the separator means, e.g. "description"
-     * @param afterName what the text after the separator means, e.g. "due date"
-     * @param usage an example of the command, shown to help the user correct it
-     * @return the two trimmed halves
-     * @throws BillyException if the separator is missing or either half is empty
-     */
-    private static String[] splitOn(String input, String separator, String beforeName,
-            String afterName, String usage) throws BillyException {
-        int separatorPosition = input.indexOf(separator);
-        if (separatorPosition == -1) {
-            throw new BillyException("I need '" + separator + "' in that command. " + usage);
-        }
-
-        String before = input.substring(0, separatorPosition).trim();
-        String after = input.substring(separatorPosition + separator.length()).trim();
-        if (before.isEmpty()) {
-            throw new BillyException("The " + beforeName + " can't be empty. " + usage);
-        }
-        if (after.isEmpty()) {
-            throw new BillyException("The " + afterName + " can't be empty. " + usage);
-        }
-        return new String[] {before, after};
-    }
-
-    /** Stores an already-built task, confirms it, and saves the new list. */
-    private static void addTask(Task task) {
-        tasks.add(task);
-        reply("Got it. I've added this task:\n  " + task + "\n" + taskCountSummary());
-        saveTasks();
-    }
-
-    /** Describes how many tasks are now stored, e.g. {@code Now you have 3 tasks in the list.} */
-    private static String taskCountSummary() {
-        return "Now you have " + describeTaskCount(tasks.size()) + " in the list.";
-    }
-
-    /**
-     * Names a number of tasks with the matching plural, e.g. {@code 1 task} or
-     * {@code 3 tasks}.
-     */
-    private static String describeTaskCount(int count) {
-        return count + (count == 1 ? " task" : " tasks");
-    }
-
-    /**
-     * Removes the task the user named from the list.
-     *
-     * @param argument the text after the keyword, expected to be a task number
-     * @throws BillyException if the argument does not name a task that exists
-     */
-    private static void deleteTask(String argument) throws BillyException {
-        int index = parseTaskNumber(argument, Command.DELETE);
-        // remove returns the task it took out, so it can be shown in the confirmation.
-        Task removed = tasks.remove(index);
-        reply("Noted. I've removed this task:\n  " + removed + "\n" + taskCountSummary());
-        saveTasks();
-    }
-
-    /** Prints every stored task, numbered from 1. */
-    private static void listTasks() {
-        if (tasks.isEmpty()) {
-            reply("Your list is empty. Nothing to do... suspicious.");
-            return;
-        }
-        System.out.println(DIVIDER);
-        System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            // List indices start at 0, but people count from 1.
-            System.out.println((i + 1) + "." + tasks.get(i));
-        }
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Prints the tasks that fall on one particular day.
-     *
-     * <p>Each task is shown with the number it has in the full list, so that a
-     * task found this way can be marked or deleted straight away without having
-     * to run {@code list} first to look its number up.
-     *
-     * <p>A time of day may be given but is ignored: a whole day is being asked
-     * about, so {@code on 2019-12-02 1800} means the same as {@code on 2019-12-02}.
-     *
-     * @param argument the text after the keyword, expected to be a date
-     * @throws BillyException if no date is given, or it cannot be read as one
-     */
-    private static void listTasksOn(String argument) throws BillyException {
-        if (argument.isBlank()) {
-            throw new BillyException("Which day should I look at? " + ON_USAGE);
-        }
-        LocalDate day = TaskDate.parse(argument).getDate();
-
-        ArrayList<String> found = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            // Each task decides for itself whether it falls on the day.
-            if (tasks.get(i).occursOn(day)) {
-                found.add((i + 1) + "." + tasks.get(i));
-            }
-        }
-
-        String shownDay = TaskDate.formatDate(day);
-        if (found.isEmpty()) {
-            reply("Nothing on " + shownDay + ". Enjoy the day off!");
-            return;
-        }
-        reply("Here's what you have on " + shownDay + ":\n" + String.join("\n", found));
-    }
-
-    /**
-     * Sets the done status of the task the user named.
-     *
-     * <p>Both {@code mark} and {@code unmark} share this method, as they differ
-     * only in the status they set and the wording they report.
-     *
-     * @param argument the text the user typed after the keyword, expected to be a task number
-     * @param done the status to set: {@code true} for done, {@code false} for not done
-     * @throws BillyException if the argument does not name a task that exists
-     */
-    private static void setTaskDone(String argument, boolean done) throws BillyException {
-        int index = parseTaskNumber(argument, done ? Command.MARK : Command.UNMARK);
-        Task task = tasks.get(index);
-        String confirmation;
-        if (done) {
-            task.markAsDone();
-            confirmation = "Nice! I've marked this task as done:";
-        } else {
-            task.markAsNotDone();
-            confirmation = "OK, I've marked this task as not done yet:";
-        }
-        reply(confirmation + "\n  " + task);
-        saveTasks();
-    }
-
-    /**
-     * Converts what the user typed into an index into {@link #tasks}.
-     *
-     * @param argument the text the user typed after the keyword
-     * @param command the command the number belongs to, used to give a fitting example
-     * @return the matching 0-based index
-     * @throws BillyException if the text is not a number, or names a task that does not exist
-     */
-    private static int parseTaskNumber(String argument, Command command) throws BillyException {
-        int taskNumber;
-        try {
-            taskNumber = Integer.parseInt(argument.trim());
-        } catch (NumberFormatException e) {
-            // Covers both a missing number ("mark") and a non-number ("mark two").
-            throw new BillyException(
-                    "I need a task number, like '" + command.getKeyword() + " 2'.");
-        }
-
-        if (tasks.isEmpty()) {
-            throw new BillyException("Your list is empty, so there's nothing to change.");
-        }
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new BillyException("There's no task " + taskNumber
-                    + " on your list. You have " + tasks.size() + ".");
-        }
-        return taskNumber - 1;
-    }
-
-    /** Prints a single message wrapped in divider lines. */
-    private static void reply(String message) {
-        System.out.println(DIVIDER);
-        System.out.println(message);
-        System.out.println(DIVIDER);
-    }
-
-    /** Prints Billy's farewell message before the program exits. */
-    private static void sayGoodbye() {
-        System.out.println("Catch you later! Don't be a stranger.");
-        System.out.println(DIVIDER);
     }
 }

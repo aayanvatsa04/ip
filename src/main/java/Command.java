@@ -1,83 +1,64 @@
+import java.io.IOException;
+
 /**
- * The commands Billy understands, each paired with the word the user types.
+ * Something the user has asked Billy to do, ready to be carried out.
  *
- * <p>Using an enum rather than loose {@code String} constants means the set of
- * commands is fixed and known to the compiler: a command can only be one of these
- * values, and a misspelt name is a compile error instead of a command that quietly
- * never matches. The list of keywords shown to the user is built from these values,
- * so it cannot fall out of step with what Billy actually accepts.
+ * <p>A command is built by {@link Parser} from what was typed, and holds
+ * whatever it needs: the task to add, the number to delete, the day to look at.
+ * By the time it exists it is known to be valid, so carrying it out is simply a
+ * matter of asking it to.
  *
- * <p>The order below is the order the keywords are listed to the user.
+ * <p>Each kind of command is its own subclass, which is what replaced a switch
+ * over every command Billy knows. Adding a command is now a new class rather
+ * than another branch in a method that grows forever, and no existing command
+ * has to be touched for it.
+ *
+ * <p>The three helpers a command may need are handed to {@link #execute} rather
+ * than held as fields, so a command carries only what makes it that command, and
+ * can be built without knowing which Billy will run it.
  */
-public enum Command {
-    /** Adds a task with no date attached, e.g. {@code todo borrow book}. */
-    TODO("todo"),
+public abstract class Command {
 
-    /** Adds a task with a due date, e.g. {@code deadline return book /by Sunday}. */
-    DEADLINE("deadline"),
+    /**
+     * Carries out this command.
+     *
+     * @param tasks the list to work on
+     * @param ui how to tell the user what happened
+     * @param storage where the list is kept between runs
+     * @throws BillyException if the command cannot be carried out after all,
+     *                        such as a task number that names nothing
+     */
+    public abstract void execute(TaskList tasks, Ui ui, Storage storage) throws BillyException;
 
-    /** Adds a task spanning a period, e.g. {@code event meeting /from 2pm /to 4pm}. */
-    EVENT("event"),
-
-    /** Prints every stored task. */
-    LIST("list"),
-
-    /** Prints the tasks falling on one day, e.g. {@code on 2019-12-02}. */
-    ON("on"),
-
-    /** Marks a task as done, e.g. {@code mark 2}. */
-    MARK("mark"),
-
-    /** Marks a task as not done again, e.g. {@code unmark 2}. */
-    UNMARK("unmark"),
-
-    /** Removes a task from the list, e.g. {@code delete 3}. */
-    DELETE("delete"),
-
-    /** Ends the conversation. */
-    BYE("bye");
-
-    /** The word the user types to invoke this command. */
-    private final String keyword;
-
-    Command(String keyword) {
-        this.keyword = keyword;
-    }
-
-    /** Returns the word the user types to invoke this command. */
-    public String getKeyword() {
-        return keyword;
+    /**
+     * Returns whether the conversation should end after this command.
+     *
+     * <p>Only one command says yes, so that is the exception rather than
+     * something every subclass has to answer.
+     */
+    public boolean isExit() {
+        return false;
     }
 
     /**
-     * Finds the command a typed word refers to, ignoring capitalisation.
+     * Writes the task list out, so the next run starts where this one left off.
      *
-     * @param word the first word of what the user typed
-     * @return the matching command
-     * @throws BillyException if no command uses that word
-     */
-    public static Command fromKeyword(String word) throws BillyException {
-        for (Command command : values()) {
-            if (command.keyword.equalsIgnoreCase(word)) {
-                return command;
-            }
-        }
-        throw new BillyException("I don't know what '" + word + "' means. " + describeAll());
-    }
-
-    /**
-     * Lists every keyword Billy accepts, for use when a command is not recognised.
+     * <p>Shared by the commands that change the list. A failure is reported
+     * rather than thrown, because the change itself did work: the user should
+     * still see the confirmation, alongside a warning that it will not outlive
+     * this session.
      *
-     * @return a sentence such as {@code I understand: todo, deadline, ..., bye.}
+     * @param tasks the list to write
+     * @param ui how to warn the user if writing fails
+     * @param storage where to write it
      */
-    public static String describeAll() {
-        StringBuilder keywords = new StringBuilder();
-        for (Command command : values()) {
-            if (keywords.length() > 0) {
-                keywords.append(", ");
-            }
-            keywords.append(command.keyword);
+    protected void save(TaskList tasks, Ui ui, Storage storage) {
+        try {
+            storage.save(tasks.asList());
+        } catch (IOException e) {
+            ui.showError("I couldn't save your list to " + storage.getPath() + " ("
+                    + Storage.describeFailure(e) + ").\nThe change is still here, but it will be"
+                    + " lost when Billy closes.");
         }
-        return "I understand: " + keywords + ".";
     }
 }

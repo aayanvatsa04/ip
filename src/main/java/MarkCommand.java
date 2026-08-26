@@ -1,0 +1,41 @@
+/**
+ * Marks a task as done, or as not done again.
+ *
+ * <p>Both are one class because they differ only in the status they set and the
+ * words they report. Splitting them would duplicate the rest for the sake of a
+ * single boolean.
+ */
+public class MarkCommand extends Command {
+
+    /** The task's number as the user sees it, counting from 1. */
+    private final int taskNumber;
+
+    /** The status to set: true for done, false for not done yet. */
+    private final boolean shouldBeDone;
+
+    /**
+     * Creates a command that will change one task's status.
+     *
+     * @param taskNumber the task's number as the user sees it, counting from 1
+     * @param shouldBeDone true to mark it done, false to mark it not done again
+     */
+    public MarkCommand(int taskNumber, boolean shouldBeDone) {
+        this.taskNumber = taskNumber;
+        this.shouldBeDone = shouldBeDone;
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws BillyException {
+        Task task = tasks.get(taskNumber);
+        String confirmation;
+        if (shouldBeDone) {
+            task.markAsDone();
+            confirmation = "Nice! I've marked this task as done:";
+        } else {
+            task.markAsNotDone();
+            confirmation = "OK, I've marked this task as not done yet:";
+        }
+        ui.show(confirmation + "\n  " + task);
+        save(tasks, ui, storage);
+    }
+}
