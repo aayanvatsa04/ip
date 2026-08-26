@@ -20,6 +20,15 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /**
+     * Returns this deadline as one line of the save file, with the due date as a
+     * field of its own, e.g. {@code D | 0 | return book | Sunday}.
+     */
+    @Override
+    public String toSaveFormat() {
+        return "D" + FIELD_SEPARATOR + super.toSaveFormat() + FIELD_SEPARATOR + by;
+    }
+
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by + ")";

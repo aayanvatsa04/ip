@@ -15,6 +15,12 @@ public class Todo extends Task {
         super(description);
     }
 
+    /** Returns this todo as one line of the save file, e.g. {@code T | 0 | borrow book}. */
+    @Override
+    public String toSaveFormat() {
+        return "T" + FIELD_SEPARATOR + super.toSaveFormat();
+    }
+
     @Override
     public String toString() {
         return "[T]" + super.toString();
