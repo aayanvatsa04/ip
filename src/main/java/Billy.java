@@ -1,13 +1,19 @@
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
  *
- * <p>This is the Level-6 increment: tasks come in three types (todo, deadline and
+ * <p>This is the Level-7 increment: tasks come in three types (todo, deadline and
  * event), and can be listed, marked as done, and marked as not done again.
  * Anything Billy cannot make sense of is reported as a {@link BillyException}
  * rather than crashing. Typing {@code bye} ends the conversation.
+ *
+ * <p>The list is kept on the hard disk by {@link Storage}: it is read back when
+ * Billy starts and written out again after every change, so closing Billy no
+ * longer loses the user's tasks.
  */
 public class Billy {
 
@@ -50,10 +56,75 @@ public class Billy {
      */
     private static final ArrayList<Task> tasks = new ArrayList<>();
 
+    /**
+     * Where the task list is kept between runs.
+     *
+     * <p>{@link Path#of(String, String...)} joins the parts with whatever separator
+     * the computer uses, so this works on macOS, Linux and Windows alike; writing
+     * {@code "data/billy.txt"} by hand would not. The path is relative, so Billy
+     * keeps its data beside wherever it is run from rather than in a fixed place
+     * that may not exist on someone else's computer.
+     */
+    private static final Path DATA_FILE = Path.of("data", "billy.txt");
+
+    /** Reads the task list from {@link #DATA_FILE} and writes it back again. */
+    private static final Storage storage = new Storage(DATA_FILE);
+
     public static void main(String[] args) {
         greet();
+        loadSavedTasks();
         runCommandLoop();
         sayGoodbye();
+    }
+
+    /**
+     * Fills the task list with whatever was saved during an earlier run.
+     *
+     * <p>Whatever goes wrong here, Billy carries on with as much of the list as it
+     * managed to read: a missing, unreadable or damaged file is worth a word to the
+     * user, but it should never stop them from working.
+     *
+     * <p>Nothing is said at all when there is nothing to report, so a first run on
+     * a fresh computer looks exactly as it did before saving existed.
+     */
+    private static void loadSavedTasks() {
+        try {
+            tasks.addAll(storage.load());
+        } catch (BillyException e) {
+            reply(e.getMessage());
+            return;
+        }
+
+        ArrayList<String> notes = new ArrayList<>();
+        if (!tasks.isEmpty()) {
+            notes.add("Welcome back! I've loaded " + describeTaskCount(tasks.size())
+                    + " from your last session.");
+        }
+        int skipped = storage.getSkippedLineCount();
+        if (skipped > 0) {
+            notes.add("Heads up: I skipped " + skipped + (skipped == 1 ? " line" : " lines")
+                    + " in " + storage.getPath() + " that I couldn't understand.");
+        }
+        if (!notes.isEmpty()) {
+            reply(String.join("\n", notes));
+        }
+    }
+
+    /**
+     * Writes the task list to disk, so the next run starts where this one left off.
+     *
+     * <p>Called after every change to the list. A failure is reported rather than
+     * thrown, because the change itself did work: the user should still see the
+     * confirmation, alongside a warning that it will not outlive this session.
+     */
+    private static void saveTasks() {
+        try {
+            storage.save(tasks);
+        } catch (IOException e) {
+            reply("I couldn't save your list to " + storage.getPath() + " ("
+                    + e.getMessage() + ").\nThe change is still here, but it will be"
+                    + " lost when Billy closes.");
+        }
     }
 
     /** Prints the startup banner and welcomes the user. */
@@ -200,16 +271,24 @@ public class Billy {
         return new String[] {before, after};
     }
 
-    /** Stores an already-built task and confirms it. */
+    /** Stores an already-built task, confirms it, and saves the new list. */
     private static void addTask(Task task) {
         tasks.add(task);
         reply("Got it. I've added this task:\n  " + task + "\n" + taskCountSummary());
+        saveTasks();
     }
 
     /** Describes how many tasks are now stored, e.g. {@code Now you have 3 tasks in the list.} */
     private static String taskCountSummary() {
-        int count = tasks.size();
-        return "Now you have " + count + (count == 1 ? " task" : " tasks") + " in the list.";
+        return "Now you have " + describeTaskCount(tasks.size()) + " in the list.";
+    }
+
+    /**
+     * Names a number of tasks with the matching plural, e.g. {@code 1 task} or
+     * {@code 3 tasks}.
+     */
+    private static String describeTaskCount(int count) {
+        return count + (count == 1 ? " task" : " tasks");
     }
 
     /**
@@ -223,6 +302,7 @@ public class Billy {
         // remove returns the task it took out, so it can be shown in the confirmation.
         Task removed = tasks.remove(index);
         reply("Noted. I've removed this task:\n  " + removed + "\n" + taskCountSummary());
+        saveTasks();
     }
 
     /** Prints every stored task, numbered from 1. */
@@ -262,6 +342,7 @@ public class Billy {
             confirmation = "OK, I've marked this task as not done yet:";
         }
         reply(confirmation + "\n  " + task);
+        saveTasks();
     }
 
     /**
