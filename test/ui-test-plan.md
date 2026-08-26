@@ -101,8 +101,8 @@ bye
 **Input:**
 ```text
 todo borrow book
-deadline return book /by Sunday
-event project meeting /from Mon 2pm /to 4pm
+deadline return book /by 2019-12-02 1800
+event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600
 bye
 ```
 
@@ -116,12 +116,12 @@ Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] return book (by: Sunday)
+  [D][ ] return book (by: Dec 2 2019, 6:00pm)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Mon 2pm to: 4pm)
+  [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
 Now you have 3 tasks in the list.
 ____________________________________________________________
 {{FAREWELL}}
@@ -134,8 +134,8 @@ ____________________________________________________________
 **Input:**
 ```text
 todo read book
-deadline return book /by June 6th
-event project meeting /from Aug 6th 2pm /to 4pm
+deadline return book /by 2019-06-06
+event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600
 todo join sports club
 mark 1
 mark 4
@@ -154,12 +154,12 @@ Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] return book (by: June 6th)
+  [D][ ] return book (by: Jun 6 2019)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+  [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
 Now you have 3 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -183,8 +183,8 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
-2.[D][ ] return book (by: June 6th)
-3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+2.[D][ ] return book (by: Jun 6 2019)
+3.[E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
 4.[T][X] join sports club
 5.[T][ ] borrow book
 ____________________________________________________________
@@ -197,7 +197,7 @@ ____________________________________________________________
 
 **Input:**
 ```text
-deadline pay fees /by Friday
+deadline pay fees /by 2019-12-06
 mark 1
 unmark 1
 bye
@@ -208,27 +208,29 @@ bye
 {{GREETING}}
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] pay fees (by: Friday)
+  [D][ ] pay fees (by: Dec 6 2019)
 Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] pay fees (by: Friday)
+  [D][X] pay fees (by: Dec 6 2019)
 ____________________________________________________________
 ____________________________________________________________
 OK, I've marked this task as not done yet:
-  [D][ ] pay fees (by: Friday)
+  [D][ ] pay fees (by: Dec 6 2019)
 ____________________________________________________________
 {{FAREWELL}}
 ```
 
-## TC-05 Dates are accepted as free text
+## TC-05 Dates are understood rather than echoed back
 
-**Aim:** Verify that a due date is stored and echoed exactly as typed, including punctuation, since dates are not parsed at this stage.
+**Aim:** Verify that a date is read as a date and shown in Billy's own format, not repeated as it was typed: `2019-10-15` must come back as `Oct 15 2019`. A date given with a time keeps it, and one given without a time must not have midnight invented for it. Free text, which earlier versions accepted, is now refused with the format spelt out — a deliberate change, since a stored date that means nothing to Billy would be no use to the `on` command.
 
 **Input:**
 ```text
-deadline do homework /by no idea :-p
+deadline do homework /by 2019-10-15
+deadline call mum /by 2019-10-15 0930
+deadline do nothing /by no idea :-p
 bye
 ```
 
@@ -237,8 +239,16 @@ bye
 {{GREETING}}
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] do homework (by: no idea :-p)
+  [D][ ] do homework (by: Oct 15 2019)
 Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] call mum (by: Oct 15 2019, 9:30am)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+I couldn't read 'no idea :-p' as a date. Use yyyy-MM-dd, and a 24-hour time if you want one, e.g. 2019-12-02 or 2019-12-02 1800.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -310,7 +320,7 @@ ____________________________________________________________
 **Input:**
 ```text
 deadline homework
-deadline /by Sunday
+deadline /by 2019-12-02
 event meeting /from 2pm
 bye
 ```
@@ -319,13 +329,13 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-I need '/by' in that command. Try: deadline return book /by Sunday
+I need '/by' in that command. Try: deadline return book /by 2019-12-02 1800
 ____________________________________________________________
 ____________________________________________________________
-The description can't be empty. Try: deadline return book /by Sunday
+The description can't be empty. Try: deadline return book /by 2019-12-02 1800
 ____________________________________________________________
 ____________________________________________________________
-I need '/to' in that command. Try: event project meeting /from Mon 2pm /to 4pm
+I need '/to' in that command. Try: event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -346,10 +356,10 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-I don't know what 'blah' means. I understand: todo, deadline, event, list, mark, unmark, delete, bye.
+I don't know what 'blah' means. I understand: todo, deadline, event, list, on, mark, unmark, delete, bye.
 ____________________________________________________________
 ____________________________________________________________
-I don't know what 'buy' means. I understand: todo, deadline, event, list, mark, unmark, delete, bye.
+I don't know what 'buy' means. I understand: todo, deadline, event, list, on, mark, unmark, delete, bye.
 ____________________________________________________________
 ____________________________________________________________
 Your list is empty. Nothing to do... suspicious.
@@ -377,13 +387,13 @@ ____________________________________________________________
 The description of a todo can't be empty. Try: todo borrow book
 ____________________________________________________________
 ____________________________________________________________
-The due date can't be empty. Try: deadline return book /by Sunday
+The due date can't be empty. Try: deadline return book /by 2019-12-02 1800
 ____________________________________________________________
 ____________________________________________________________
-The start time can't be empty. Try: event project meeting /from Mon 2pm /to 4pm
+The start time can't be empty. Try: event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600
 ____________________________________________________________
 ____________________________________________________________
-The end time can't be empty. Try: event project meeting /from Mon 2pm /to 4pm
+The end time can't be empty. Try: event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -418,8 +428,8 @@ ____________________________________________________________
 **Input:**
 ```text
 todo read book
-deadline return book /by June 6th
-event project meeting /from Aug 6th 2pm /to 4pm
+deadline return book /by 2019-06-06
+event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600
 todo join sports club
 todo borrow book
 mark 1
@@ -441,12 +451,12 @@ Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] return book (by: June 6th)
+  [D][ ] return book (by: Jun 6 2019)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+  [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
 Now you have 3 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -465,7 +475,7 @@ Nice! I've marked this task as done:
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] return book (by: June 6th)
+  [D][X] return book (by: Jun 6 2019)
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
@@ -474,20 +484,20 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
-2.[D][X] return book (by: June 6th)
-3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+2.[D][X] return book (by: Jun 6 2019)
+3.[E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
 4.[T][X] join sports club
 5.[T][ ] borrow book
 ____________________________________________________________
 ____________________________________________________________
 Noted. I've removed this task:
-  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+  [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
 Now you have 4 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
-2.[D][X] return book (by: June 6th)
+2.[D][X] return book (by: Jun 6 2019)
 3.[T][X] join sports club
 4.[T][ ] borrow book
 ____________________________________________________________
@@ -668,8 +678,8 @@ ____________________________________________________________
 **Input:**
 ```text
 todo read book
-deadline return book /by Sunday
-event project meeting /from Mon 2pm /to 4pm
+deadline return book /by 2019-12-02 1800
+event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600
 mark 2
 bye
 --- restart ---
@@ -687,17 +697,17 @@ Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] return book (by: Sunday)
+  [D][ ] return book (by: Dec 2 2019, 6:00pm)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Mon 2pm to: 4pm)
+  [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
 Now you have 3 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] return book (by: Sunday)
+  [D][X] return book (by: Dec 2 2019, 6:00pm)
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
@@ -707,8 +717,8 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
-2.[D][X] return book (by: Sunday)
-3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+2.[D][X] return book (by: Dec 2 2019, 6:00pm)
+3.[E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -815,8 +825,8 @@ ____________________________________________________________
 **Data file:**
 ```text
 T | 1 | read book
-D | 0 | return book | June 6th
-E | 1 | project meeting | Aug 6th 2pm | 4pm
+D | 0 | return book | 2019-06-06
+E | 1 | project meeting | 2019-08-06 1400 | 2019-08-06 1600
 ```
 
 **Input:**
@@ -834,8 +844,8 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
-2.[D][ ] return book (by: June 6th)
-3.[E][X] project meeting (from: Aug 6th 2pm to: 4pm)
+2.[D][ ] return book (by: Jun 6 2019)
+3.[E][X] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -848,8 +858,8 @@ ____________________________________________________________
 ```text
 T | 1 | read book
 X | 0 | who knows what this is
-D | 2 | return book | Sunday
-E | 0 | project meeting | Mon 2pm
+D | 2 | return book | 2019-12-02
+E | 0 | project meeting | 2019-12-02 1400
 this line is not in the format at all
 T | 0 | join sports club
 ```
@@ -901,6 +911,170 @@ bye
 {{GREETING}}
 ____________________________________________________________
 Your list is empty. Nothing to do... suspicious.
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-24 Finding the tasks on one day
+
+**Aim:** Verify the `on` command. A deadline matches only the day it is due, while an event matches every day it runs across, both ends included — so the multi-day event here must be found on all three of its days, and the deadline on only one. The todo has no date and must never appear. Each match is shown with the number it carries in the full list, not a fresh count, so a task found this way can be marked or deleted straight away.
+
+**Input:**
+```text
+deadline return book /by 2019-12-05 1800
+event conference /from 2019-12-02 0900 /to 2019-12-04 1700
+todo buy milk
+on 2019-12-02
+on 2019-12-03
+on 2019-12-05
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Dec 5 2019, 6:00pm)
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] buy milk
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here's what you have on Dec 2 2019:
+2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+____________________________________________________________
+____________________________________________________________
+Here's what you have on Dec 3 2019:
+2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+____________________________________________________________
+____________________________________________________________
+Here's what you have on Dec 5 2019:
+1.[D][ ] return book (by: Dec 5 2019, 6:00pm)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-25 Asking about a day with nothing on it, or asking badly
+
+**Aim:** Verify that a day with no tasks is answered plainly rather than with an empty list, that a day just outside an event's span is correctly found to be empty, and that `on` with no date or an unreadable one says how to type it. A time given to `on` is ignored, since a whole day is being asked about.
+
+**Input:**
+```text
+event conference /from 2019-12-02 0900 /to 2019-12-04 1700
+on 2019-12-05
+on 2019-12-04 2359
+on
+on next tuesday
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Nothing on Dec 5 2019. Enjoy the day off!
+____________________________________________________________
+____________________________________________________________
+Here's what you have on Dec 4 2019:
+1.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+____________________________________________________________
+____________________________________________________________
+Which day should I look at? Try: on 2019-12-02
+____________________________________________________________
+____________________________________________________________
+I couldn't read 'next tuesday' as a date. Use yyyy-MM-dd, and a 24-hour time if you want one, e.g. 2019-12-02 or 2019-12-02 1800.
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-26 Dates survive being saved and reloaded
+
+**Aim:** Verify that a date is written to disk in a form that reads back as the same date, and that the difference between a date with a time and one without survives the round trip. If a time were invented on loading, the reloaded deadline would show midnight; if one were dropped, the event would lose its start time. The `on` command working after the restart proves the reloaded dates are real dates and not just text that looks right.
+
+**Input:**
+```text
+deadline return book /by 2019-12-05
+event conference /from 2019-12-02 0900 /to 2019-12-04 1700
+bye
+--- restart ---
+list
+on 2019-12-03
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Dec 5 2019)
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+Now you have 2 tasks in the list.
+____________________________________________________________
+{{FAREWELL}}
+{{GREETING}}
+____________________________________________________________
+Welcome back! I've loaded 2 tasks from your last session.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[D][ ] return book (by: Dec 5 2019)
+2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+____________________________________________________________
+____________________________________________________________
+Here's what you have on Dec 3 2019:
+2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-27 A saved date that is not a date is treated as damage
+
+**Aim:** Verify that the corrupted-file handling now covers dates too. A file written by an older version of Billy holds free text where a date should be, and a hand-edited one may hold an impossible date such as the 31st of February. Neither can become a task, so both lines must be skipped and counted, leaving the readable tasks untouched.
+
+**Data file:**
+```text
+T | 0 | read book
+D | 0 | return book | Sunday
+D | 0 | pay fees | 2019-02-31
+E | 0 | conference | 2019-12-02 0900 | 2019-12-04 1700
+```
+
+**Input:**
+```text
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Welcome back! I've loaded 2 tasks from your last session.
+Heads up: I skipped 2 lines in data/billy.txt that I couldn't understand.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 {{FAREWELL}}
 ```
