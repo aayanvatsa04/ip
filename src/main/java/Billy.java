@@ -20,34 +20,12 @@ import java.util.List;
  * tidy up how they are shown and answer {@code on} with the tasks falling on a
  * given day.
  *
- * <p>Talking to the user is left to {@link Ui}, the file to {@link Storage} and
- * the tasks themselves to {@link TaskList}, so what is left here is the work of
- * deciding what each command means and asking the right helper to carry it out.
+ * <p>Billy itself now only coordinates: {@link Parser} makes sense of what was
+ * typed, {@link TaskList} holds the tasks, {@link Storage} keeps them on disk
+ * and {@link Ui} does the talking. What is left here is deciding which of them
+ * to ask, and in what order.
  */
 public class Billy {
-
-    /** Separates a deadline's description from its due date. */
-    private static final String BY_SEPARATOR = "/by";
-
-    /** Separates an event's description from its start time. */
-    private static final String FROM_SEPARATOR = "/from";
-
-    /** Separates an event's start time from its end time. */
-    private static final String TO_SEPARATOR = "/to";
-
-    /** Shown alongside an error to remind the user how a todo is typed. */
-    private static final String TODO_USAGE = "Try: todo borrow book";
-
-    /** Shown alongside an error to remind the user how a deadline is typed. */
-    private static final String DEADLINE_USAGE =
-            "Try: deadline return book /by 2019-12-02 1800";
-
-    /** Shown alongside an error to remind the user how an event is typed. */
-    private static final String EVENT_USAGE =
-            "Try: event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600";
-
-    /** Shown alongside an error to remind the user how a day is asked about. */
-    private static final String ON_USAGE = "Try: on 2019-12-02";
 
     /**
      * The user's tasks.
@@ -167,103 +145,26 @@ public class Billy {
      * @throws BillyException if the command cannot be carried out as typed
      */
     private static boolean handleCommand(String line) throws BillyException {
-        if (line.isEmpty()) {
-            throw new BillyException("You'll have to give me something to work with!");
-        }
+        Parser.ParsedCommand parsed = Parser.parse(line);
+        Command command = parsed.command();
+        String argument = parsed.argument();
 
-        // Split into the keyword and everything after it, e.g. "mark 2" -> "mark", "2".
-        String[] parts = line.split("\\s+", 2);
-        Command command = Command.fromKeyword(parts[0]);
-        String argument = parts.length > 1 ? parts[1] : "";
-
+        // Each branch reads as what it does, because anything that had to be made
+        // sense of was made sense of before it got here.
         switch (command) {
         case LIST -> listTasks();
-        case ON -> listTasksOn(argument);
-        case MARK -> setTaskDone(argument, true);
-        case UNMARK -> setTaskDone(argument, false);
-        case TODO -> addTodo(argument);
-        case DEADLINE -> addDeadline(argument);
-        case EVENT -> addEvent(argument);
-        case DELETE -> deleteTask(argument);
+        case ON -> listTasksOn(Parser.parseDay(argument));
+        case MARK -> setTaskDone(Parser.parseTaskNumber(argument, command), true);
+        case UNMARK -> setTaskDone(Parser.parseTaskNumber(argument, command), false);
+        case TODO -> addTask(Parser.parseTodo(argument));
+        case DEADLINE -> addTask(Parser.parseDeadline(argument));
+        case EVENT -> addTask(Parser.parseEvent(argument));
+        case DELETE -> deleteTask(Parser.parseTaskNumber(argument, command));
         case BYE -> {
             return false;
         }
         }
         return true;
-    }
-
-    /**
-     * Builds a todo from the user's input and stores it.
-     *
-     * @param description what the user wants to do
-     * @throws BillyException if the description is missing
-     */
-    private static void addTodo(String description) throws BillyException {
-        if (description.isBlank()) {
-            throw new BillyException("The description of a todo can't be empty. " + TODO_USAGE);
-        }
-        addTask(new Todo(description.trim()));
-    }
-
-    /**
-     * Builds a deadline from the user's input and stores it.
-     *
-     * @param argument the text after the keyword, expected as {@code <description> /by <date>}
-     * @throws BillyException if the due date or the description is missing
-     */
-    private static void addDeadline(String argument) throws BillyException {
-        String[] parts = splitOn(argument, BY_SEPARATOR, "description", "due date", DEADLINE_USAGE);
-        // Reading the date here means a task can never hold one that isn't real.
-        addTask(new Deadline(parts[0], TaskDate.parse(parts[1])));
-    }
-
-    /**
-     * Builds an event from the user's input and stores it.
-     *
-     * @param argument the text after the keyword, expected as
-     *                 {@code <description> /from <start> /to <end>}
-     * @throws BillyException if the description, the start or the end is missing
-     */
-    private static void addEvent(String argument) throws BillyException {
-        String[] descriptionAndRest =
-                splitOn(argument, FROM_SEPARATOR, "description", "start time", EVENT_USAGE);
-        // The start and end times are still joined together, so split them apart too.
-        String[] startAndEnd =
-                splitOn(descriptionAndRest[1], TO_SEPARATOR, "start time", "end time", EVENT_USAGE);
-        addTask(new Event(descriptionAndRest[0], TaskDate.parse(startAndEnd[0]),
-                TaskDate.parse(startAndEnd[1])));
-    }
-
-    /**
-     * Splits input around a separator such as {@value #BY_SEPARATOR}.
-     *
-     * <p>The two halves are named by the caller so that a failure can say exactly
-     * which part of the command is missing.
-     *
-     * @param input the text to split
-     * @param separator the marker to split around
-     * @param beforeName what the text before the separator means, e.g. "description"
-     * @param afterName what the text after the separator means, e.g. "due date"
-     * @param usage an example of the command, shown to help the user correct it
-     * @return the two trimmed halves
-     * @throws BillyException if the separator is missing or either half is empty
-     */
-    private static String[] splitOn(String input, String separator, String beforeName,
-            String afterName, String usage) throws BillyException {
-        int separatorPosition = input.indexOf(separator);
-        if (separatorPosition == -1) {
-            throw new BillyException("I need '" + separator + "' in that command. " + usage);
-        }
-
-        String before = input.substring(0, separatorPosition).trim();
-        String after = input.substring(separatorPosition + separator.length()).trim();
-        if (before.isEmpty()) {
-            throw new BillyException("The " + beforeName + " can't be empty. " + usage);
-        }
-        if (after.isEmpty()) {
-            throw new BillyException("The " + afterName + " can't be empty. " + usage);
-        }
-        return new String[] {before, after};
     }
 
     /** Stores an already-built task, confirms it, and saves the new list. */
@@ -289,11 +190,10 @@ public class Billy {
     /**
      * Removes the task the user named from the list.
      *
-     * @param argument the text after the keyword, expected to be a task number
-     * @throws BillyException if the argument does not name a task that exists
+     * @param taskNumber the task's number as the user sees it, counting from 1
+     * @throws BillyException if no task has that number
      */
-    private static void deleteTask(String argument) throws BillyException {
-        int taskNumber = parseTaskNumber(argument, Command.DELETE);
+    private static void deleteTask(int taskNumber) throws BillyException {
         // remove returns the task it took out, so it can be shown in the confirmation.
         Task removed = tasks.remove(taskNumber);
         ui.show("Noted. I've removed this task:\n  " + removed + "\n" + taskCountSummary());
@@ -322,18 +222,9 @@ public class Billy {
      * task found this way can be marked or deleted straight away without having
      * to run {@code list} first to look its number up.
      *
-     * <p>A time of day may be given but is ignored: a whole day is being asked
-     * about, so {@code on 2019-12-02 1800} means the same as {@code on 2019-12-02}.
-     *
-     * @param argument the text after the keyword, expected to be a date
-     * @throws BillyException if no date is given, or it cannot be read as one
+     * @param day the day to look at
      */
-    private static void listTasksOn(String argument) throws BillyException {
-        if (argument.isBlank()) {
-            throw new BillyException("Which day should I look at? " + ON_USAGE);
-        }
-        LocalDate day = TaskDate.parse(argument).getDate();
-
+    private static void listTasksOn(LocalDate day) {
         List<Task> all = tasks.asList();
         ArrayList<String> found = new ArrayList<>();
         for (int i = 0; i < all.size(); i++) {
@@ -357,12 +248,11 @@ public class Billy {
      * <p>Both {@code mark} and {@code unmark} share this method, as they differ
      * only in the status they set and the wording they report.
      *
-     * @param argument the text the user typed after the keyword, expected to be a task number
+     * @param taskNumber the task's number as the user sees it, counting from 1
      * @param done the status to set: {@code true} for done, {@code false} for not done
-     * @throws BillyException if the argument does not name a task that exists
+     * @throws BillyException if no task has that number
      */
-    private static void setTaskDone(String argument, boolean done) throws BillyException {
-        int taskNumber = parseTaskNumber(argument, done ? Command.MARK : Command.UNMARK);
+    private static void setTaskDone(int taskNumber, boolean done) throws BillyException {
         Task task = tasks.get(taskNumber);
         String confirmation;
         if (done) {
@@ -374,27 +264,6 @@ public class Billy {
         }
         ui.show(confirmation + "\n  " + task);
         saveTasks();
-    }
-
-    /**
-     * Reads what the user typed as a task number.
-     *
-     * <p>Only the reading happens here. Whether the number names a task that
-     * exists is for {@link TaskList} to say, since it is the one that knows.
-     *
-     * @param argument the text the user typed after the keyword
-     * @param command the command the number belongs to, used to give a fitting example
-     * @return the number as the user wrote it, counting from 1
-     * @throws BillyException if the text is not a number at all
-     */
-    private static int parseTaskNumber(String argument, Command command) throws BillyException {
-        try {
-            return Integer.parseInt(argument.trim());
-        } catch (NumberFormatException e) {
-            // Covers both a missing number ("mark") and a non-number ("mark two").
-            throw new BillyException(
-                    "I need a task number, like '" + command.getKeyword() + " 2'.");
-        }
     }
 
 }
