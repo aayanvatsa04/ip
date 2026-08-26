@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
@@ -19,21 +18,12 @@ import java.util.Scanner;
  * <p>Deadlines and events carry real dates rather than free text, so Billy can
  * tidy up how they are shown and answer {@code on} with the tasks falling on a
  * given day.
+ *
+ * <p>Talking to the user is left to {@link Ui} and the file to {@link Storage},
+ * so what is left here is the work itself: deciding what each command means and
+ * carrying it out.
  */
 public class Billy {
-
-    /** Horizontal line used to visually separate Billy's messages from the rest of the output. */
-    private static final String DIVIDER =
-            "____________________________________________________________";
-
-    /** ASCII art of the chatbot's name, shown once when Billy starts up. */
-    private static final String BANNER =
-            " ____  _ _ _       \n"
-            + "| __ )(_) | |_   _ \n"
-            + "|  _ \\| | | | | | |\n"
-            + "| |_) | | | | |_| |\n"
-            + "|____/|_|_|_|\\__, |\n"
-            + "             |___/ ";
 
     /** Separates a deadline's description from its due date. */
     private static final String BY_SEPARATOR = "/by";
@@ -80,11 +70,14 @@ public class Billy {
     /** Reads the task list from {@link #DATA_FILE} and writes it back again. */
     private static final Storage storage = new Storage(DATA_FILE);
 
+    /** Says everything the user sees, and reads everything the user types. */
+    private static final Ui ui = new Ui();
+
     public static void main(String[] args) {
-        greet();
+        ui.showWelcome();
         loadSavedTasks();
         runCommandLoop();
-        sayGoodbye();
+        ui.showGoodbye();
     }
 
     /**
@@ -101,7 +94,7 @@ public class Billy {
         try {
             tasks.addAll(storage.load());
         } catch (BillyException e) {
-            reply(e.getMessage());
+            ui.showError(e.getMessage());
             return;
         }
 
@@ -116,7 +109,7 @@ public class Billy {
                     + " in " + storage.getPath() + " that I couldn't understand.");
         }
         if (!notes.isEmpty()) {
-            reply(String.join("\n", notes));
+            ui.show(String.join("\n", notes));
         }
     }
 
@@ -131,19 +124,10 @@ public class Billy {
         try {
             storage.save(tasks);
         } catch (IOException e) {
-            reply("I couldn't save your list to " + storage.getPath() + " ("
+            ui.showError("I couldn't save your list to " + storage.getPath() + " ("
                     + Storage.describeFailure(e) + ").\nThe change is still here, but it will be"
                     + " lost when Billy closes.");
         }
-    }
-
-    /** Prints the startup banner and welcomes the user. */
-    private static void greet() {
-        System.out.println(DIVIDER);
-        System.out.println(BANNER);
-        System.out.println("Hey there! Billy here, at your service.");
-        System.out.println("I track todos, deadlines and events. Type 'list' to see them all.");
-        System.out.println(DIVIDER);
     }
 
     /**
@@ -157,20 +141,17 @@ public class Billy {
      * read (for example, if the user presses Ctrl+D).
      */
     private static void runCommandLoop() {
-        // try-with-resources closes the Scanner automatically, even if we break out early.
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine().trim();
-                try {
-                    // handleCommand reports whether the conversation should carry on.
-                    if (!handleCommand(line)) {
-                        break;
-                    }
-                } catch (BillyException e) {
-                    reply(e.getMessage());
+        while (ui.hasNextCommand()) {
+            try {
+                // handleCommand reports whether the conversation should carry on.
+                if (!handleCommand(ui.readCommand())) {
+                    break;
                 }
+            } catch (BillyException e) {
+                ui.showError(e.getMessage());
             }
         }
+        ui.close();
     }
 
     /**
@@ -287,7 +268,7 @@ public class Billy {
     /** Stores an already-built task, confirms it, and saves the new list. */
     private static void addTask(Task task) {
         tasks.add(task);
-        reply("Got it. I've added this task:\n  " + task + "\n" + taskCountSummary());
+        ui.show("Got it. I've added this task:\n  " + task + "\n" + taskCountSummary());
         saveTasks();
     }
 
@@ -314,23 +295,22 @@ public class Billy {
         int index = parseTaskNumber(argument, Command.DELETE);
         // remove returns the task it took out, so it can be shown in the confirmation.
         Task removed = tasks.remove(index);
-        reply("Noted. I've removed this task:\n  " + removed + "\n" + taskCountSummary());
+        ui.show("Noted. I've removed this task:\n  " + removed + "\n" + taskCountSummary());
         saveTasks();
     }
 
     /** Prints every stored task, numbered from 1. */
     private static void listTasks() {
         if (tasks.isEmpty()) {
-            reply("Your list is empty. Nothing to do... suspicious.");
+            ui.show("Your list is empty. Nothing to do... suspicious.");
             return;
         }
-        System.out.println(DIVIDER);
-        System.out.println("Here are the tasks in your list:");
+        ArrayList<String> lines = new ArrayList<>();
         for (int i = 0; i < tasks.size(); i++) {
             // List indices start at 0, but people count from 1.
-            System.out.println((i + 1) + "." + tasks.get(i));
+            lines.add((i + 1) + "." + tasks.get(i));
         }
-        System.out.println(DIVIDER);
+        ui.show("Here are the tasks in your list:\n" + String.join("\n", lines));
     }
 
     /**
@@ -362,10 +342,10 @@ public class Billy {
 
         String shownDay = TaskDate.formatDate(day);
         if (found.isEmpty()) {
-            reply("Nothing on " + shownDay + ". Enjoy the day off!");
+            ui.show("Nothing on " + shownDay + ". Enjoy the day off!");
             return;
         }
-        reply("Here's what you have on " + shownDay + ":\n" + String.join("\n", found));
+        ui.show("Here's what you have on " + shownDay + ":\n" + String.join("\n", found));
     }
 
     /**
@@ -389,7 +369,7 @@ public class Billy {
             task.markAsNotDone();
             confirmation = "OK, I've marked this task as not done yet:";
         }
-        reply(confirmation + "\n  " + task);
+        ui.show(confirmation + "\n  " + task);
         saveTasks();
     }
 
@@ -421,16 +401,4 @@ public class Billy {
         return taskNumber - 1;
     }
 
-    /** Prints a single message wrapped in divider lines. */
-    private static void reply(String message) {
-        System.out.println(DIVIDER);
-        System.out.println(message);
-        System.out.println(DIVIDER);
-    }
-
-    /** Prints Billy's farewell message before the program exits. */
-    private static void sayGoodbye() {
-        System.out.println("Catch you later! Don't be a stranger.");
-        System.out.println(DIVIDER);
-    }
 }
