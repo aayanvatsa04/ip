@@ -1,12 +1,13 @@
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
  *
- * <p>This is the Level-7 increment: tasks come in three types (todo, deadline and
+ * <p>This is the Level-8 increment: tasks come in three types (todo, deadline and
  * event), and can be listed, marked as done, and marked as not done again.
  * Anything Billy cannot make sense of is reported as a {@link BillyException}
  * rather than crashing. Typing {@code bye} ends the conversation.
@@ -14,6 +15,10 @@ import java.util.Scanner;
  * <p>The list is kept on the hard disk by {@link Storage}: it is read back when
  * Billy starts and written out again after every change, so closing Billy no
  * longer loses the user's tasks.
+ *
+ * <p>Deadlines and events carry real dates rather than free text, so Billy can
+ * tidy up how they are shown and answer {@code on} with the tasks falling on a
+ * given day.
  */
 public class Billy {
 
@@ -43,10 +48,15 @@ public class Billy {
     private static final String TODO_USAGE = "Try: todo borrow book";
 
     /** Shown alongside an error to remind the user how a deadline is typed. */
-    private static final String DEADLINE_USAGE = "Try: deadline return book /by Sunday";
+    private static final String DEADLINE_USAGE =
+            "Try: deadline return book /by 2019-12-02 1800";
 
     /** Shown alongside an error to remind the user how an event is typed. */
-    private static final String EVENT_USAGE = "Try: event project meeting /from Mon 2pm /to 4pm";
+    private static final String EVENT_USAGE =
+            "Try: event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600";
+
+    /** Shown alongside an error to remind the user how a day is asked about. */
+    private static final String ON_USAGE = "Try: on 2019-12-02";
 
     /**
      * Stored tasks, in the order the user added them.
@@ -122,7 +132,7 @@ public class Billy {
             storage.save(tasks);
         } catch (IOException e) {
             reply("I couldn't save your list to " + storage.getPath() + " ("
-                    + e.getMessage() + ").\nThe change is still here, but it will be"
+                    + Storage.describeFailure(e) + ").\nThe change is still here, but it will be"
                     + " lost when Billy closes.");
         }
     }
@@ -186,6 +196,7 @@ public class Billy {
 
         switch (command) {
         case LIST -> listTasks();
+        case ON -> listTasksOn(argument);
         case MARK -> setTaskDone(argument, true);
         case UNMARK -> setTaskDone(argument, false);
         case TODO -> addTodo(argument);
@@ -220,7 +231,8 @@ public class Billy {
      */
     private static void addDeadline(String argument) throws BillyException {
         String[] parts = splitOn(argument, BY_SEPARATOR, "description", "due date", DEADLINE_USAGE);
-        addTask(new Deadline(parts[0], parts[1]));
+        // Reading the date here means a task can never hold one that isn't real.
+        addTask(new Deadline(parts[0], TaskDate.parse(parts[1])));
     }
 
     /**
@@ -236,7 +248,8 @@ public class Billy {
         // The start and end times are still joined together, so split them apart too.
         String[] startAndEnd =
                 splitOn(descriptionAndRest[1], TO_SEPARATOR, "start time", "end time", EVENT_USAGE);
-        addTask(new Event(descriptionAndRest[0], startAndEnd[0], startAndEnd[1]));
+        addTask(new Event(descriptionAndRest[0], TaskDate.parse(startAndEnd[0]),
+                TaskDate.parse(startAndEnd[1])));
     }
 
     /**
@@ -318,6 +331,41 @@ public class Billy {
             System.out.println((i + 1) + "." + tasks.get(i));
         }
         System.out.println(DIVIDER);
+    }
+
+    /**
+     * Prints the tasks that fall on one particular day.
+     *
+     * <p>Each task is shown with the number it has in the full list, so that a
+     * task found this way can be marked or deleted straight away without having
+     * to run {@code list} first to look its number up.
+     *
+     * <p>A time of day may be given but is ignored: a whole day is being asked
+     * about, so {@code on 2019-12-02 1800} means the same as {@code on 2019-12-02}.
+     *
+     * @param argument the text after the keyword, expected to be a date
+     * @throws BillyException if no date is given, or it cannot be read as one
+     */
+    private static void listTasksOn(String argument) throws BillyException {
+        if (argument.isBlank()) {
+            throw new BillyException("Which day should I look at? " + ON_USAGE);
+        }
+        LocalDate day = TaskDate.parse(argument).getDate();
+
+        ArrayList<String> found = new ArrayList<>();
+        for (int i = 0; i < tasks.size(); i++) {
+            // Each task decides for itself whether it falls on the day.
+            if (tasks.get(i).occursOn(day)) {
+                found.add((i + 1) + "." + tasks.get(i));
+            }
+        }
+
+        String shownDay = TaskDate.formatDate(day);
+        if (found.isEmpty()) {
+            reply("Nothing on " + shownDay + ". Enjoy the day off!");
+            return;
+        }
+        reply("Here's what you have on " + shownDay + ":\n" + String.join("\n", found));
     }
 
     /**

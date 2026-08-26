@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+
 /**
  * Represents a single task in the user's list.
  *
@@ -50,6 +52,20 @@ public class Task {
     /** Marks this task as not completed yet. */
     public void markAsNotDone() {
         this.isDone = false;
+    }
+
+    /**
+     * Returns whether this task has anything to do with a particular day.
+     *
+     * <p>A plain task carries no date, so the answer is no. The kinds of task
+     * that do carry dates answer for themselves, which lets Billy search the
+     * list without having to ask what type each task is.
+     *
+     * @param day the day being asked about
+     * @return whether this task falls on that day
+     */
+    public boolean occursOn(LocalDate day) {
+        return false;
     }
 
     /**

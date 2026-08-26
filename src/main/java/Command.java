@@ -22,6 +22,9 @@ public enum Command {
     /** Prints every stored task. */
     LIST("list"),
 
+    /** Prints the tasks falling on one day, e.g. {@code on 2019-12-02}. */
+    ON("on"),
+
     /** Marks a task as done, e.g. {@code mark 2}. */
     MARK("mark"),
 
