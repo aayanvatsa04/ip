@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
@@ -19,9 +20,9 @@ import java.util.ArrayList;
  * tidy up how they are shown and answer {@code on} with the tasks falling on a
  * given day.
  *
- * <p>Talking to the user is left to {@link Ui} and the file to {@link Storage},
- * so what is left here is the work itself: deciding what each command means and
- * carrying it out.
+ * <p>Talking to the user is left to {@link Ui}, the file to {@link Storage} and
+ * the tasks themselves to {@link TaskList}, so what is left here is the work of
+ * deciding what each command means and asking the right helper to carry it out.
  */
 public class Billy {
 
@@ -49,12 +50,12 @@ public class Billy {
     private static final String ON_USAGE = "Try: on 2019-12-02";
 
     /**
-     * Stored tasks, in the order the user added them.
+     * The user's tasks.
      *
-     * <p>An {@link ArrayList} grows as needed, so there is no limit on how many
-     * tasks Billy can hold, and it tracks its own size.
+     * <p>Replaced wholesale when the saved list is read at startup, which is why
+     * it is not final.
      */
-    private static final ArrayList<Task> tasks = new ArrayList<>();
+    private static TaskList tasks = new TaskList();
 
     /**
      * Where the task list is kept between runs.
@@ -92,7 +93,7 @@ public class Billy {
      */
     private static void loadSavedTasks() {
         try {
-            tasks.addAll(storage.load());
+            tasks = new TaskList(storage.load());
         } catch (BillyException e) {
             ui.showError(e.getMessage());
             return;
@@ -122,7 +123,7 @@ public class Billy {
      */
     private static void saveTasks() {
         try {
-            storage.save(tasks);
+            storage.save(tasks.asList());
         } catch (IOException e) {
             ui.showError("I couldn't save your list to " + storage.getPath() + " ("
                     + Storage.describeFailure(e) + ").\nThe change is still here, but it will be"
@@ -292,9 +293,9 @@ public class Billy {
      * @throws BillyException if the argument does not name a task that exists
      */
     private static void deleteTask(String argument) throws BillyException {
-        int index = parseTaskNumber(argument, Command.DELETE);
+        int taskNumber = parseTaskNumber(argument, Command.DELETE);
         // remove returns the task it took out, so it can be shown in the confirmation.
-        Task removed = tasks.remove(index);
+        Task removed = tasks.remove(taskNumber);
         ui.show("Noted. I've removed this task:\n  " + removed + "\n" + taskCountSummary());
         saveTasks();
     }
@@ -305,10 +306,11 @@ public class Billy {
             ui.show("Your list is empty. Nothing to do... suspicious.");
             return;
         }
+        List<Task> all = tasks.asList();
         ArrayList<String> lines = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            // List indices start at 0, but people count from 1.
-            lines.add((i + 1) + "." + tasks.get(i));
+        for (int i = 0; i < all.size(); i++) {
+            // List positions start at 0, but people count from 1.
+            lines.add((i + 1) + "." + all.get(i));
         }
         ui.show("Here are the tasks in your list:\n" + String.join("\n", lines));
     }
@@ -332,11 +334,12 @@ public class Billy {
         }
         LocalDate day = TaskDate.parse(argument).getDate();
 
+        List<Task> all = tasks.asList();
         ArrayList<String> found = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
+        for (int i = 0; i < all.size(); i++) {
             // Each task decides for itself whether it falls on the day.
-            if (tasks.get(i).occursOn(day)) {
-                found.add((i + 1) + "." + tasks.get(i));
+            if (all.get(i).occursOn(day)) {
+                found.add((i + 1) + "." + all.get(i));
             }
         }
 
@@ -359,8 +362,8 @@ public class Billy {
      * @throws BillyException if the argument does not name a task that exists
      */
     private static void setTaskDone(String argument, boolean done) throws BillyException {
-        int index = parseTaskNumber(argument, done ? Command.MARK : Command.UNMARK);
-        Task task = tasks.get(index);
+        int taskNumber = parseTaskNumber(argument, done ? Command.MARK : Command.UNMARK);
+        Task task = tasks.get(taskNumber);
         String confirmation;
         if (done) {
             task.markAsDone();
@@ -374,31 +377,24 @@ public class Billy {
     }
 
     /**
-     * Converts what the user typed into an index into {@link #tasks}.
+     * Reads what the user typed as a task number.
+     *
+     * <p>Only the reading happens here. Whether the number names a task that
+     * exists is for {@link TaskList} to say, since it is the one that knows.
      *
      * @param argument the text the user typed after the keyword
      * @param command the command the number belongs to, used to give a fitting example
-     * @return the matching 0-based index
-     * @throws BillyException if the text is not a number, or names a task that does not exist
+     * @return the number as the user wrote it, counting from 1
+     * @throws BillyException if the text is not a number at all
      */
     private static int parseTaskNumber(String argument, Command command) throws BillyException {
-        int taskNumber;
         try {
-            taskNumber = Integer.parseInt(argument.trim());
+            return Integer.parseInt(argument.trim());
         } catch (NumberFormatException e) {
             // Covers both a missing number ("mark") and a non-number ("mark two").
             throw new BillyException(
                     "I need a task number, like '" + command.getKeyword() + " 2'.");
         }
-
-        if (tasks.isEmpty()) {
-            throw new BillyException("Your list is empty, so there's nothing to change.");
-        }
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new BillyException("There's no task " + taskNumber
-                    + " on your list. You have " + tasks.size() + ".");
-        }
-        return taskNumber - 1;
     }
 
 }
