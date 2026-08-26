@@ -2,6 +2,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Locale;
 
 /**
@@ -30,7 +31,19 @@ public class TaskDate {
 
     /** Shown alongside an error to remind the user how a date is typed. */
     public static final String USAGE =
-            "Use yyyy-MM-dd, and a 24-hour time if you want one, e.g. 2019-12-02 or 2019-12-02 1800.";
+            "Use yyyy-MM-dd or d/M/yyyy, and a 24-hour time if you want one,"
+            + " e.g. 2019-12-02, 2/12/2019 or 2/12/2019 1800.";
+
+    /**
+     * Reads a date written the way it is spoken here, e.g. {@code 2/12/2019}
+     * for the 2nd of December.
+     *
+     * <p>The day comes first, as it does in most of the world outside the United
+     * States. A single digit is allowed for either part, so both {@code 2/12/2019}
+     * and {@code 02/12/2019} are understood.
+     */
+    private static final DateTimeFormatter DAY_FIRST_TYPED =
+            DateTimeFormatter.ofPattern("d/M/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     /** Reads and writes the time of day as four digits, e.g. {@code 1800}. */
     private static final DateTimeFormatter TIME_STORED = DateTimeFormatter.ofPattern("HHmm");
@@ -63,10 +76,10 @@ public class TaskDate {
     /**
      * Reads what the user typed as a date, with a time of day if one is given.
      *
-     * @param text a date such as {@code 2019-12-02}, optionally followed by a
-     *             24-hour time such as {@code 1800}
+     * @param text a date such as {@code 2019-12-02} or {@code 2/12/2019},
+     *             optionally followed by a 24-hour time such as {@code 1800}
      * @return the date it describes
-     * @throws BillyException if the text is not a date in the expected shape
+     * @throws BillyException if the text is not a date in either expected shape
      */
     public static TaskDate parse(String text) throws BillyException {
         String trimmed = text.trim();
@@ -74,12 +87,51 @@ public class TaskDate {
         // being quietly ignored.
         String[] parts = trimmed.split("\\s+", 2);
         try {
-            LocalDate date = LocalDate.parse(parts[0]);
             LocalTime time = parts.length > 1 ? LocalTime.parse(parts[1], TIME_STORED) : null;
-            return new TaskDate(date, time);
+            return new TaskDate(parseDate(parts[0]), time);
         } catch (DateTimeParseException e) {
             throw new BillyException("I couldn't read '" + trimmed + "' as a date. " + USAGE);
         }
+    }
+
+    /**
+     * Reads the date part on its own, in either accepted shape.
+     *
+     * <p>The two shapes cannot be confused for one another, since one is
+     * separated by dashes and the other by slashes, so trying them in turn is
+     * safe. The dashed form is tried first because that is the one Billy writes
+     * to the save file, and so the one seen most often.
+     *
+     * @param text just the date, with no time after it
+     * @return the day it names
+     * @throws DateTimeParseException if it is neither shape, nor a real date
+     */
+    private static LocalDate parseDate(String text) {
+        if (text.contains("/")) {
+            return LocalDate.parse(text, DAY_FIRST_TYPED);
+        }
+        return LocalDate.parse(text);
+    }
+
+    /**
+     * Returns whether this comes before another point in time.
+     *
+     * <p>On two different days the days decide it. On the same day, a time can
+     * only settle the order if both sides name one: a date given without a time
+     * says nothing about the hour, so it is treated as expressing no preference
+     * rather than as midnight, which Billy was never told.
+     *
+     * @param other the point in time to compare against
+     * @return whether this is known to come first
+     */
+    public boolean isBefore(TaskDate other) {
+        if (!date.equals(other.date)) {
+            return date.isBefore(other.date);
+        }
+        if (time == null || other.time == null) {
+            return false;
+        }
+        return time.isBefore(other.time);
     }
 
     /** Returns the day this falls on, ignoring any time of day. */
