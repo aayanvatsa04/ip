@@ -1,16 +1,19 @@
+import java.time.LocalDate;
+
 /**
  * Represents a task that runs from one date or time until another.
  *
- * <p>Both ends are kept as free text, so anything the user types is accepted,
- * e.g. {@code [E][ ] project meeting (from: Mon 2pm to: 4pm)}.
+ * <p>Both ends are real dates rather than free text, which lets Billy work out
+ * the days an event covers,
+ * e.g. {@code [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)}.
  */
 public class Event extends Task {
 
-    /** When the event starts, exactly as the user typed it. */
-    protected String from;
+    /** When the event starts. */
+    protected TaskDate from;
 
-    /** When the event ends, exactly as the user typed it. */
-    protected String to;
+    /** When the event ends. */
+    protected TaskDate to;
 
     /**
      * Creates an event that is not done yet.
@@ -19,20 +22,32 @@ public class Event extends Task {
      * @param from when the event starts
      * @param to when the event ends
      */
-    public Event(String description, String from, String to) {
+    public Event(String description, TaskDate from, TaskDate to) {
         super(description);
         this.from = from;
         this.to = to;
     }
 
     /**
+     * An event covers every day it runs across, not just the day it starts.
+     *
+     * <p>Both ends count as part of it, so an event running from the 2nd to the
+     * 4th is found by asking about the 2nd, the 3rd or the 4th.
+     */
+    @Override
+    public boolean occursOn(LocalDate day) {
+        return !day.isBefore(from.getDate()) && !day.isAfter(to.getDate());
+    }
+
+    /**
      * Returns this event as one line of the save file, with the start and end as
-     * fields of their own, e.g. {@code E | 0 | project meeting | Mon 2pm | 4pm}.
+     * fields of their own,
+     * e.g. {@code E | 0 | project meeting | 2019-12-02 1400 | 2019-12-02 1600}.
      */
     @Override
     public String toSaveFormat() {
         return "E" + FIELD_SEPARATOR + super.toSaveFormat()
-                + FIELD_SEPARATOR + from + FIELD_SEPARATOR + to;
+                + FIELD_SEPARATOR + from.toSaveFormat() + FIELD_SEPARATOR + to.toSaveFormat();
     }
 
     @Override
