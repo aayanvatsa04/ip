@@ -1,5 +1,5 @@
 /**
- * The commands Billy understands, each paired with the word the user types.
+ * The words Billy accepts as commands, one for each thing it can be asked to do.
  *
  * <p>Using an enum rather than loose {@code String} constants means the set of
  * commands is fixed and known to the compiler: a command can only be one of these
@@ -9,7 +9,7 @@
  *
  * <p>The order below is the order the keywords are listed to the user.
  */
-public enum Command {
+public enum CommandWord {
     /** Adds a task with no date attached, e.g. {@code todo borrow book}. */
     TODO("todo"),
 
@@ -40,7 +40,7 @@ public enum Command {
     /** The word the user types to invoke this command. */
     private final String keyword;
 
-    Command(String keyword) {
+    CommandWord(String keyword) {
         this.keyword = keyword;
     }
 
@@ -56,8 +56,8 @@ public enum Command {
      * @return the matching command
      * @throws BillyException if no command uses that word
      */
-    public static Command fromKeyword(String word) throws BillyException {
-        for (Command command : values()) {
+    public static CommandWord fromKeyword(String word) throws BillyException {
+        for (CommandWord command : values()) {
             if (command.keyword.equalsIgnoreCase(word)) {
                 return command;
             }
@@ -72,7 +72,7 @@ public enum Command {
      */
     public static String describeAll() {
         StringBuilder keywords = new StringBuilder();
-        for (Command command : values()) {
+        for (CommandWord command : values()) {
             if (keywords.length() > 0) {
                 keywords.append(", ");
             }

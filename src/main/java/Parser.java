@@ -57,7 +57,7 @@ public class Parser {
      * @param command which command the user named
      * @param argument everything after the keyword, or empty if nothing followed
      */
-    public record ParsedCommand(Command command, String argument) {
+    public record ParsedCommand(CommandWord command, String argument) {
     }
 
     /**
@@ -73,7 +73,7 @@ public class Parser {
         }
         // Split into the keyword and everything after it, e.g. "mark 2" -> "mark", "2".
         String[] parts = line.split("\\s+", 2);
-        Command command = Command.fromKeyword(parts[0]);
+        CommandWord command = CommandWord.fromKeyword(parts[0]);
         String argument = parts.length > 1 ? parts[1] : "";
         return new ParsedCommand(command, argument);
     }
@@ -133,7 +133,7 @@ public class Parser {
      * @return the number as the user wrote it, counting from 1
      * @throws BillyException if the text is not a number at all
      */
-    public static int parseTaskNumber(String argument, Command command) throws BillyException {
+    public static int parseTaskNumber(String argument, CommandWord command) throws BillyException {
         try {
             return Integer.parseInt(argument.trim());
         } catch (NumberFormatException e) {

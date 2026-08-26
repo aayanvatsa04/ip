@@ -186,7 +186,7 @@ public class Billy {
      */
     private boolean handleCommand(String line) throws BillyException {
         Parser.ParsedCommand parsed = Parser.parse(line);
-        Command command = parsed.command();
+        CommandWord command = parsed.command();
         String argument = parsed.argument();
 
         // Each branch reads as what it does, because anything that had to be made
