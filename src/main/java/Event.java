@@ -18,12 +18,22 @@ public class Event extends Task {
     /**
      * Creates an event that is not done yet.
      *
+     * <p>An event that ends before it starts is refused rather than stored. Such
+     * an event covers no days at all, so it would sit in the list yet never be
+     * found by {@code on} — including on the very days it names, which would
+     * look like a fault in the search rather than in the event.
+     *
      * @param description what the user wants to do
      * @param from when the event starts
      * @param to when the event ends
+     * @throws BillyException if the event would end before it starts
      */
-    public Event(String description, TaskDate from, TaskDate to) {
+    public Event(String description, TaskDate from, TaskDate to) throws BillyException {
         super(description);
+        if (to.isBefore(from)) {
+            throw new BillyException("An event can't end before it starts, and you gave"
+                    + " from: " + from + " to: " + to + ".");
+        }
         this.from = from;
         this.to = to;
     }

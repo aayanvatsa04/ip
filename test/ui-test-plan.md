@@ -248,7 +248,7 @@ Got it. I've added this task:
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
-I couldn't read 'no idea :-p' as a date. Use yyyy-MM-dd, and a 24-hour time if you want one, e.g. 2019-12-02 or 2019-12-02 1800.
+I couldn't read 'no idea :-p' as a date. Use yyyy-MM-dd or d/M/yyyy, and a 24-hour time if you want one, e.g. 2019-12-02, 2/12/2019 or 2/12/2019 1800.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -996,7 +996,7 @@ ____________________________________________________________
 Which day should I look at? Try: on 2019-12-02
 ____________________________________________________________
 ____________________________________________________________
-I couldn't read 'next tuesday' as a date. Use yyyy-MM-dd, and a 24-hour time if you want one, e.g. 2019-12-02 or 2019-12-02 1800.
+I couldn't read 'next tuesday' as a date. Use yyyy-MM-dd or d/M/yyyy, and a 24-hour time if you want one, e.g. 2019-12-02, 2/12/2019 or 2/12/2019 1800.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -1070,6 +1070,169 @@ bye
 ____________________________________________________________
 Welcome back! I've loaded 2 tasks from your last session.
 Heads up: I skipped 2 lines in data/billy.txt that I couldn't understand.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-28 Dates may be written day-first with slashes
+
+**Aim:** Verify the second accepted date format, `d/M/yyyy`, so that `2/12/2019 1800` means the 2nd of December 2019 at 6pm rather than being refused. The day comes first, so `12/2/2019` must be read as the 12th of February and not the American way round. A single digit is allowed for the day or the month, and an impossible date in this format must still be caught. Both formats end up displayed identically, since the format a date was typed in says nothing about the date itself.
+
+**Input:**
+```text
+deadline return book /by 2/12/2019 1800
+deadline pay fees /by 02/12/2019
+deadline call mum /by 12/2/2019
+deadline never /by 31/2/2019
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Dec 2 2019, 6:00pm)
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] pay fees (by: Dec 2 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] call mum (by: Feb 12 2019)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+I couldn't read '31/2/2019' as a date. Use yyyy-MM-dd or d/M/yyyy, and a 24-hour time if you want one, e.g. 2019-12-02, 2/12/2019 or 2/12/2019 1800.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[D][ ] return book (by: Dec 2 2019, 6:00pm)
+2.[D][ ] pay fees (by: Dec 2 2019)
+3.[D][ ] call mum (by: Feb 12 2019)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-29 Both date formats are saved the same way
+
+**Aim:** Verify that the format a date was typed in is not carried into the save file. A date read from `2/12/2019` and one read from `2019-12-02` are the same date, so after a restart they must be indistinguishable. This also proves the day-first form is converted on the way in rather than stored as text and reinterpreted on the way out, which would risk `12/2/2019` coming back as the 2nd of December.
+
+**Input:**
+```text
+deadline slashes /by 12/2/2019 0930
+deadline dashes /by 2019-02-12 0930
+bye
+--- restart ---
+list
+on 12/2/2019
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] slashes (by: Feb 12 2019, 9:30am)
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] dashes (by: Feb 12 2019, 9:30am)
+Now you have 2 tasks in the list.
+____________________________________________________________
+{{FAREWELL}}
+{{GREETING}}
+____________________________________________________________
+Welcome back! I've loaded 2 tasks from your last session.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[D][ ] slashes (by: Feb 12 2019, 9:30am)
+2.[D][ ] dashes (by: Feb 12 2019, 9:30am)
+____________________________________________________________
+____________________________________________________________
+Here's what you have on Feb 12 2019:
+1.[D][ ] slashes (by: Feb 12 2019, 9:30am)
+2.[D][ ] dashes (by: Feb 12 2019, 9:30am)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-30 An event cannot end before it starts
+
+**Aim:** Verify that a backwards event is refused instead of stored. Such an event covers no days at all, so it would sit in the list and yet never be found by `on`, even on the days it names — which reads as a fault in the search rather than in the event. Both a backwards day and a backwards time on the same day must be caught, while an end with no time given must not be mistaken for midnight and wrongly refused.
+
+**Input:**
+```text
+event backwards /from 2019-12-10 1000 /to 2019-12-02 1000
+event too early /from 2019-12-02 1400 /to 2019-12-02 1000
+event same day /from 2019-12-02 1000 /to 2019-12-02 1400
+event open end /from 2019-12-02 1000 /to 2019-12-02
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+An event can't end before it starts, and you gave from: Dec 10 2019, 10:00am to: Dec 2 2019, 10:00am.
+____________________________________________________________
+____________________________________________________________
+An event can't end before it starts, and you gave from: Dec 2 2019, 2:00pm to: Dec 2 2019, 10:00am.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] same day (from: Dec 2 2019, 10:00am to: Dec 2 2019, 2:00pm)
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] open end (from: Dec 2 2019, 10:00am to: Dec 2 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[E][ ] same day (from: Dec 2 2019, 10:00am to: Dec 2 2019, 2:00pm)
+2.[E][ ] open end (from: Dec 2 2019, 10:00am to: Dec 2 2019)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-31 A backwards event in the save file is treated as damage
+
+**Aim:** Verify that the rule holds for files as well as commands. A hand-edited file could hold an event that ends before it starts; since such an event cannot exist, the line must be skipped and counted like any other damage rather than loaded through a back door that the typed command refuses.
+
+**Data file:**
+```text
+T | 0 | read book
+E | 0 | backwards | 2019-12-10 1000 | 2019-12-02 1000
+E | 0 | conference | 2019-12-02 0900 | 2019-12-04 1700
+```
+
+**Input:**
+```text
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Welcome back! I've loaded 2 tasks from your last session.
+Heads up: I skipped 1 line in data/billy.txt that I couldn't understand.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
