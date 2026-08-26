@@ -1,5 +1,9 @@
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +16,8 @@ import java.util.List;
  *
  * <pre>
  * T | 1 | read book
- * D | 0 | return book | Sunday
- * E | 0 | project meeting | Mon 2pm | 4pm
+ * D | 0 | return book | 2019-12-02 1800
+ * E | 0 | project meeting | 2019-12-02 1400 | 2019-12-02 1600
  * </pre>
  *
  * <p>The first field is the type letter, the second is 1 for a finished task and
@@ -91,7 +95,7 @@ public class Storage {
         try {
             lines = Files.readAllLines(file);
         } catch (IOException e) {
-            throw new BillyException("I couldn't read " + file + " (" + e.getMessage()
+            throw new BillyException("I couldn't read " + file + " (" + describeFailure(e)
                     + "), so I'm starting with an empty list.");
         }
 
@@ -135,6 +139,36 @@ public class Storage {
     }
 
     /**
+     * Says what went wrong with a file, without repeating the file's name.
+     *
+     * <p>Java's file exceptions carry the path as their message and add a reason
+     * only when they know one, so {@code getMessage()} on its own often just
+     * echoes back the path Billy has already named. Asking for the reason, and
+     * naming the kind of failure when there is none, keeps the warning useful.
+     *
+     * @param e the failure to describe
+     * @return a short phrase to put in brackets after the file's name
+     */
+    static String describeFailure(IOException e) {
+        // Checked first: the more specific types below carry no reason of their own.
+        if (e instanceof FileSystemException fileError && fileError.getReason() != null) {
+            String reason = fileError.getReason().trim();
+            // e.g. "Is a directory" reads better mid-sentence as "is a directory".
+            return reason.substring(0, 1).toLowerCase() + reason.substring(1);
+        }
+        if (e instanceof AccessDeniedException) {
+            return "permission was denied";
+        }
+        if (e instanceof FileAlreadyExistsException) {
+            return "something that isn't a folder is in the way";
+        }
+        if (e instanceof NoSuchFileException) {
+            return "it isn't there";
+        }
+        return "the file couldn't be opened";
+    }
+
+    /**
      * Turns one saved line back into the task it describes.
      *
      * @param line one line of the save file
@@ -156,11 +190,11 @@ public class Storage {
         }
         case "D" -> {
             fields = splitFields(line, 4);
-            task = new Deadline(fields[2], fields[3]);
+            task = new Deadline(fields[2], TaskDate.parse(fields[3]));
         }
         case "E" -> {
             fields = splitFields(line, 5);
-            task = new Event(fields[2], fields[3], fields[4]);
+            task = new Event(fields[2], TaskDate.parse(fields[3]), TaskDate.parse(fields[4]));
         }
         default -> throw new BillyException("unknown task type: " + type);
         }
