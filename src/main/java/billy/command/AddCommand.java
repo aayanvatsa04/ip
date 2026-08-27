@@ -27,6 +27,12 @@ public class AddCommand extends Command {
         this.task = task;
     }
 
+    /**
+     * Adds the task to the list, says so, and writes the list out.
+     *
+     * <p>The confirmation names the task and how many there now are, so the user
+     * can see both what was added and where that leaves them.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         tasks.add(task);

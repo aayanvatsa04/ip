@@ -31,6 +31,13 @@ public class OnCommand extends Command {
         this.day = day;
     }
 
+    /**
+     * Shows the tasks falling on the day being asked about.
+     *
+     * <p>Each match keeps the number it has in the full list, so a task found
+     * this way can be marked or deleted without running {@code list} first to
+     * look its number up.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> all = tasks.asList();

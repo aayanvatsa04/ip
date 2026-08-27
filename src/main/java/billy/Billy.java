@@ -92,6 +92,12 @@ public class Billy {
         loadError = failure;
     }
 
+    /**
+     * Starts Billy, keeping the task list in the usual file.
+     *
+     * @param args not used; Billy takes its instructions from the conversation
+     *             rather than from the command line
+     */
     public static void main(String[] args) {
         new Billy(DATA_FILE).run();
     }

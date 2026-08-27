@@ -23,6 +23,12 @@ public class DeleteCommand extends Command {
         this.taskNumber = taskNumber;
     }
 
+    /**
+     * Removes the task the user named, says which one went, and writes the list out.
+     *
+     * <p>A number naming no task is refused by the list before anything is taken
+     * out, so the confirmation can never describe a deletion that did not happen.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws BillyException {
         // remove returns the task it took out, so it can be shown in the confirmation.

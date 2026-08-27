@@ -64,6 +64,10 @@ public class Event extends Task {
                 + FIELD_SEPARATOR + from.toSaveFormat() + FIELD_SEPARATOR + to.toSaveFormat();
     }
 
+    /**
+     * Returns this event as it is shown, with both ends after it, e.g.
+     * {@code [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)}.
+     */
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";

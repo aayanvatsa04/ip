@@ -41,6 +41,10 @@ public class Deadline extends Task {
                 + FIELD_SEPARATOR + by.toSaveFormat();
     }
 
+    /**
+     * Returns this deadline as it is shown, with the due date after it,
+     * e.g. {@code [D][ ] return book (by: Dec 2 2019, 6:00pm)}.
+     */
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by + ")";

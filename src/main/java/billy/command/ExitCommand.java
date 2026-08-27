@@ -13,11 +13,19 @@ import billy.ui.Ui;
  */
 public class ExitCommand extends Command {
 
+    /**
+     * Does nothing at all.
+     *
+     * <p>The farewell is printed once the conversation has ended rather than
+     * here, so that it appears whether the user said goodbye or simply ran out
+     * of input.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         // Nothing to do. Saying so is isExit's job.
     }
 
+    /** Returns true: this is the one command that ends the conversation. */
     @Override
     public boolean isExit() {
         return true;
