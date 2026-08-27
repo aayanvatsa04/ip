@@ -29,6 +29,9 @@ public enum CommandWord {
     /** Prints the tasks falling on one day, e.g. {@code on 2019-12-02}. */
     ON("on"),
 
+    /** Prints the tasks whose description mentions a word, e.g. {@code find book}. */
+    FIND("find"),
+
     /** Marks a task as done, e.g. {@code mark 2}. */
     MARK("mark"),
 
