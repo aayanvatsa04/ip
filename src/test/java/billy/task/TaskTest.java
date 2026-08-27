@@ -2,6 +2,7 @@ package billy.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 
@@ -83,6 +84,56 @@ public class TaskTest {
         Task task = new Task("read book");
         assertFalse(task.occursOn(LocalDate.of(2019, 12, 2)));
         assertFalse(task.occursOn(LocalDate.of(1999, 1, 1)));
+    }
+
+    // ---------------------------------------------------------------
+    // Finding a task by a word in its description
+    // ---------------------------------------------------------------
+
+    @Test
+    public void descriptionContains_wholeWordPresent_true() {
+        assertTrue(new Task("read book").descriptionContains("book"));
+    }
+
+    @Test
+    public void descriptionContains_wordAbsent_false() {
+        assertFalse(new Task("read book").descriptionContains("meeting"));
+    }
+
+    @Test
+    public void descriptionContains_differentCapitalisation_true() {
+        // Capitalisation is the user's business here as it is for keywords.
+        assertTrue(new Task("read book").descriptionContains("BOOK"));
+        assertTrue(new Task("Read Book").descriptionContains("book"));
+    }
+
+    @Test
+    public void descriptionContains_partOfAWord_true() {
+        // Insisting on whole words would mean remembering how a task was worded
+        // in order to find it again.
+        assertTrue(new Task("read textbook").descriptionContains("book"));
+        assertTrue(new Task("read book").descriptionContains("boo"));
+    }
+
+    @Test
+    public void descriptionContains_phraseSpanningWords_true() {
+        assertTrue(new Task("read the green book").descriptionContains("the green"));
+    }
+
+    @Test
+    public void descriptionContains_wordsPresentButNotTogether_false() {
+        // The search is for the text as typed, not for each word separately.
+        assertFalse(new Task("read the green book").descriptionContains("read book"));
+    }
+
+    @Test
+    public void descriptionContains_wholeDescription_true() {
+        assertTrue(new Task("read book").descriptionContains("read book"));
+    }
+
+    @Test
+    public void descriptionContains_longerThanTheDescription_false() {
+        assertFalse(new Task("read").descriptionContains("read book"));
     }
 
     @Test

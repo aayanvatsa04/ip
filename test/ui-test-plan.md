@@ -356,10 +356,10 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-I don't know what 'blah' means. I understand: todo, deadline, event, list, on, mark, unmark, delete, bye.
+I don't know what 'blah' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, bye.
 ____________________________________________________________
 ____________________________________________________________
-I don't know what 'buy' means. I understand: todo, deadline, event, list, on, mark, unmark, delete, bye.
+I don't know what 'buy' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, bye.
 ____________________________________________________________
 ____________________________________________________________
 Your list is empty. Nothing to do... suspicious.
@@ -1238,6 +1238,153 @@ ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-32 Find shows the tasks whose description matches
+
+**Aim:** Verify the main use of `find`: a word typed after the keyword lists
+every task whose description contains it, and nothing else. The matches keep
+the numbers they have in the full list, so a task found this way can be acted
+on straight away — the closing `mark` proves that number is the real one.
+
+**Input:**
+```text
+todo read book
+deadline return book /by 2019-06-06
+todo buy milk
+find book
+mark 2
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Jun 6 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] buy milk
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+1.[T][ ] read book
+2.[D][ ] return book (by: Jun 6 2019)
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [D][X] return book (by: Jun 6 2019)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-33 Find ignores capitals and matches part of a word
+
+**Aim:** Verify that a search is not defeated by how the task was capitalised,
+and that part of a word counts. Someone who wrote "Textbook" should still find
+it by typing `book`, since otherwise they must remember their own wording to
+search for it. The third task is present to show the search does not simply
+return everything.
+
+**Input:**
+```text
+todo Read Textbook
+todo buy milk
+find BOOK
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] Read Textbook
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] buy milk
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+1.[T][ ] Read Textbook
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-34 Find says so when nothing matches
+
+**Aim:** Verify that a search matching nothing is answered plainly rather than
+with an empty heading, which would read as though something had gone wrong. The
+word is quoted back so a typo in the search itself is easy to see. Searching an
+empty list is the same case and must not fail differently.
+
+**Input:**
+```text
+find milk
+todo read book
+find zzz
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Nothing in your list mentions 'milk'.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Nothing in your list mentions 'zzz'.
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-35 Find needs something to look for
+
+**Aim:** Verify that `find` with no word is refused with an example rather than
+listing every task or silently matching everything, either of which would look
+like Billy had misunderstood. A search made only of spaces is the same case,
+since the line is trimmed before it is read.
+
+**Input:**
+```text
+todo read book
+find
+find   
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+What should I look for? Try: find book
+____________________________________________________________
+____________________________________________________________
+What should I look for? Try: find book
 ____________________________________________________________
 {{FAREWELL}}
 ```
