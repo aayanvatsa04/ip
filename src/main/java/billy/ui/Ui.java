@@ -102,6 +102,8 @@ public class Ui {
      *
      * <p>False once the input runs out, which is what happens when the user
      * presses Ctrl+D or a file of commands ends.
+     *
+     * @return whether the user has typed anything more
      */
     public boolean hasNextCommand() {
         return scanner.hasNextLine();

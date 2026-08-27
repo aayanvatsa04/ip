@@ -42,6 +42,8 @@ public abstract class Command {
      *
      * <p>Only one command says yes, so that is the exception rather than
      * something every subclass has to answer.
+     *
+     * @return whether the conversation should end after this command
      */
     public boolean isExit() {
         return false;

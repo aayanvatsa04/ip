@@ -32,6 +32,12 @@ public class MarkCommand extends Command {
         this.shouldBeDone = shouldBeDone;
     }
 
+    /**
+     * Changes the task's status, says which way it went, and writes the list out.
+     *
+     * <p>The task is changed in place, so the list holds the new status without
+     * anything having to be put back into it.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws BillyException {
         Task task = tasks.get(taskNumber);

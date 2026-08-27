@@ -23,6 +23,7 @@ public class Todo extends Task {
         return "T" + FIELD_SEPARATOR + super.toSaveFormat();
     }
 
+    /** Returns this todo as it is shown, e.g. {@code [T][ ] borrow book}. */
     @Override
     public String toString() {
         return "[T]" + super.toString();

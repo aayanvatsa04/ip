@@ -13,6 +13,12 @@ import billy.ui.Ui;
  */
 public class ListCommand extends Command {
 
+    /**
+     * Shows every task, numbered the way the user refers to them.
+     *
+     * <p>An empty list gets a remark of its own rather than a heading with
+     * nothing under it, which would read as though something had gone wrong.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         if (tasks.isEmpty()) {
