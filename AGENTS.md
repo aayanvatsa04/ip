@@ -111,6 +111,20 @@ and say which side was changed and why.
 
 ## Git
 
+All commits, branch names and tags in this project must follow the SE-EDU Git
+conventions. The rules are written out in the `seedu-git-standard` skill.
+
+**Invoke that skill before writing or proposing any commit message**, and before
+naming a branch or creating a tag. Write the message from the skill's rules
+rather than from habit: the conventions are stricter than usual about the
+50-character subject line and about saying what changed and why rather than how.
+
+Commits here are subject-only, which the standard allows. Propose a single
+`git commit -m "Subject line"` by default, and carry the reasoning in the
+subject rather than in a body. Add a body only where the subject genuinely
+cannot carry it — a change that looks wrong without an explanation, an obvious
+alternative that was rejected, or a rule deliberately not followed — and say why
+that commit earns one.
+
 Use lightweight tags unless the user requests an annotated tag.
-When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
