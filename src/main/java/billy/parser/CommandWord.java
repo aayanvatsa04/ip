@@ -7,7 +7,7 @@ import billy.BillyException;
  *
  * <p>Using an enum rather than loose {@code String} constants means the set of
  * commands is fixed and known to the compiler: a command can only be one of these
- * values, and a misspelt name is a compile error instead of a command that quietly
+ * values, and a misspelled name is a compile error instead of a command that quietly
  * never matches. The list of keywords shown to the user is built from these values,
  * so it cannot fall out of step with what Billy actually accepts.
  *
@@ -63,7 +63,7 @@ public enum CommandWord {
     }
 
     /**
-     * Finds the command a typed word refers to, ignoring capitalisation.
+     * Finds the command a typed word refers to, ignoring capitalization.
      *
      * @param word the first word of what the user typed
      * @return the matching command
@@ -79,7 +79,7 @@ public enum CommandWord {
     }
 
     /**
-     * Lists every keyword Billy accepts, for use when a command is not recognised.
+     * Lists every keyword Billy accepts, for use when a command is not recognized.
      *
      * @return a sentence such as {@code I understand: todo, deadline, ..., bye.}
      */

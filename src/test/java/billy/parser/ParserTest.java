@@ -97,8 +97,8 @@ public class ParserTest {
     // ---------------------------------------------------------------
 
     @Test
-    public void parse_keywordInCapitals_stillRecognised() throws BillyException {
-        // Capitalisation is the user's business, not Billy's.
+    public void parse_keywordInCapitals_stillRecognized() throws BillyException {
+        // Capitalization is the user's business, not Billy's.
         assertInstanceOf(ListCommand.class, Parser.parse("LIST"));
         assertInstanceOf(AddCommand.class, Parser.parse("ToDo borrow book"));
     }
@@ -164,19 +164,19 @@ public class ParserTest {
     @Test
     public void parse_deadlineWithUnreadableDate_exceptionThrown() {
         assertThrows(BillyException.class,
-            () -> Parser.parse("deadline return book /by someday"));
+                () -> Parser.parse("deadline return book /by someday"));
     }
 
     @Test
     public void parse_eventWithoutFrom_exceptionThrown() {
         assertThrows(BillyException.class,
-            () -> Parser.parse("event meeting /to 2019-12-02 1600"));
+                () -> Parser.parse("event meeting /to 2019-12-02 1600"));
     }
 
     @Test
     public void parse_eventWithoutTo_exceptionThrown() {
         assertThrows(BillyException.class,
-            () -> Parser.parse("event meeting /from 2019-12-02 1400"));
+                () -> Parser.parse("event meeting /from 2019-12-02 1400"));
     }
 
     @Test
@@ -184,7 +184,7 @@ public class ParserTest {
         // Refused here rather than stored, because such an event covers no days
         // at all and so could never be found again by the `on` command.
         assertThrows(BillyException.class,
-            () -> Parser.parse("event meeting /from 2019-12-02 1600 /to 2019-12-02 1400"));
+                () -> Parser.parse("event meeting /from 2019-12-02 1600 /to 2019-12-02 1400"));
     }
 
     @Test

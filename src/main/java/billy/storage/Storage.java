@@ -31,7 +31,7 @@ import billy.task.Todo;
  *
  * <p>The first field is the type letter, the second is 1 for a finished task and
  * 0 for an unfinished one, and the rest are the task's own details. A readable
- * text format was chosen over Java's object serialisation because a person can
+ * text format was chosen over Java's object serialization because a person can
  * open it, understand it and fix it by hand — useful while the program is still
  * being built.
  *
@@ -206,19 +206,20 @@ public class Storage {
         String[] fields;
         Task task;
         switch (type) {
-        case "T" -> {
-            fields = splitFields(line, 3);
-            task = new Todo(fields[2]);
-        }
-        case "D" -> {
-            fields = splitFields(line, 4);
-            task = new Deadline(fields[2], TaskDate.parse(fields[3]));
-        }
-        case "E" -> {
-            fields = splitFields(line, 5);
-            task = new Event(fields[2], TaskDate.parse(fields[3]), TaskDate.parse(fields[4]));
-        }
-        default -> throw new BillyException("unknown task type: " + type);
+            case "T" -> {
+                fields = splitFields(line, 3);
+                task = new Todo(fields[2]);
+            }
+            case "D" -> {
+                fields = splitFields(line, 4);
+                task = new Deadline(fields[2], TaskDate.parse(fields[3]));
+            }
+            case "E" -> {
+                fields = splitFields(line, 5);
+                task = new Event(fields[2], TaskDate.parse(fields[3]),
+                        TaskDate.parse(fields[4]));
+            }
+            default -> throw new BillyException("unknown task type: " + type);
         }
 
         if (fields[1].equals("1")) {

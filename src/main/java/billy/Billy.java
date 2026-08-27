@@ -79,6 +79,11 @@ public class Billy {
         ui = new Ui();
         storage = new Storage(filePath);
 
+        // These two cannot be initialized where they are declared, as the coding
+        // standard would otherwise ask: the value depends on whether loading
+        // threw. Assigning the final fields directly from the try and the catch
+        // does not compile either, since the compiler cannot rule out the field
+        // having been set before the exception arrived. Hence the temporaries.
         TaskList loaded;
         String failure;
         try {

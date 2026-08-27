@@ -56,7 +56,7 @@ public class TaskDate {
     /**
      * Shows a date the way a person writes it, e.g. {@code Dec 2 2019}.
      *
-     * <p>The locale is fixed to English so that the month is spelt the same way
+     * <p>The locale is fixed to English so that the month is spelled the same way
      * on every computer, rather than following whatever language the user's
      * machine happens to be set to.
      */

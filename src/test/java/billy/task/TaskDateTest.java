@@ -20,7 +20,7 @@ import billy.BillyException;
  * drift apart. A date that is shown correctly but saved wrongly would look fine
  * all session and lose the user's work when Billy restarts.
  *
- * <p>The tests are named {@code feature_scenario_expectedBehaviour} so that a
+ * <p>The tests are named {@code feature_scenario_expectedBehavior} so that a
  * failure report says what broke without anyone having to open this file.
  */
 public class TaskDateTest {
