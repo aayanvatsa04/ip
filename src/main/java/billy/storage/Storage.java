@@ -1,3 +1,5 @@
+package billy.storage;
+
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
@@ -7,6 +9,13 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import billy.BillyException;
+import billy.task.Deadline;
+import billy.task.Event;
+import billy.task.Task;
+import billy.task.TaskDate;
+import billy.task.Todo;
 
 /**
  * Keeps the task list on the hard disk, so it survives Billy being closed.
@@ -146,10 +155,15 @@ public class Storage {
      * echoes back the path Billy has already named. Asking for the reason, and
      * naming the kind of failure when there is none, keeps the warning useful.
      *
+     * <p>Public because the commands that save the list word their own warning
+     * around it, and they now live in a package of their own. Being visible to
+     * the whole program is the price of that; it is safe to pay here, since this
+     * only turns an exception into words and holds nothing back.
+     *
      * @param e the failure to describe
      * @return a short phrase to put in brackets after the file's name
      */
-    static String describeFailure(IOException e) {
+    public static String describeFailure(IOException e) {
         // Checked first: the more specific types below carry no reason of their own.
         if (e instanceof FileSystemException fileError && fileError.getReason() != null) {
             String reason = fileError.getReason().trim();

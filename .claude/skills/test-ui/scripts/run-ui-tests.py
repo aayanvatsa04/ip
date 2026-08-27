@@ -28,8 +28,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 DEFAULT_PLAN = "test/ui-test-plan.md"
-DEFAULT_MAIN_CLASS = "Billy"
-DEFAULT_SOURCE_GLOB = "src/main/java/*.java"
+DEFAULT_MAIN_CLASS = "billy.Billy"
+DEFAULT_SOURCE_GLOB = "src/main/java/**/*.java"
 DEFAULT_TIMEOUT_SECONDS = 10
 DEFAULT_DATA_FILE = "data/billy.txt"
 
@@ -198,7 +198,9 @@ def parse_plan(path: Path) -> tuple[dict[str, str], list[TestCase]]:
 
 def compile_sources(repo: Path, source_glob: str, classes_dir: Path) -> None:
     """Compiles the project's sources, raising SystemExit on any compile error."""
-    sources = sorted(glob.glob(str(repo / source_glob)))
+    # recursive=True is what makes a `**` in the glob span nested folders rather
+    # than a single level, so sources organised into packages are all found.
+    sources = sorted(glob.glob(str(repo / source_glob), recursive=True))
     if not sources:
         fail(f"no source files matched {source_glob!r} under {repo}")
 

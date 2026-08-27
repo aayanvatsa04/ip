@@ -1,6 +1,10 @@
+package billy.task;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import billy.BillyException;
 
 /**
  * The user's tasks, in the order they were added.
