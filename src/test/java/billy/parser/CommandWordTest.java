@@ -83,8 +83,8 @@ public class CommandWordTest {
 
     @Test
     public void describeAll_always_readsAsASentenceInTheDeclaredOrder() {
-        assertEquals("I understand: todo, deadline, event, list, on, mark, unmark, delete, bye.",
-                CommandWord.describeAll());
+        assertEquals("I understand: todo, deadline, event, list, on, find, mark, unmark,"
+                + " delete, bye.", CommandWord.describeAll());
     }
 
     @Test

@@ -7,6 +7,7 @@ import billy.command.AddCommand;
 import billy.command.Command;
 import billy.command.DeleteCommand;
 import billy.command.ExitCommand;
+import billy.command.FindCommand;
 import billy.command.ListCommand;
 import billy.command.MarkCommand;
 import billy.command.OnCommand;
@@ -59,6 +60,9 @@ public class Parser {
     /** Shown alongside an error to remind the user how a day is asked about. */
     private static final String ON_USAGE = "Try: on 2019-12-02";
 
+    /** Shown alongside an error to remind the user how a search is typed. */
+    private static final String FIND_USAGE = "Try: find book";
+
     /** Nothing here needs an instance, so there is no way to make one. */
     private Parser() {
     }
@@ -91,6 +95,7 @@ public class Parser {
             case EVENT -> new AddCommand(parseEvent(argument));
             case LIST -> new ListCommand();
             case ON -> new OnCommand(parseDay(argument));
+            case FIND -> new FindCommand(parseKeyword(argument));
             case MARK -> new MarkCommand(parseTaskNumber(argument, word), true);
             case UNMARK -> new MarkCommand(parseTaskNumber(argument, word), false);
             case DELETE -> new DeleteCommand(parseTaskNumber(argument, word));
@@ -161,6 +166,25 @@ public class Parser {
             throw new BillyException(
                     "I need a task number, like '" + command.getKeyword() + " 2'.");
         }
+    }
+
+    /**
+     * Reads what the user typed as the word to search for.
+     *
+     * <p>Whatever was typed is taken as it stands, spaces and all, so
+     * {@code find read book} looks for that whole phrase rather than for either
+     * word. A search for two words at once would need a way to say whether both
+     * or either must match, and nothing yet asks for one.
+     *
+     * @param argument the text the user typed after the keyword
+     * @return the word to look for, trimmed
+     * @throws BillyException if nothing was given to look for
+     */
+    private static String parseKeyword(String argument) throws BillyException {
+        if (argument.isBlank()) {
+            throw new BillyException("What should I look for? " + FIND_USAGE);
+        }
+        return argument.trim();
     }
 
     /**

@@ -11,6 +11,7 @@ import billy.BillyException;
 import billy.command.AddCommand;
 import billy.command.DeleteCommand;
 import billy.command.ExitCommand;
+import billy.command.FindCommand;
 import billy.command.ListCommand;
 import billy.command.MarkCommand;
 import billy.command.OnCommand;
@@ -60,6 +61,11 @@ public class ParserTest {
     @Test
     public void parse_on_onCommandReturned() throws BillyException {
         assertInstanceOf(OnCommand.class, Parser.parse("on 2019-12-02"));
+    }
+
+    @Test
+    public void parse_find_findCommandReturned() throws BillyException {
+        assertInstanceOf(FindCommand.class, Parser.parse("find book"));
     }
 
     @Test
@@ -209,6 +215,18 @@ public class ParserTest {
     @Test
     public void parse_deleteWithWordInsteadOfNumber_exceptionThrown() {
         assertThrows(BillyException.class, () -> Parser.parse("delete last"));
+    }
+
+    @Test
+    public void parse_findWithoutKeyword_exceptionThrown() {
+        assertThrows(BillyException.class, () -> Parser.parse("find"));
+        assertThrows(BillyException.class, () -> Parser.parse("find    "));
+    }
+
+    @Test
+    public void parse_findPhrase_takenWhole() throws BillyException {
+        // Everything after the keyword is the search, spaces included.
+        assertInstanceOf(FindCommand.class, Parser.parse("find read book"));
     }
 
     @Test

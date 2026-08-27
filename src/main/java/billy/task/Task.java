@@ -1,6 +1,7 @@
 package billy.task;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 /**
  * Represents a single task in the user's list.
@@ -68,6 +69,29 @@ public class Task {
      */
     public boolean occursOn(LocalDate day) {
         return false;
+    }
+
+    /**
+     * Returns whether this task's description mentions a word.
+     *
+     * <p>Capitalization is ignored, as it is for command keywords, so looking
+     * for {@code Book} finds {@code read book}. Any part of a word counts, so
+     * {@code book} also finds {@code textbook}: insisting on whole words would
+     * mean the user had to guess how the task was worded to find it again.
+     *
+     * <p>Only the description is searched. A date is asked about with
+     * {@code on}, which understands what a day is, rather than by matching the
+     * text a date happens to be printed as.
+     *
+     * <p>The locale is fixed so that a task is found the same way on every
+     * computer, rather than depending on the language the machine is set to.
+     *
+     * @param keyword the word to look for
+     * @return whether the description contains it
+     */
+    public boolean descriptionContains(String keyword) {
+        return description.toLowerCase(Locale.ENGLISH)
+                .contains(keyword.toLowerCase(Locale.ENGLISH));
     }
 
     /**
