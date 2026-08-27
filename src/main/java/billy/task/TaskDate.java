@@ -73,6 +73,15 @@ public class TaskDate {
     /** The time of day, or null if the user gave only a date. */
     private final LocalTime time;
 
+    /**
+     * Creates a point in time from parts already known to be sound.
+     *
+     * <p>Private because text has to be made sense of before it can be trusted,
+     * which is {@link #parse(String)}'s job rather than a caller's.
+     *
+     * @param date the day this refers to
+     * @param time the time of day, or null if only a day was given
+     */
     private TaskDate(LocalDate date, LocalTime time) {
         this.date = date;
         this.time = time;
@@ -139,7 +148,11 @@ public class TaskDate {
         return time.isBefore(other.time);
     }
 
-    /** Returns the day this falls on, ignoring any time of day. */
+    /**
+     * Returns the day this falls on, ignoring any time of day.
+     *
+     * @return the day, without the hour even when one was given
+     */
     public LocalDate getDate() {
         return date;
     }
@@ -167,6 +180,8 @@ public class TaskDate {
      * <p>What is written is itself something {@link #parse(String)} accepts, so
      * loading reuses the same reading code and there is only ever one date format
      * to get right.
+     *
+     * @return this point in time as one field of the save file
      */
     public String toSaveFormat() {
         return time == null ? date.toString() : date + " " + time.format(TIME_STORED);

@@ -44,11 +44,20 @@ public enum CommandWord {
     /** The word the user types to invoke this command. */
     private final String keyword;
 
+    /**
+     * Creates a command with the word that invokes it.
+     *
+     * @param keyword the word the user types, in lower case
+     */
     CommandWord(String keyword) {
         this.keyword = keyword;
     }
 
-    /** Returns the word the user types to invoke this command. */
+    /**
+     * Returns the word the user types to invoke this command.
+     *
+     * @return the keyword, in lower case
+     */
     public String getKeyword() {
         return keyword;
     }

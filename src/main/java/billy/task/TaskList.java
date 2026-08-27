@@ -83,12 +83,20 @@ public class TaskList {
         return tasks.get(taskNumber - 1);
     }
 
-    /** Returns how many tasks are stored. */
+    /**
+     * Returns how many tasks are stored.
+     *
+     * @return the number of tasks, counting from 0 upwards
+     */
     public int size() {
         return tasks.size();
     }
 
-    /** Returns whether there are no tasks at all. */
+    /**
+     * Returns whether there are no tasks at all.
+     *
+     * @return whether the list is empty
+     */
     public boolean isEmpty() {
         return tasks.isEmpty();
     }

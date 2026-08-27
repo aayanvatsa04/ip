@@ -70,12 +70,20 @@ public class Storage {
         this.file = file;
     }
 
-    /** Returns the file the tasks are kept in, for use in messages to the user. */
+    /**
+     * Returns the file the tasks are kept in, for use in messages to the user.
+     *
+     * @return the file this storage reads from and writes to
+     */
     public Path getPath() {
         return file;
     }
 
-    /** Returns how many lines the last {@link #load()} skipped as unreadable. */
+    /**
+     * Returns how many lines the last {@link #load()} skipped as unreadable.
+     *
+     * @return the number of damaged lines seen by the last load, or 0
+     */
     public int getSkippedLineCount() {
         return skippedLineCount;
     }
