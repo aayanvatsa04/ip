@@ -30,21 +30,67 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 
 ## Testing after code changes
 
+The project is tested at two levels, and both must pass before any change is
+reported as done. They catch different faults and neither replaces the other:
+
+* **JUnit tests** in `src/test/java`, run with `./gradlew test`. These call
+  methods directly and check what they return or throw. A failure names the
+  method and the scenario, so it says what broke and roughly where.
+* **Text UI tests** described in `test/ui-test-plan.md`, run by the `test-ui`
+  skill. These start the whole program, type commands into it and compare the
+  entire console session. They catch what JUnit structurally cannot see:
+  wording, layout, the flow of the conversation, and whether the task list
+  survives a restart.
+
+Note that `test/` and `src/test/java` are unrelated. Gradle only ever compiles
+`src/test/java`; the top-level `test/` folder holds the UI test plan and is
+invisible to it.
+
+### JUnit coverage target
+
+Aim to cover the **top ~50% highest-value methods** by JUnit tests: the complex,
+core and critical ones, where "high value" means a bug would be costly, silent,
+or hard to trace. Data handling, parsing, and any arithmetic on what the user
+sees rank above thin wrappers, getters and printing code. Methods already
+covered thoroughly end to end by the UI test plan rank lower, since testing them
+again in isolation adds little.
+
+**Keep the JUnit tests up to date with every code change**, so that target keeps
+holding rather than decaying:
+
+* A new method that falls in the top half needs tests in the same change.
+* A changed method needs its tests updated in the same change — including
+  deliberate behaviour changes, where the test is what records the new intent.
+* A removed or renamed method needs its tests removed or renamed with it.
+
+Tests mirror the package of the class under test, e.g. `billy.task.TaskList` is
+tested by `src/test/java/billy/task/TaskListTest.java`. Name test methods
+`featureUnderTest_testScenario_expectedBehaviour`, e.g.
+`get_taskInEmptyList_exceptionThrown`.
+
+Write tests that would actually fail if the method were wrong. A test that only
+restates what the code already does proves nothing and quietly locks in bugs.
+
+### The routine
+
 After every change to the code, before reporting the work as done:
 
-1. Update `test/ui-test-plan.md` if the change affects the text UI. Add cases for
+1. Add or update the JUnit tests as described above. Skip this step only when
+   nothing in the top half of the codebase was touched, and say so.
+2. Update `test/ui-test-plan.md` if the change affects the text UI. Add cases for
    new commands or behaviour, and update the expected output of existing cases
    whose output the change deliberately alters. Skip this step only when the
    change cannot affect what the user sees on the console, and say so.
-2. Invoke the `test-ui` skill to run the test cases.
-3. Show the user the test session transcript, and report how many cases passed.
-   Tool output is not reliably visible to the user, so save the transcript to a
-   file and send it rather than assuming they can see the console output.
+3. Run `./gradlew test`, then invoke the `test-ui` skill to run the UI cases.
+4. Show the user both test session transcripts, and report how many tests and
+   cases passed. Tool output is not reliably visible to the user, so save the
+   transcripts to files and send them rather than assuming they can see the
+   console output.
 
-Never report a change as working without having run the tests. If a case fails,
-fix the cause rather than editing the expected output to match — unless the new
-output is genuinely intended, in which case update the plan and say which side
-was changed and why.
+Never report a change as working without having run both suites. If something
+fails, fix the cause rather than editing the expectation to match — unless the
+new behaviour is genuinely intended, in which case update the test or the plan
+and say which side was changed and why.
 
 ## Git
 
