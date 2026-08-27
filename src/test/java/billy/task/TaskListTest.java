@@ -192,7 +192,7 @@ public class TaskListTest {
         // Callers get a view they cannot change, so no task can be slipped in
         // behind the checks this class makes.
         assertThrows(UnsupportedOperationException.class,
-            () -> tasks.asList().add(new Todo("sneaked in")));
+                () -> tasks.asList().add(new Todo("sneaked in")));
     }
 
     @Test

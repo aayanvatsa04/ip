@@ -86,15 +86,15 @@ public class Parser {
         String argument = parts.length > 1 ? parts[1] : "";
 
         return switch (word) {
-        case TODO -> new AddCommand(parseTodo(argument));
-        case DEADLINE -> new AddCommand(parseDeadline(argument));
-        case EVENT -> new AddCommand(parseEvent(argument));
-        case LIST -> new ListCommand();
-        case ON -> new OnCommand(parseDay(argument));
-        case MARK -> new MarkCommand(parseTaskNumber(argument, word), true);
-        case UNMARK -> new MarkCommand(parseTaskNumber(argument, word), false);
-        case DELETE -> new DeleteCommand(parseTaskNumber(argument, word));
-        case BYE -> new ExitCommand();
+            case TODO -> new AddCommand(parseTodo(argument));
+            case DEADLINE -> new AddCommand(parseDeadline(argument));
+            case EVENT -> new AddCommand(parseEvent(argument));
+            case LIST -> new ListCommand();
+            case ON -> new OnCommand(parseDay(argument));
+            case MARK -> new MarkCommand(parseTaskNumber(argument, word), true);
+            case UNMARK -> new MarkCommand(parseTaskNumber(argument, word), false);
+            case DELETE -> new DeleteCommand(parseTaskNumber(argument, word));
+            case BYE -> new ExitCommand();
         };
     }
 
