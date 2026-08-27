@@ -24,8 +24,9 @@ import billy.BillyException;
  * <ul>
  *   <li><b>typed</b> by the user as {@code 2019-12-02} or {@code 2019-12-02 1800}</li>
  *   <li><b>shown</b> back as {@code Dec 2 2019} or {@code Dec 2 2019, 6:00pm}</li>
- *   <li><b>saved</b> in the same shape it was typed, so a file written today
- *       reads back correctly tomorrow</li>
+ *   <li><b>saved</b> as {@code 2019-12-02} or {@code 2019-12-02 1800}, in a shape
+ *       {@link #parse(String)} can read back, so a file written today is
+ *       understood tomorrow</li>
  * </ul>
  *
  * <p>Instances never change once built, so a task can hand its date out without
@@ -157,11 +158,15 @@ public class TaskDate {
     }
 
     /**
-     * Returns this as one field of the save file, in the same shape the user
-     * typed it, e.g. {@code 2019-12-02 1800}.
+     * Returns this as one field of the save file, e.g. {@code 2019-12-02 1800}.
      *
-     * <p>Writing it back exactly as it was read means {@link #parse(String)} can
-     * be reused to load it, so there is only ever one date format to get right.
+     * <p>The date is always written with dashes, whichever of the two accepted
+     * shapes the user typed, so the file has a single format to read back rather
+     * than a record of how each date happened to be entered.
+     *
+     * <p>What is written is itself something {@link #parse(String)} accepts, so
+     * loading reuses the same reading code and there is only ever one date format
+     * to get right.
      */
     public String toSaveFormat() {
         return time == null ? date.toString() : date + " " + time.format(TIME_STORED);
