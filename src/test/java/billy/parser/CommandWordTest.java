@@ -13,9 +13,9 @@ import billy.BillyException;
  *
  * <p>Two promises are worth holding this enum to. The first is that the word a
  * user types finds its command whatever case they type it in, since
- * capitalisation is their business and not Billy's.
+ * capitalization is their business and not Billy's.
  *
- * <p>The second is that the list shown when a command is not recognised is built
+ * <p>The second is that the list shown when a command is not recognized is built
  * from the same values used to match it. That is the whole reason the keywords
  * live in an enum rather than as loose strings: the help can then never advertise
  * a command Billy does not accept, nor omit one it does.

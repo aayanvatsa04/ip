@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
  *
  * <p>A todo adds only its {@code T} label to what {@link Task} already does, so
  * what is worth checking is that the label is added in the right place and that
- * the base behaviour still shows through underneath it.
+ * the base behavior still shows through underneath it.
  */
 public class TodoTest {
 

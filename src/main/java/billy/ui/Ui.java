@@ -88,7 +88,7 @@ public class Ui {
      *
      * <p>Errors look the same as any other message today, but they are asked for
      * by a name of their own so that the callers read honestly and so that
-     * setting them apart later — colour, a prefix — is a change here and nowhere
+     * setting them apart later — color, a prefix — is a change here and nowhere
      * else.
      *
      * @param message what went wrong, phrased for the person typing the command

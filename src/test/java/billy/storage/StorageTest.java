@@ -261,7 +261,7 @@ public class StorageTest {
     }
 
     @Test
-    public void describeFailure_unrecognisedFailure_fallsBackToSomethingUseful() {
+    public void describeFailure_unrecognizedFailure_fallsBackToSomethingUseful() {
         // Whatever goes wrong, the user gets a phrase rather than a class name.
         assertEquals("the file couldn't be opened",
                 Storage.describeFailure(new IOException("something odd")));
