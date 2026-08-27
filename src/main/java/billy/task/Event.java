@@ -1,4 +1,8 @@
+package billy.task;
+
 import java.time.LocalDate;
+
+import billy.BillyException;
 
 /**
  * Represents a task that runs from one date or time until another.

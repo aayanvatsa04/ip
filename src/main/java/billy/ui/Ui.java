@@ -1,3 +1,5 @@
+package billy.ui;
+
 import java.util.Scanner;
 
 /**

@@ -1,10 +1,17 @@
+package billy.command;
+
+import billy.storage.Storage;
+import billy.task.Task;
+import billy.task.TaskList;
+import billy.ui.Ui;
+
 /**
  * Adds a task to the list.
  *
  * <p>One class covers todos, deadlines and events alike, because adding is the
  * same act whatever is being added. Which kind of task it is was settled by
- * {@link Parser}, and the task itself knows how to describe and store itself, so
- * there is nothing here that differs between the three.
+ * {@link billy.parser.Parser Parser}, and the task itself knows how to describe
+ * and store itself, so there is nothing here that differs between the three.
  */
 public class AddCommand extends Command {
 

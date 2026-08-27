@@ -1,3 +1,5 @@
+package billy;
+
 /**
  * Signals that Billy could not carry out what the user asked for.
  *

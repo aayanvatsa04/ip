@@ -1,3 +1,5 @@
+package billy.task;
+
 import java.time.LocalDate;
 
 /**
@@ -14,8 +16,8 @@ public class Task {
     /**
      * Separates the fields of one task in the save file, e.g. {@code T | 1 | read book}.
      *
-     * <p>Spaces around the bar make a saved file easy to read by eye; {@link Storage}
-     * trims them away again when reading.
+     * <p>Spaces around the bar make a saved file easy to read by eye;
+     * {@link billy.storage.Storage Storage} trims them away again when reading.
      */
     public static final String FIELD_SEPARATOR = " | ";
 

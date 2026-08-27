@@ -1,3 +1,5 @@
+package billy.task;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -5,14 +7,16 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
 
+import billy.BillyException;
+
 /**
  * A point in time that a task refers to: a date, and optionally a time of day.
  *
  * <p>The time is optional because both ways of speaking are natural. "Return the
  * book by the 2nd of December" fixes only a day, while "the meeting starts at 6pm
- * on the 2nd" fixes a moment. Storing a bare {@link LocalDateTime} would force a
- * time onto the first case, and Billy would then claim a deadline was due at
- * midnight when the user never said so.
+ * on the 2nd" fixes a moment. Storing a bare {@link java.time.LocalDateTime
+ * LocalDateTime} would force a time onto the first case, and Billy would then
+ * claim a deadline was due at midnight when the user never said so.
  *
  * <p>The same text is read and written in three different shapes, and keeping all
  * three in this one class means they can never drift apart:

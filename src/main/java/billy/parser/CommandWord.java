@@ -1,3 +1,7 @@
+package billy.parser;
+
+import billy.BillyException;
+
 /**
  * The words Billy accepts as commands, one for each thing it can be asked to do.
  *

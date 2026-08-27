@@ -1,9 +1,16 @@
+package billy.command;
+
 import java.io.IOException;
+
+import billy.BillyException;
+import billy.storage.Storage;
+import billy.task.TaskList;
+import billy.ui.Ui;
 
 /**
  * Something the user has asked Billy to do, ready to be carried out.
  *
- * <p>A command is built by {@link Parser} from what was typed, and holds
+ * <p>A command is built by {@link billy.parser.Parser Parser} from what was typed, and holds
  * whatever it needs: the task to add, the number to delete, the day to look at.
  * By the time it exists it is known to be valid, so carrying it out is simply a
  * matter of asking it to.
