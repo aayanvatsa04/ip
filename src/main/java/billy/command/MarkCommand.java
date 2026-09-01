@@ -49,7 +49,7 @@ public class MarkCommand extends Command {
             task.markAsNotDone();
             confirmation = "OK, I've marked this task as not done yet:";
         }
-        ui.show(confirmation + "\n  " + task);
+        ui.show(confirmation, "  " + task);
         save(tasks, ui, storage);
     }
 }

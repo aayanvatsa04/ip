@@ -103,4 +103,42 @@ public class UiTest {
         ui.show("second");
         assertEquals("second", ui.stopCollecting());
     }
+
+    @Test
+    public void show_severalLines_joinedIntoOneMessage() {
+        // The lines are the message, not several messages: what the user sees is
+        // one block, exactly as if the newlines had been typed by the caller.
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.show("Got it. I've added this task:", "  [T][ ] read book", "Now you have 1 task.");
+        assertEquals("Got it. I've added this task:\n  [T][ ] read book\nNow you have 1 task.",
+                ui.stopCollecting());
+    }
+
+    @Test
+    public void show_oneLine_noNewlineAdded() {
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.show("Your list is empty.");
+        assertEquals("Your list is empty.", ui.stopCollecting());
+    }
+
+    @Test
+    public void show_lineThatItselfSpansLines_leftAsItIs() {
+        // A caller that already has a joined block can still pass it whole, which
+        // is what the commands listing tasks do.
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.show("Heading:", "1.first\n2.second");
+        assertEquals("Heading:\n1.first\n2.second", ui.stopCollecting());
+    }
+
+    @Test
+    public void showError_severalLines_joinedIntoOneMessage() {
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.showError("I couldn't save your list.", "The change will be lost when Billy closes.");
+        assertEquals("I couldn't save your list.\nThe change will be lost when Billy closes.",
+                ui.stopCollecting());
+    }
 }

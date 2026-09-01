@@ -32,6 +32,6 @@ public class ListCommand extends Command {
             // List positions start at 0, but people count from 1.
             lines.add((i + 1) + "." + all.get(i));
         }
-        ui.show("Here are the tasks in your list:\n" + String.join("\n", lines));
+        ui.show("Here are the tasks in your list:", String.join("\n", lines));
     }
 }

@@ -36,8 +36,9 @@ public class AddCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         tasks.add(task);
-        ui.show("Got it. I've added this task:\n  " + task + "\n"
-                + Ui.describeNewListSize(tasks.size()));
+        ui.show("Got it. I've added this task:",
+                "  " + task,
+                Ui.describeNewListSize(tasks.size()));
         save(tasks, ui, storage);
     }
 }

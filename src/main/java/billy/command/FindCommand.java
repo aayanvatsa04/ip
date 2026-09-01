@@ -50,6 +50,6 @@ public class FindCommand extends Command {
             ui.show("Nothing in your list mentions '" + keyword + "'.");
             return;
         }
-        ui.show("Here are the matching tasks in your list:\n" + String.join("\n", found));
+        ui.show("Here are the matching tasks in your list:", String.join("\n", found));
     }
 }
