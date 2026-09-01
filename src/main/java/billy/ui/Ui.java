@@ -130,9 +130,15 @@ public class Ui {
     /**
      * Prints one message as a block between divider lines.
      *
-     * @param message what to say; may span several lines
+     * <p>Takes the message a line at a time, since that is what Billy's answers
+     * are: a sentence, then the task it concerns, then how many are left. The
+     * callers used to glue those together with {@code \n} themselves, which put
+     * the shape of the message in every command rather than here.
+     *
+     * @param lines the message, one line per argument
      */
-    public void show(String message) {
+    public void show(String... lines) {
+        String message = String.join("\n", lines);
         if (transcript != null) {
             // No dividers: a dialog box already shows where the message ends.
             transcript.append(message).append("\n");
@@ -151,10 +157,11 @@ public class Ui {
      * setting them apart later — color, a prefix — is a change here and nowhere
      * else.
      *
-     * @param message what went wrong, phrased for the person typing the command
+     * @param lines what went wrong, phrased for the person typing the command,
+     *              one line per argument
      */
-    public void showError(String message) {
-        show(message);
+    public void showError(String... lines) {
+        show(lines);
     }
 
     /**

@@ -66,8 +66,8 @@ public abstract class Command {
             storage.save(tasks.asList());
         } catch (IOException e) {
             ui.showError("I couldn't save your list to " + storage.getPath() + " ("
-                    + Storage.describeFailure(e) + ").\nThe change is still here, but it will be"
-                    + " lost when Billy closes.");
+                    + Storage.describeFailure(e) + ").",
+                    "The change is still here, but it will be lost when Billy closes.");
         }
     }
 }

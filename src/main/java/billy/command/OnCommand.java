@@ -54,6 +54,6 @@ public class OnCommand extends Command {
             ui.show("Nothing on " + shownDay + ". Enjoy the day off!");
             return;
         }
-        ui.show("Here's what you have on " + shownDay + ":\n" + String.join("\n", found));
+        ui.show("Here's what you have on " + shownDay + ":", String.join("\n", found));
     }
 }

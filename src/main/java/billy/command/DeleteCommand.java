@@ -33,8 +33,9 @@ public class DeleteCommand extends Command {
     public void execute(TaskList tasks, Ui ui, Storage storage) throws BillyException {
         // remove returns the task it took out, so it can be shown in the confirmation.
         Task removed = tasks.remove(taskNumber);
-        ui.show("Noted. I've removed this task:\n  " + removed + "\n"
-                + Ui.describeNewListSize(tasks.size()));
+        ui.show("Noted. I've removed this task:",
+                "  " + removed,
+                Ui.describeNewListSize(tasks.size()));
         save(tasks, ui, storage);
     }
 }
