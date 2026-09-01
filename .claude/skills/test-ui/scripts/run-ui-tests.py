@@ -196,11 +196,23 @@ def parse_plan(path: Path) -> tuple[dict[str, str], list[TestCase]]:
     return settings, cases
 
 
-def compile_sources(repo: Path, source_glob: str, classes_dir: Path) -> None:
+def compile_sources(
+    repo: Path, source_glob: str, classes_dir: Path, exclude_glob: str | None = None
+) -> None:
     """Compiles the project's sources, raising SystemExit on any compile error."""
     # recursive=True is what makes a `**` in the glob span nested folders rather
     # than a single level, so sources organised into packages are all found.
     sources = sorted(glob.glob(str(repo / source_glob), recursive=True))
+
+    # The GUI sources need JavaFX on the classpath, which plain javac does not
+    # have. They are left out rather than compiled, since the text UI never uses
+    # them: nothing the console conversation touches refers to the window.
+    if exclude_glob:
+        excluded = set(glob.glob(str(repo / exclude_glob), recursive=True))
+        sources = [s for s in sources if s not in excluded]
+        if excluded:
+            print(f"Excluded {len(excluded)} source file(s) matching {exclude_glob!r}.")
+
     if not sources:
         fail(f"no source files matched {source_glob!r} under {repo}")
 
@@ -357,6 +369,7 @@ def main() -> int:
 
     main_class = args.main or settings.get("main_class", DEFAULT_MAIN_CLASS)
     source_glob = args.sources or settings.get("source_glob", DEFAULT_SOURCE_GLOB)
+    exclude_glob = settings.get("exclude_glob")
     data_file = settings.get("data_file", DEFAULT_DATA_FILE)
 
     if args.only:
@@ -371,7 +384,7 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="ui-test-") as workspace:
         classes_dir = Path(workspace) / "classes"
-        compile_sources(repo, source_glob, classes_dir)
+        compile_sources(repo, source_glob, classes_dir, exclude_glob)
 
         for number, case in enumerate(cases, start=1):
             work_dir = Path(workspace) / f"case-{number:02d}"

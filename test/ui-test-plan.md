@@ -1,6 +1,7 @@
 ---
 main_class: billy.Billy
 source_glob: src/main/java/**/*.java
+exclude_glob: src/main/java/billy/gui/**/*.java
 data_file: data/billy.txt
 ---
 

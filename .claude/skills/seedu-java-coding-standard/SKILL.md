@@ -139,10 +139,25 @@ if (isDone) {                    if (isDone) doCleanup();
 
 ## Checking compliance
 
-There is no linter wired into the build, so check by reading and with these:
+Checkstyle enforces the mechanically checkable half of this standard, using the
+SE-EDU ruleset in `config/checkstyle/`. Run it first:
 
 ```bash
-awk 'length > 120 {print FILENAME":"FNR" ("length")"}' $(find src -name '*.java')
+./gradlew checkstyleMain checkstyleTest
+```
+
+Silence means no violations; anything found is printed with its file, line and
+rule name, and also written to `build/reports/checkstyle/`. Add `--rerun-tasks`
+to force a fresh run, as Gradle otherwise reports `UP-TO-DATE` and re-uses the
+previous answer.
+
+The rest is still read for, since no ruleset can judge whether a name is
+meaningful or a comment says anything worth saying. These two help with the
+parts Checkstyle does not cover — the 110-character soft limit, which it does
+not enforce, and British spelling, which it cannot see:
+
+```bash
+awk 'length > 110 {print FILENAME":"FNR" ("length")"}' $(find src -name '*.java')
 ```
 
 ```bash
