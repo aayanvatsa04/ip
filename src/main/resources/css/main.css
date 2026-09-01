@@ -1,0 +1,43 @@
+/* The window itself: the conversation area, the input box and the send button. */
+
+.root {
+    -fx-background-color: #f4f1ea;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #d8d2c4;
+    -fx-border-width: 1 0 0 0;
+    -fx-font-size: 13px;
+    -fx-padding: 10 12 10 12;
+}
+
+.button {
+    -fx-background-color: #6b8f71;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: #7ba382;
+}
+
+.button:pressed {
+    -fx-background-color: #5a7a5f;
+}
+
+.button:disabled {
+    -fx-opacity: 0.5;
+}

@@ -1,0 +1,15 @@
+/* One message in the conversation. The user's messages and Billy's differ only
+   in color and in which side they sit on, which is enough to tell them apart. */
+
+.label {
+    -fx-background-color: #dbe7dc;
+    -fx-background-radius: 12px;
+    -fx-font-size: 13px;
+    -fx-padding: 10 14 10 14;
+    -fx-text-fill: #23281f;
+}
+
+/* Billy's replies, added by DialogBox.flip(). */
+.reply-label {
+    -fx-background-color: white;
+}
