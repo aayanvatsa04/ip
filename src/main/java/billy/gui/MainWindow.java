@@ -43,13 +43,19 @@ public class MainWindow extends AnchorPane {
     /**
      * Prepares the window once JavaFX has built it from the layout file.
      *
-     * <p>Binding the scroll position to the height of the conversation is what
-     * keeps the newest message in view: every time a dialog box is added the
-     * container grows taller, and the scroll pane follows it down.
+     * <p>Watching the height of the conversation is what keeps the newest
+     * message in view: every time a dialog box is added the container grows
+     * taller, and the scroll pane is sent to the bottom to follow it.
+     *
+     * <p>A listener rather than a binding, deliberately. Binding the scroll
+     * position would keep it at the bottom just as well, but a bound property
+     * cannot be set by anything else — including the user, whose mouse wheel and
+     * trackpad would then be ignored. Setting it from a listener leaves the
+     * scroll position free to be moved by hand afterwards.
      */
     @FXML
     public void initialize() {
-        scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        dialogContainer.heightProperty().addListener(observable -> scrollPane.setVvalue(1.0));
     }
 
     /**
