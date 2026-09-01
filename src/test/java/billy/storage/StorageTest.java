@@ -242,7 +242,7 @@ public class StorageTest {
 
     @Test
     public void describeFailure_reasonGiven_readsAsPartOfASentence() {
-        // Java capitalises its reasons; mid-sentence they should not be.
+        // Java capitalizes its reasons; mid-sentence they should not be.
         FileSystemException failure =
                 new FileSystemException("billy.txt", null, "Is a directory");
         assertEquals("is a directory", Storage.describeFailure(failure));
