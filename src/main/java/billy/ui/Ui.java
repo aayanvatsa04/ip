@@ -32,6 +32,17 @@ public class Ui {
     private final Scanner scanner = new Scanner(System.in);
 
     /**
+     * Collects what Billy says instead of printing it, or null while Billy is
+     * talking to the console.
+     *
+     * <p>The window needs Billy's answer as a piece of text it can put in a
+     * dialog box, not as something already written to a console that is not
+     * there. Collecting it here keeps that difference in the one class whose
+     * job is how Billy's words reach the user.
+     */
+    private StringBuilder transcript = null;
+
+    /**
      * Names a number of tasks with the matching plural, e.g. {@code 1 task} or
      * {@code 3 tasks}.
      *
@@ -57,19 +68,63 @@ public class Ui {
         return "Now you have " + describeListSize(count) + " in the list.";
     }
 
+    /**
+     * Returns the words Billy opens with, without the banner around them.
+     *
+     * <p>Asked for by name so that the window can open with the same greeting
+     * the console does. The banner is left out of it because ASCII art of the
+     * name only lines up in a font whose letters are all the same width.
+     *
+     * @return the greeting, spanning two lines.
+     */
+    public static String getGreeting() {
+        return "Hey there! Billy here, at your service.\n"
+                + "I track todos, deadlines and events. Type 'list' to see them all.";
+    }
+
+    /**
+     * Returns Billy's sign-off.
+     *
+     * @return the farewell, on one line.
+     */
+    public static String getFarewell() {
+        return "Catch you later! Don't be a stranger.";
+    }
+
     /** Prints the startup banner and welcomes the user. */
     public void showWelcome() {
         System.out.println(DIVIDER);
         System.out.println(BANNER);
-        System.out.println("Hey there! Billy here, at your service.");
-        System.out.println("I track todos, deadlines and events. Type 'list' to see them all.");
+        System.out.println(getGreeting());
         System.out.println(DIVIDER);
     }
 
     /** Prints Billy's farewell before the program exits. */
     public void showGoodbye() {
-        System.out.println("Catch you later! Don't be a stranger.");
+        System.out.println(getFarewell());
         System.out.println(DIVIDER);
+    }
+
+    /**
+     * Starts collecting what Billy says rather than printing it.
+     *
+     * <p>Called before each command the window carries out, so that the answer
+     * can be handed back as text instead of disappearing into a console.
+     */
+    public void startCollecting() {
+        transcript = new StringBuilder();
+    }
+
+    /**
+     * Returns everything said since collecting started, and goes back to
+     * printing.
+     *
+     * @return what Billy said, with no divider lines and no trailing blank line.
+     */
+    public String stopCollecting() {
+        String collected = transcript.toString().strip();
+        transcript = null;
+        return collected;
     }
 
     /**
@@ -78,6 +133,11 @@ public class Ui {
      * @param message what to say; may span several lines
      */
     public void show(String message) {
+        if (transcript != null) {
+            // No dividers: a dialog box already shows where the message ends.
+            transcript.append(message).append("\n");
+            return;
+        }
         System.out.println(DIVIDER);
         System.out.println(message);
         System.out.println(DIVIDER);

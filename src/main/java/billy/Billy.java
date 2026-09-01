@@ -67,6 +67,27 @@ public class Billy {
     private final String loadError;
 
     /**
+     * Whether the last command answered through {@link #getResponse(String)}
+     * asked to end the conversation.
+     *
+     * <p>The console loop keeps this in a local variable, since it is the thing
+     * doing the looping. The window has no loop of its own to hold it in: it
+     * hands over one command at a time and asks afterwards whether that was the
+     * last, so the answer has to survive between calls.
+     */
+    private boolean isExitRequested = false;
+
+    /**
+     * Builds a Billy that keeps its tasks in the usual file.
+     *
+     * <p>Offered for the window, which has no reason to care where the list is
+     * kept. Tests still name a file of their own through the other constructor.
+     */
+    public Billy() {
+        this(DATA_FILE);
+    }
+
+    /**
      * Builds a Billy that keeps its tasks in a particular file.
      *
      * <p>Whatever goes wrong while reading, Billy is left able to work: a missing,
@@ -138,15 +159,53 @@ public class Billy {
     }
 
     /**
-     * Says what happened while the saved list was being read.
+     * Answers one command, as text rather than as something printed.
+     *
+     * <p>This is how the window talks to Billy. It runs the same parsing and
+     * the same commands as the console conversation does, so the two cannot
+     * drift apart; only where the words end up differs.
+     *
+     * @param input the line the user typed
+     * @return what Billy has to say in reply, ready to put in a dialog box
+     */
+    public String getResponse(String input) {
+        ui.startCollecting();
+        try {
+            Command command = Parser.parse(input);
+            command.execute(tasks, ui, storage);
+            isExitRequested = command.isExit();
+            if (isExitRequested) {
+                // The console prints the farewell after its loop ends. The
+                // window has no such moment, so the goodbye is said here.
+                ui.show(Ui.getFarewell());
+            }
+        } catch (BillyException e) {
+            ui.showError(e.getMessage());
+        }
+        return ui.stopCollecting();
+    }
+
+    /**
+     * Returns whether the last answered command asked to end the conversation.
+     *
+     * @return whether Billy has been told to say goodbye.
+     */
+    public boolean isExitRequested() {
+        return isExitRequested;
+    }
+
+    /**
+     * Returns what Billy has to say about the saved list before the first
+     * command is typed, or null when there is nothing worth saying.
      *
      * <p>Nothing is said when there is nothing to report, so a first run on a
      * fresh computer looks exactly as it did before saving existed.
+     *
+     * @return the startup message, or null if there is none.
      */
-    private void reportStartup() {
+    public String getStartupMessage() {
         if (loadError != null) {
-            ui.showError(loadError);
-            return;
+            return loadError;
         }
 
         ArrayList<String> notes = new ArrayList<>();
@@ -159,8 +218,24 @@ public class Billy {
             notes.add("Heads up: I skipped " + skipped + (skipped == 1 ? " line" : " lines")
                     + " in " + storage.getPath() + " that I couldn't understand.");
         }
-        if (!notes.isEmpty()) {
-            ui.show(String.join("\n", notes));
+        return notes.isEmpty() ? null : String.join("\n", notes);
+    }
+
+    /**
+     * Says what happened while the saved list was being read.
+     *
+     * <p>Nothing is said when there is nothing to report, so a first run on a
+     * fresh computer looks exactly as it did before saving existed.
+     */
+    private void reportStartup() {
+        String message = getStartupMessage();
+        if (message == null) {
+            return;
+        }
+        if (loadError != null) {
+            ui.showError(message);
+        } else {
+            ui.show(message);
         }
     }
 }

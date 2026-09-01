@@ -59,4 +59,48 @@ public class UiTest {
         assertEquals("Now you have " + Ui.describeListSize(7) + " in the list.",
                 Ui.describeNewListSize(7));
     }
+
+    @Test
+    public void getGreeting_always_matchesWhatTheConsoleSays() {
+        // The window and the console open with the same words; only the banner
+        // around them differs. Spelling the greeting out here is what would
+        // catch the two drifting apart.
+        assertEquals("Hey there! Billy here, at your service.\n"
+                + "I track todos, deadlines and events. Type 'list' to see them all.",
+                Ui.getGreeting());
+    }
+
+    @Test
+    public void getFarewell_always_matchesWhatTheConsoleSays() {
+        assertEquals("Catch you later! Don't be a stranger.", Ui.getFarewell());
+    }
+
+    @Test
+    public void stopCollecting_messagesShown_returnedWithoutDividers() {
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.show("first");
+        ui.show("second");
+        assertEquals("first\nsecond", ui.stopCollecting());
+    }
+
+    @Test
+    public void stopCollecting_errorShown_returnedLikeAnyOtherMessage() {
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.showError("something went wrong");
+        assertEquals("something went wrong", ui.stopCollecting());
+    }
+
+    @Test
+    public void startCollecting_afterAnEarlierRound_nothingCarriedOver() {
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.show("first");
+        ui.stopCollecting();
+
+        ui.startCollecting();
+        ui.show("second");
+        assertEquals("second", ui.stopCollecting());
+    }
 }
