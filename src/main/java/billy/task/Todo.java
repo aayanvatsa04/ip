@@ -8,6 +8,12 @@ package billy.task;
  */
 public class Todo extends Task {
 
+    /** Marks a saved line as a todo. */
+    public static final String TYPE_LETTER = "T";
+
+    /** How many fields a saved todo has: the letter, the flag and the description. */
+    public static final int FIELD_COUNT = 3;
+
     /**
      * Creates a todo that is not done yet.
      *
@@ -20,7 +26,7 @@ public class Todo extends Task {
     /** Returns this todo as one line of the save file, e.g. {@code T | 0 | borrow book}. */
     @Override
     public String toSaveFormat() {
-        return "T" + FIELD_SEPARATOR + super.toSaveFormat();
+        return TYPE_LETTER + FIELD_SEPARATOR + super.toSaveFormat();
     }
 
     /** Returns this todo as it is shown, e.g. {@code [T][ ] borrow book}. */

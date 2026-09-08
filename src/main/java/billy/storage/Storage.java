@@ -206,26 +206,27 @@ public class Storage {
         String[] fields;
         Task task;
         switch (type) {
-            case "T" -> {
-                fields = splitFields(line, 3);
+            case Todo.TYPE_LETTER -> {
+                fields = splitFields(line, Todo.FIELD_COUNT);
                 task = new Todo(fields[2]);
             }
-            case "D" -> {
-                fields = splitFields(line, 4);
+            case Deadline.TYPE_LETTER -> {
+                fields = splitFields(line, Deadline.FIELD_COUNT);
                 task = new Deadline(fields[2], TaskDate.parse(fields[3]));
             }
-            case "E" -> {
-                fields = splitFields(line, 5);
+            case Event.TYPE_LETTER -> {
+                fields = splitFields(line, Event.FIELD_COUNT);
                 task = new Event(fields[2], TaskDate.parse(fields[3]),
                         TaskDate.parse(fields[4]));
             }
             default -> throw new BillyException("unknown task type: " + type);
         }
 
-        if (fields[1].equals("1")) {
+        if (fields[1].equals(Task.FLAG_DONE)) {
             task.markAsDone();
-        } else if (!fields[1].equals("0")) {
-            throw new BillyException("the done flag must be 0 or 1, but was: " + fields[1]);
+        } else if (!fields[1].equals(Task.FLAG_NOT_DONE)) {
+            throw new BillyException("the done flag must be " + Task.FLAG_NOT_DONE + " or "
+                    + Task.FLAG_DONE + ", but was: " + fields[1]);
         }
         return task;
     }
