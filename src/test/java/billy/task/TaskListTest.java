@@ -204,4 +204,12 @@ public class TaskListTest {
     public void asList_emptyList_noTasks() {
         assertTrue(new TaskList().asList().isEmpty());
     }
+
+    @Test
+    public void constructor_nullTaskList_assertionFails() {
+        // Every method here reads the backing list without checking it first, so
+        // a null would surface as a NullPointerException in whichever command
+        // happened to be running rather than where the list was built.
+        assertThrows(AssertionError.class, () -> new TaskList(null));
+    }
 }

@@ -2,6 +2,7 @@ package billy.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -140,5 +141,13 @@ public class TaskTest {
     public void toString_descriptionWithSpaces_keptAsTyped() {
         // The description is the user's words and is not tidied up.
         assertEquals("[ ] read the  green book", new Task("read the  green book").toString());
+    }
+
+    @Test
+    public void constructor_blankDescription_assertionFails() {
+        // Parser and Storage each refuse an empty description before building a
+        // task, so reaching here with one means a caller skipped those checks.
+        // A task with nothing in it would list and save as an empty line.
+        assertThrows(AssertionError.class, () -> new Task("   "));
     }
 }

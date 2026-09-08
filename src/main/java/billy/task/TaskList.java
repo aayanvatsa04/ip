@@ -36,6 +36,8 @@ public class TaskList {
      * @param tasks the tasks to start with, in the order they should appear
      */
     public TaskList(ArrayList<Task> tasks) {
+        assert tasks != null
+                : "A task list is never backed by null; a failed load gives an empty list instead.";
         this.tasks = tasks;
     }
 
@@ -57,7 +59,10 @@ public class TaskList {
      */
     public Task remove(int taskNumber) throws BillyException {
         Task task = get(taskNumber);
-        tasks.remove(taskNumber - 1);
+        Task removed = tasks.remove(taskNumber - 1);
+        // Both lines above turn the same task number into a position, and this is
+        // the one place that conversion happens twice.
+        assert removed == task : "get and remove disagree about task number " + taskNumber + ".";
         return task;
     }
 
