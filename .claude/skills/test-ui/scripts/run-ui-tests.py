@@ -281,7 +281,7 @@ def run_case(
         stdin_text = "".join(line + "\n" for line in session)
         try:
             result = subprocess.run(
-                ["java", "-cp", str(classes_dir), main_class],
+                ["java", "-ea", "-cp", str(classes_dir), main_class],
                 input=stdin_text,
                 capture_output=True,
                 text=True,
