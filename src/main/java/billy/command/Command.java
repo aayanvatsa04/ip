@@ -1,9 +1,9 @@
 package billy.command;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 import billy.BillyException;
 import billy.storage.Storage;
@@ -69,14 +69,13 @@ public abstract class Command {
      */
     protected static List<String> numberMatching(TaskList tasks, Predicate<Task> isMatch) {
         List<Task> all = tasks.asList();
-        List<String> lines = new ArrayList<>();
-        for (int i = 0; i < all.size(); i++) {
-            if (isMatch.test(all.get(i))) {
+        // Streaming the positions rather than the tasks keeps each task's number
+        // available, since a stream of tasks alone could not say where each came from.
+        return IntStream.range(0, all.size())
+                .filter(i -> isMatch.test(all.get(i)))
                 // List positions start at 0, but people count from 1.
-                lines.add((i + 1) + "." + all.get(i));
-            }
-        }
-        return lines;
+                .mapToObj(i -> (i + 1) + "." + all.get(i))
+                .toList();
     }
 
     /**

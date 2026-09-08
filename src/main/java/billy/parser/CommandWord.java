@@ -1,5 +1,8 @@
 package billy.parser;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import billy.BillyException;
 
 /**
@@ -73,12 +76,11 @@ public enum CommandWord {
      * @throws BillyException if no command uses that word
      */
     public static CommandWord fromKeyword(String word) throws BillyException {
-        for (CommandWord command : values()) {
-            if (command.keyword.equalsIgnoreCase(word)) {
-                return command;
-            }
-        }
-        throw new BillyException("I don't know what '" + word + "' means. " + describeAll());
+        return Arrays.stream(values())
+                .filter(command -> command.keyword.equalsIgnoreCase(word))
+                .findFirst()
+                .orElseThrow(() -> new BillyException(
+                        "I don't know what '" + word + "' means. " + describeAll()));
     }
 
     /**
@@ -87,13 +89,9 @@ public enum CommandWord {
      * @return a sentence such as {@code I understand: todo, deadline, ..., bye.}
      */
     public static String describeAll() {
-        StringBuilder keywords = new StringBuilder();
-        for (CommandWord command : values()) {
-            if (keywords.length() > 0) {
-                keywords.append(", ");
-            }
-            keywords.append(command.keyword);
-        }
+        String keywords = Arrays.stream(values())
+                .map(CommandWord::getKeyword)
+                .collect(Collectors.joining(", "));
         return "I understand: " + keywords + ".";
     }
 }
