@@ -34,6 +34,11 @@ public class Task {
      * @param description what the user wants to do
      */
     public Task(String description) {
+        // Parser refuses an empty description and Storage refuses an empty field,
+        // so a blank one here means a task was built from somewhere that skipped
+        // those checks rather than that the user typed nothing.
+        assert description != null && !description.isBlank()
+                : "A task must have a description, but was given: " + description;
         this.description = description;
         this.isDone = false;
     }

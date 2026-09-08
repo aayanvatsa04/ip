@@ -49,6 +49,11 @@ dependencies {
 test {
     useJUnitPlatform()
 
+    // Java ignores every 'assert' unless run with -ea. Gradle turns them on for
+    // tests by default; stating it means the assertions cannot quietly stop
+    // being checked if that default ever changes.
+    enableAssertions = true
+
     testLogging {
         events 'passed', 'skipped', 'failed'
 

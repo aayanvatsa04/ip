@@ -1,6 +1,7 @@
 package billy.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -140,5 +141,22 @@ public class UiTest {
         ui.showError("I couldn't save your list.", "The change will be lost when Billy closes.");
         assertEquals("I couldn't save your list.\nThe change will be lost when Billy closes.",
                 ui.stopCollecting());
+    }
+
+    @Test
+    public void show_noLines_assertionFails() {
+        // show takes its lines as varargs, so show() compiles. It would print an
+        // empty block between two dividers, which reads as Billy having nothing
+        // to say rather than as the mistake it is.
+        Ui ui = new Ui();
+        assertThrows(AssertionError.class, () -> ui.show());
+    }
+
+    @Test
+    public void stopCollecting_withoutStartCollecting_assertionFails() {
+        // The window calls these two in pairs. Unpaired, this would be a bare
+        // NullPointerException from inside Ui with nothing to say which caller
+        // forgot to start.
+        assertThrows(AssertionError.class, () -> new Ui().stopCollecting());
     }
 }

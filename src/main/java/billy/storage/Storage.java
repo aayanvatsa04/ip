@@ -243,6 +243,10 @@ public class Storage {
             throw new BillyException("expected " + fieldCount + " fields but found "
                     + fields.length);
         }
+        // The split limit caps the count and the check above sets the floor, which
+        // is what lets parseTask reach for fields[3] and fields[4] by number.
+        assert fields.length == fieldCount
+                : "expected exactly " + fieldCount + " fields but found " + fields.length;
         for (int i = 0; i < fields.length; i++) {
             fields[i] = fields[i].trim();
             if (fields[i].isEmpty()) {
