@@ -13,6 +13,12 @@ import billy.BillyException;
  */
 public class Event extends Task {
 
+    /** Marks a saved line as an event. */
+    public static final String TYPE_LETTER = "E";
+
+    /** How many fields a saved event has: a todo's three, plus a start and an end. */
+    public static final int FIELD_COUNT = 5;
+
     /** When the event starts. */
     protected TaskDate from;
 
@@ -60,7 +66,7 @@ public class Event extends Task {
      */
     @Override
     public String toSaveFormat() {
-        return "E" + FIELD_SEPARATOR + super.toSaveFormat()
+        return TYPE_LETTER + FIELD_SEPARATOR + super.toSaveFormat()
                 + FIELD_SEPARATOR + from.toSaveFormat() + FIELD_SEPARATOR + to.toSaveFormat();
     }
 

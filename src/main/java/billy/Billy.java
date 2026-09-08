@@ -12,10 +12,11 @@ import billy.ui.Ui;
 /**
  * Billy is a friendly chatbot that keeps a list of tasks for the user.
  *
- * <p>This is the Level-8 increment: tasks come in three types (todo, deadline and
- * event), and can be listed, marked as done, and marked as not done again.
- * Anything Billy cannot make sense of is reported as a {@link BillyException}
- * rather than crashing. Typing {@code bye} ends the conversation.
+ * <p>Tasks come in three types (todo, deadline and event). They can be listed,
+ * searched for by word or by day, marked as done, marked as not done again, and
+ * deleted. Anything Billy cannot make sense of is reported as a
+ * {@link BillyException} rather than crashing. Typing {@code bye} ends the
+ * conversation.
  *
  * <p>The list is kept on the hard disk by {@link Storage}: it is read back when
  * Billy starts and written out again after every change, so closing Billy no
