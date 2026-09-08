@@ -147,10 +147,9 @@ public class Storage {
             Files.createDirectories(folder);
         }
 
-        List<String> lines = new ArrayList<>();
-        for (Task task : tasks) {
-            lines.add(task.toSaveFormat());
-        }
+        List<String> lines = tasks.stream()
+                .map(Task::toSaveFormat)
+                .toList();
         // Creates the file if it is missing, and empties it if it is not.
         Files.write(file, lines);
     }
