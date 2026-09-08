@@ -1,7 +1,7 @@
 package billy.command;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import billy.storage.Storage;
 import billy.task.Task;
@@ -27,11 +27,12 @@ public class ListCommand extends Command {
         }
 
         List<Task> all = tasks.asList();
-        ArrayList<String> lines = new ArrayList<>();
-        for (int i = 0; i < all.size(); i++) {
-            // List positions start at 0, but people count from 1.
-            lines.add((i + 1) + "." + all.get(i));
-        }
+        // Streaming the positions rather than the tasks keeps each task's number
+        // available, since a stream of tasks alone could not say where each came from.
+        List<String> lines = IntStream.range(0, all.size())
+                // List positions start at 0, but people count from 1.
+                .mapToObj(i -> (i + 1) + "." + all.get(i))
+                .toList();
         ui.show("Here are the tasks in your list:", String.join("\n", lines));
     }
 }

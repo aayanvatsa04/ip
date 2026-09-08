@@ -1,7 +1,7 @@
 package billy.command;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import billy.storage.Storage;
 import billy.task.Task;
@@ -37,13 +37,13 @@ public class FindCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> all = tasks.asList();
-        ArrayList<String> found = new ArrayList<>();
-        for (int i = 0; i < all.size(); i++) {
-            // Each task decides for itself whether its description matches.
-            if (all.get(i).descriptionContains(keyword)) {
-                found.add((i + 1) + "." + all.get(i));
-            }
-        }
+        // Streaming the positions rather than the tasks keeps each match's number
+        // in the whole list, which is what the user types to mark or delete it.
+        List<String> found = IntStream.range(0, all.size())
+                // Each task decides for itself whether its description matches.
+                .filter(i -> all.get(i).descriptionContains(keyword))
+                .mapToObj(i -> (i + 1) + "." + all.get(i))
+                .toList();
 
         if (found.isEmpty()) {
             // The word is quoted back, so a typo in the search is easy to spot.
