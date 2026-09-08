@@ -2,10 +2,8 @@ package billy.command;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import billy.storage.Storage;
-import billy.task.Task;
 import billy.task.TaskDate;
 import billy.task.TaskList;
 import billy.ui.Ui;
@@ -40,14 +38,8 @@ public class OnCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
-        List<Task> all = tasks.asList();
-        // Streaming the positions rather than the tasks keeps each match's number
-        // in the whole list, which is what the user types to mark or delete it.
-        List<String> found = IntStream.range(0, all.size())
-                // Each task decides for itself whether it falls on the day.
-                .filter(i -> all.get(i).occursOn(day))
-                .mapToObj(i -> (i + 1) + "." + all.get(i))
-                .toList();
+        // Each task decides for itself whether it falls on the day.
+        List<String> found = numberMatching(tasks, task -> task.occursOn(day));
 
         String shownDay = TaskDate.formatDate(day);
         if (found.isEmpty()) {

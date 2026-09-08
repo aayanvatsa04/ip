@@ -11,6 +11,12 @@ import java.time.LocalDate;
  */
 public class Deadline extends Task {
 
+    /** Marks a saved line as a deadline. */
+    public static final String TYPE_LETTER = "D";
+
+    /** How many fields a saved deadline has: a todo's three, plus the due date. */
+    public static final int FIELD_COUNT = 4;
+
     /** When the task is due. */
     protected TaskDate by;
 
@@ -37,7 +43,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toSaveFormat() {
-        return "D" + FIELD_SEPARATOR + super.toSaveFormat()
+        return TYPE_LETTER + FIELD_SEPARATOR + super.toSaveFormat()
                 + FIELD_SEPARATOR + by.toSaveFormat();
     }
 

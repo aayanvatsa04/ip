@@ -63,6 +63,16 @@ public class Parser {
     /** Shown alongside an error to remind the user how a search is typed. */
     private static final String FIND_USAGE = "Try: find book";
 
+    /**
+     * The two halves a command is split into, such as a description and the due
+     * date after {@value #BY_SEPARATOR}.
+     *
+     * @param before what came before the separator, trimmed
+     * @param after what came after the separator, trimmed
+     */
+    private record Halves(String before, String after) {
+    }
+
     /** Nothing here needs an instance, so there is no way to make one. */
     private Parser() {
     }
@@ -125,8 +135,8 @@ public class Parser {
      * @throws BillyException if the description or the due date is missing or unreadable
      */
     private static Deadline parseDeadline(String argument) throws BillyException {
-        String[] parts = splitOn(argument, BY_SEPARATOR, "description", "due date", DEADLINE_USAGE);
-        return new Deadline(parts[0], TaskDate.parse(parts[1]));
+        Halves parts = splitOn(argument, BY_SEPARATOR, "description", "due date", DEADLINE_USAGE);
+        return new Deadline(parts.before(), TaskDate.parse(parts.after()));
     }
 
     /**
@@ -138,13 +148,13 @@ public class Parser {
      *                        event would end before it starts
      */
     private static Event parseEvent(String argument) throws BillyException {
-        String[] descriptionAndRest =
+        Halves descriptionAndRest =
                 splitOn(argument, FROM_SEPARATOR, "description", "start time", EVENT_USAGE);
         // The start and end times are still joined together, so split them apart too.
-        String[] startAndEnd =
-                splitOn(descriptionAndRest[1], TO_SEPARATOR, "start time", "end time", EVENT_USAGE);
-        return new Event(descriptionAndRest[0], TaskDate.parse(startAndEnd[0]),
-                TaskDate.parse(startAndEnd[1]));
+        Halves startAndEnd = splitOn(descriptionAndRest.after(), TO_SEPARATOR,
+                "start time", "end time", EVENT_USAGE);
+        return new Event(descriptionAndRest.before(), TaskDate.parse(startAndEnd.before()),
+                TaskDate.parse(startAndEnd.after()));
     }
 
     /**
@@ -218,7 +228,7 @@ public class Parser {
      * @return the two trimmed halves
      * @throws BillyException if the separator is missing or either half is empty
      */
-    private static String[] splitOn(String input, String separator, String beforeName,
+    private static Halves splitOn(String input, String separator, String beforeName,
             String afterName, String usage) throws BillyException {
         int separatorPosition = input.indexOf(separator);
         if (separatorPosition == -1) {
@@ -233,6 +243,6 @@ public class Parser {
         if (after.isEmpty()) {
             throw new BillyException("The " + afterName + " can't be empty. " + usage);
         }
-        return new String[] {before, after};
+        return new Halves(before, after);
     }
 }

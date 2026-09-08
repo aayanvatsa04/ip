@@ -22,6 +22,12 @@ public class Task {
      */
     public static final String FIELD_SEPARATOR = " | ";
 
+    /** How a finished task is written in the save file. */
+    public static final String FLAG_DONE = "1";
+
+    /** How an unfinished task is written in the save file. */
+    public static final String FLAG_NOT_DONE = "0";
+
     /** What the user wants to do, exactly as they typed it. */
     protected String description;
 
@@ -111,7 +117,7 @@ public class Task {
      * @return e.g. {@code 1 | read book}
      */
     public String toSaveFormat() {
-        return (isDone ? "1" : "0") + FIELD_SEPARATOR + description;
+        return (isDone ? FLAG_DONE : FLAG_NOT_DONE) + FIELD_SEPARATOR + description;
     }
 
     /**

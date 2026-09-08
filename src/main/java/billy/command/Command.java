@@ -1,9 +1,13 @@
 package billy.command;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 import billy.BillyException;
 import billy.storage.Storage;
+import billy.task.Task;
 import billy.task.TaskList;
 import billy.ui.Ui;
 
@@ -47,6 +51,31 @@ public abstract class Command {
      */
     public boolean isExit() {
         return false;
+    }
+
+    /**
+     * Returns the tasks a test picks out, each numbered as the user refers to it.
+     *
+     * <p>The number is the task's place in the whole list rather than in the
+     * result, so a task found by {@code find} or {@code on} can be marked or
+     * deleted straight away without running {@code list} first to look its
+     * number up. Every command that shows part of the list makes that promise,
+     * and keeping the numbering here is what stops one of them quietly breaking
+     * it.
+     *
+     * @param tasks the list to look through
+     * @param isMatch what makes a task worth showing
+     * @return one line per matching task, e.g. {@code 3.[T][ ] read book}
+     */
+    protected static List<String> numberMatching(TaskList tasks, Predicate<Task> isMatch) {
+        List<Task> all = tasks.asList();
+        // Streaming the positions rather than the tasks keeps each task's number
+        // available, since a stream of tasks alone could not say where each came from.
+        return IntStream.range(0, all.size())
+                .filter(i -> isMatch.test(all.get(i)))
+                // List positions start at 0, but people count from 1.
+                .mapToObj(i -> (i + 1) + "." + all.get(i))
+                .toList();
     }
 
     /**
