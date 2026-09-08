@@ -1,11 +1,9 @@
 package billy.command;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import billy.storage.Storage;
-import billy.task.Task;
 import billy.task.TaskDate;
 import billy.task.TaskList;
 import billy.ui.Ui;
@@ -40,14 +38,8 @@ public class OnCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
-        List<Task> all = tasks.asList();
-        ArrayList<String> found = new ArrayList<>();
-        for (int i = 0; i < all.size(); i++) {
-            // Each task decides for itself whether it falls on the day.
-            if (all.get(i).occursOn(day)) {
-                found.add((i + 1) + "." + all.get(i));
-            }
-        }
+        // Each task decides for itself whether it falls on the day.
+        List<String> found = numberMatching(tasks, task -> task.occursOn(day));
 
         String shownDay = TaskDate.formatDate(day);
         if (found.isEmpty()) {

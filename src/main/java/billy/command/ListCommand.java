@@ -1,10 +1,8 @@
 package billy.command;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import billy.storage.Storage;
-import billy.task.Task;
 import billy.task.TaskList;
 import billy.ui.Ui;
 
@@ -26,12 +24,7 @@ public class ListCommand extends Command {
             return;
         }
 
-        List<Task> all = tasks.asList();
-        ArrayList<String> lines = new ArrayList<>();
-        for (int i = 0; i < all.size(); i++) {
-            // List positions start at 0, but people count from 1.
-            lines.add((i + 1) + "." + all.get(i));
-        }
+        List<String> lines = numberMatching(tasks, task -> true);
         ui.show("Here are the tasks in your list:", String.join("\n", lines));
     }
 }

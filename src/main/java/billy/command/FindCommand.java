@@ -1,10 +1,8 @@
 package billy.command;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import billy.storage.Storage;
-import billy.task.Task;
 import billy.task.TaskList;
 import billy.ui.Ui;
 
@@ -36,15 +34,8 @@ public class FindCommand extends Command {
 
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
-        List<Task> all = tasks.asList();
-        ArrayList<String> found = new ArrayList<>();
-        for (int i = 0; i < all.size(); i++) {
-            // Each task decides for itself whether its description matches.
-            if (all.get(i).descriptionContains(keyword)) {
-                found.add((i + 1) + "." + all.get(i));
-            }
-        }
-
+        // Each task decides for itself whether its description matches.
+        List<String> found = numberMatching(tasks, task -> task.descriptionContains(keyword));
         if (found.isEmpty()) {
             // The word is quoted back, so a typo in the search is easy to spot.
             ui.show("Nothing in your list mentions '" + keyword + "'.");
