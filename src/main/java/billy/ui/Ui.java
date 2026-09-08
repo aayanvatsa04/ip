@@ -122,6 +122,7 @@ public class Ui {
      * @return what Billy said, with no divider lines and no trailing blank line.
      */
     public String stopCollecting() {
+        assert transcript != null : "stopCollecting was called without a matching startCollecting.";
         String collected = transcript.toString().strip();
         transcript = null;
         return collected;
@@ -138,6 +139,9 @@ public class Ui {
      * @param lines the message, one line per argument
      */
     public void show(String... lines) {
+        // Varargs makes show() with no arguments compile, and it would print an
+        // empty block between two dividers rather than failing outright.
+        assert lines.length > 0 : "A message must have at least one line.";
         String message = String.join("\n", lines);
         if (transcript != null) {
             // No dividers: a dialog box already shows where the message ends.

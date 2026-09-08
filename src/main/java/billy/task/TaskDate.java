@@ -83,6 +83,7 @@ public class TaskDate {
      * @param time the time of day, or null if only a day was given
      */
     private TaskDate(LocalDate date, LocalTime time) {
+        assert date != null : "A TaskDate always names a day; only the time of day is optional.";
         this.date = date;
         this.time = time;
     }
