@@ -1,8 +1,12 @@
 package billy.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +23,10 @@ import billy.BillyException;
  * from the same values used to match it. That is the whole reason the keywords
  * live in an enum rather than as loose strings: the help can then never advertise
  * a command Billy does not accept, nor omit one it does.
+ *
+ * <p>The shorter words add a third: no word may invoke two different commands. A
+ * clash there would be silent, since the first command declared would swallow the
+ * word and the second would simply never be reached.
  */
 public class CommandWordTest {
 
@@ -85,6 +93,85 @@ public class CommandWordTest {
     public void describeAll_always_readsAsASentenceInTheDeclaredOrder() {
         assertEquals("I understand: todo, deadline, event, list, on, find, mark, unmark,"
                 + " delete, bye.", CommandWord.describeAll());
+    }
+
+    // ---------------------------------------------------------------
+    // Shorter words
+    // ---------------------------------------------------------------
+
+    @Test
+    public void fromKeyword_alias_commandFound() throws BillyException {
+        assertEquals(CommandWord.TODO, CommandWord.fromKeyword("t"));
+        assertEquals(CommandWord.DELETE, CommandWord.fromKeyword("rm"));
+        assertEquals(CommandWord.BYE, CommandWord.fromKeyword("q"));
+    }
+
+    @Test
+    public void fromKeyword_aliasCapitalised_commandStillFound() throws BillyException {
+        // Capitalization is the user's business for a short word as much as a long one.
+        assertEquals(CommandWord.DEADLINE, CommandWord.fromKeyword("DL"));
+        assertEquals(CommandWord.UNMARK, CommandWord.fromKeyword("Um"));
+    }
+
+    @Test
+    public void fromKeyword_everyAlias_findsItsOwnCommand() throws BillyException {
+        // Walking the values proves every declared alias reaches the command it
+        // was declared on, rather than the handful someone remembered to test.
+        for (CommandWord command : CommandWord.values()) {
+            for (String alias : command.getAliases()) {
+                assertEquals(command, CommandWord.fromKeyword(alias),
+                        "the alias " + alias + " should reach " + command);
+            }
+        }
+    }
+
+    @Test
+    public void keywordsAndAliases_acrossEveryCommand_allDistinct() {
+        // A word declared on two commands would be swallowed by whichever is
+        // declared first, and the second would quietly become unreachable by it.
+        Set<String> seen = new HashSet<>();
+        for (CommandWord command : CommandWord.values()) {
+            assertTrue(seen.add(command.getKeyword()),
+                    "the word " + command.getKeyword() + " invokes more than one command");
+            for (String alias : command.getAliases()) {
+                assertTrue(seen.add(alias),
+                        "the word " + alias + " invokes more than one command");
+            }
+        }
+    }
+
+    @Test
+    public void getAliases_commandWithNoShorterWord_empty() {
+        // on is already as short as it is worth making it.
+        assertTrue(CommandWord.ON.getAliases().isEmpty());
+    }
+
+    @Test
+    public void getAliases_everyCommand_lowerCaseWordsDistinctFromTheKeyword() {
+        // Not every alias is shorter: bye also answers to exit and quit, which are
+        // longer but are what someone leaving a program reaches for first. What
+        // must hold is that an alias is a single lower-case word, and a different
+        // word from the keyword it stands beside.
+        for (CommandWord command : CommandWord.values()) {
+            for (String alias : command.getAliases()) {
+                assertEquals(alias.toLowerCase(), alias);
+                assertTrue(!alias.isBlank() && !alias.contains(" "));
+                assertNotEquals(command.getKeyword(), alias);
+            }
+        }
+    }
+
+    @Test
+    public void describeAll_always_namesOnlyTheFullKeywords() {
+        // The shorter words are deliberately left out: this sentence is shown to
+        // someone who has just got a command wrong.
+        String described = CommandWord.describeAll();
+        for (CommandWord command : CommandWord.values()) {
+            for (String alias : command.getAliases()) {
+                assertTrue(!described.contains(" " + alias + ",") && !described.contains(" " + alias + "."),
+                        "the alias " + alias + " should not be advertised");
+            }
+        }
     }
 
     @Test

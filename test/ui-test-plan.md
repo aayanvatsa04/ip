@@ -1389,3 +1389,83 @@ What should I look for? Try: find book
 ____________________________________________________________
 {{FAREWELL}}
 ```
+
+## TC-36 Short words invoke the same commands
+
+**Aim:** Verify that the shorter word declared beside each keyword reaches the
+same command, so that a whole session can be held in the short forms. Adding,
+listing, marking and deleting are all exercised, since a short word that reached
+the wrong command would still look plausible on its own.
+
+**Input:**
+```text
+t read book
+dl return book /by 2019-12-02
+l
+m 1
+rm 2
+q
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Dec 2 2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+2.[D][ ] return book (by: Dec 2 2019)
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] read book
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [D][ ] return book (by: Dec 2 2019)
+Now you have 1 task in the list.
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-37 A short word is read the same whatever its case
+
+**Aim:** Verify that capitalization is the user's business for a short word as
+much as for a full keyword, and that a near miss is still refused rather than
+guessed at. The refusal names the full keywords only, since the short words are
+for someone who already knows the command.
+
+**Input:**
+```text
+T borrow book
+LS
+tt read book
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] borrow book
+Now you have 1 task in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] borrow book
+____________________________________________________________
+____________________________________________________________
+I don't know what 'tt' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, bye.
+____________________________________________________________
+{{FAREWELL}}
+```
