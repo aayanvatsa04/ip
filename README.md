@@ -10,7 +10,8 @@ can list them, search them, mark them done and delete them. Your list is saved
 to `data/billy.txt` after every change and read back the next time Billy starts,
 so closing the window never loses it.
 
-The full instructions are in the [user guide](docs/README.md).
+The full instructions are in the **[user guide](https://aayanvatsa04.github.io/ip/)**
+(also readable [here in the repository](docs/README.md)).
 
 ## Running Billy
 

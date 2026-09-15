@@ -15,6 +15,17 @@ Billy starts.
 Billy handles three kinds of task — **todos**, **deadlines** and **events** —
 and can list them, search them, mark them done and delete them.
 
+## Quick start
+
+1. Check you have **Java 25** installed: run `java -version` in a terminal.
+2. Download the latest `billy.jar` from the
+   [releases page](https://github.com/aayanvatsa04/ip/releases).
+3. Put it in a folder of its own. Billy saves your tasks beside the jar, in
+   `data/billy.txt`, and creates that folder itself the first time.
+4. Run it with `java -jar billy.jar`.
+5. Type a command into the box at the bottom and press Enter. Try `help` to see
+   everything Billy understands, or go straight to `todo read book`.
+
 ## Quick reference
 
 | What you want | Type |
@@ -226,6 +237,33 @@ Billy reacts to the state of your list as well as confirming what you asked for:
   reported as a count of zero.
 * Once the list reaches ten tasks, Billy has a word to say about that too.
 
+Adding a task you already have is allowed, but pointed out:
+
+```
+Consider it written down:
+  [T][ ] read book
+That's 2 tasks on the books.
+Heads up: that's the same as task 1. Type 'delete 2' if you didn't mean it.
+```
+
+## Using the window
+
+Billy is a window, not a terminal. Type into the box along the bottom and press
+Enter, or click **Send**.
+
+What you type appears on the right in a coloured bubble; Billy answers on the
+left. The two are shown differently on purpose, because the conversation is not
+between equals: your commands are short, while Billy's answers can run to a list
+of everything you have to do.
+
+When something goes wrong, the reply is drawn as a red card with a warning sign
+and a bar down its left edge, so a mistyped command is hard to scroll past. Only
+failures look like that.
+
+Drag any edge to resize. The text rewraps to fit, down to a narrow strip you can
+leave open beside your work. Typing `bye` closes the window a moment later, and
+closing the window yourself does no harm — your list is already saved.
+
 ## If something goes wrong
 
 Billy explains rather than crashes, and the conversation carries on. Each of
@@ -235,8 +273,8 @@ these is answered with what to type instead:
 * A task number that names nothing, including `0` and negative numbers.
 * A date it cannot read, including dates that do not exist such as `2019-02-30`.
 * An event that ends before it starts, or that starts and ends at the same
-  stated time. An event covering a whole day is written `/from 2019-12-02 /to
-  2019-12-02`, with no times, and is perfectly ordinary.
+  stated time. An all-day event is written with no times at all, as in
+  `event conference /from 2019-12-02 /to 2019-12-02`, and is perfectly ordinary.
 * The same marker given twice, such as two `/by` in one command.
 * A description containing `|`. Billy separates the parts of a saved task with
   that character, so a description containing one could not be read back
