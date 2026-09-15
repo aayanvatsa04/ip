@@ -107,9 +107,14 @@ public class EventTest {
     }
 
     @Test
-    public void constructor_startAndEndAtTheSameMoment_allowed() {
-        // Equal is not backwards, so an event of no length is accepted.
-        assertDoesNotThrow(() -> running("2019-12-02 1400", "2019-12-02 1400"));
+    public void constructor_startAndEndAtTheSameMoment_exceptionThrown() {
+        // Changed deliberately: an event from 2pm to 2pm covers no time at all,
+        // which is almost always a mistyped end time rather than something the
+        // user meant. It used to be accepted on the grounds that equal is not
+        // backwards.
+        BillyException thrown = assertThrows(BillyException.class, () ->
+                running("2019-12-02 1400", "2019-12-02 1400"));
+        assertTrue(thrown.getMessage().contains("last some time"), thrown.getMessage());
     }
 
     @Test
@@ -147,5 +152,36 @@ public class EventTest {
     public void toSaveFormat_eventWithoutTimes_datesOnly() throws BillyException {
         assertEquals("E | 0 | project meeting | 2019-12-02 | 2019-12-04",
                 running("2019-12-02", "2019-12-04").toSaveFormat());
+    }
+
+    @Test
+    public void constructor_sameDayWithNoTimes_allowed() {
+        // The trap in refusing the case above: an all-day event on one day is
+        // written exactly like this, and is perfectly ordinary. Refusing it
+        // would break a case that has always worked.
+        assertDoesNotThrow(() -> new Event("conference", TaskDate.parse("2019-12-02"),
+                TaskDate.parse("2019-12-02")));
+    }
+
+    @Test
+    public void constructor_sameDayDifferentTimes_allowed() {
+        assertDoesNotThrow(() -> new Event("meeting", TaskDate.parse("2019-12-02 1400"),
+                TaskDate.parse("2019-12-02 1600")));
+    }
+
+    @Test
+    public void isSameTask_sameWordingAndSamePeriod_true() throws BillyException {
+        assertTrue(new Event("meeting", TaskDate.parse("2019-12-02 1400"),
+                        TaskDate.parse("2019-12-02 1600"))
+                .isSameTask(new Event("meeting", TaskDate.parse("2019-12-02 1400"),
+                        TaskDate.parse("2019-12-02 1600"))));
+    }
+
+    @Test
+    public void isSameTask_sameWordingButADifferentEnd_false() throws BillyException {
+        assertFalse(new Event("meeting", TaskDate.parse("2019-12-02 1400"),
+                        TaskDate.parse("2019-12-02 1600"))
+                .isSameTask(new Event("meeting", TaskDate.parse("2019-12-02 1400"),
+                        TaskDate.parse("2019-12-02 1700"))));
     }
 }

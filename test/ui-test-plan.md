@@ -1621,3 +1621,147 @@ That's 9 tasks on the books.
 ____________________________________________________________
 {{FAREWELL}}
 ```
+
+## TC-42 A description may not contain the field separator
+
+**Aim:** Verify that a description containing `|` is refused when it is typed, rather than accepted and then lost. Billy separates the fields of a saved task with `|`, so such a description splits into the wrong fields when the file is read back: a deadline loses its date and the whole task is dropped as damaged on the next run. The todo case is included because its description is the last field on the line and so happens to survive a round trip; it is refused all the same, so the rule does not depend on the task type.
+
+**Input:**
+```text
+deadline pay rent | utilities /by 2019-12-02
+todo buy milk | eggs
+todo 50% off / half price (maybe)
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+A description can't contain '|', since that's what I use to separate the parts of a saved task. Try wording it without one.
+____________________________________________________________
+____________________________________________________________
+A description can't contain '|', since that's what I use to separate the parts of a saved task. Try wording it without one.
+____________________________________________________________
+____________________________________________________________
+Consider it written down:
+  [T][ ] 50% off / half price (maybe)
+That's 1 task on the books.
+____________________________________________________________
+____________________________________________________________
+Behold, your list:
+1.[T][ ] 50% off / half price (maybe)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-43 A marker given twice is named as the problem
+
+**Aim:** Verify that repeating `/by` or `/from` is reported as the repetition it is. Splitting at the first marker and leaving the rest in place would push the second copy into the date, where it would surface as an unreadable date and say nothing about the actual mistake.
+
+**Input:**
+```text
+deadline essay /by 2019-12-02 /by 2019-12-03
+event meeting /from 2019-12-02 /from 2019-12-03 /to 2019-12-04
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+I found more than one '/by' in that command, so I don't know which one you meant. Try: deadline return book /by 2019-12-02 1800
+____________________________________________________________
+____________________________________________________________
+I found more than one '/from' in that command, so I don't know which one you meant. Try: event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-44 An event has to cover some time
+
+**Aim:** Verify that an event starting and ending at the same stated moment is refused, while an all-day event is not. These are told apart by whether a time of day was given: `/from 2019-12-02 /to 2019-12-02` is an ordinary event lasting the whole day, and refusing it alongside the zero-length case would break something that has always worked.
+
+**Input:**
+```text
+event standup /from 2019-12-02 1400 /to 2019-12-02 1400
+event conference /from 2019-12-02 /to 2019-12-02
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+An event has to last some time, and you gave from: Dec 2 2019, 2:00pm to: Dec 2 2019, 2:00pm. Leave the times off if you mean the whole day.
+____________________________________________________________
+____________________________________________________________
+Consider it written down:
+  [E][ ] conference (from: Dec 2 2019 to: Dec 2 2019)
+That's 1 task on the books.
+____________________________________________________________
+____________________________________________________________
+Behold, your list:
+1.[E][ ] conference (from: Dec 2 2019 to: Dec 2 2019)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-45 Adding a task that is already on the list
+
+**Aim:** Verify that a duplicate is added but remarked on, that the remark names every outstanding match and the number to delete to undo it, and that a finished task is not treated as a duplicate. The last part is the point: ticking a chore off and adding it again is how a repeat is done, so warning about it would be wrong.
+
+**Input:**
+```text
+todo water the plants
+todo WATER THE PLANTS
+todo water the plants
+mark 1
+mark 2
+mark 3
+todo water the plants
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Consider it written down:
+  [T][ ] water the plants
+That's 1 task on the books.
+____________________________________________________________
+____________________________________________________________
+Consider it written down:
+  [T][ ] WATER THE PLANTS
+That's 2 tasks on the books.
+Heads up: that's the same as task 1. Type 'delete 2' if you didn't mean it.
+____________________________________________________________
+____________________________________________________________
+Consider it written down:
+  [T][ ] water the plants
+That's 3 tasks on the books.
+Heads up: that's the same as tasks 1 and 2. Type 'delete 3' if you didn't mean it.
+____________________________________________________________
+____________________________________________________________
+BOOM. Done and dusted:
+  [T][X] water the plants
+____________________________________________________________
+____________________________________________________________
+BOOM. Done and dusted:
+  [T][X] WATER THE PLANTS
+____________________________________________________________
+____________________________________________________________
+BOOM. Done and dusted:
+  [T][X] water the plants
+And that's your whole list conquered. Take a bow.
+____________________________________________________________
+____________________________________________________________
+Consider it written down:
+  [T][ ] water the plants
+That's 4 tasks on the books.
+____________________________________________________________
+{{FAREWELL}}
+```

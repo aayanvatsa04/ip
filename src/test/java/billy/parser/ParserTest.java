@@ -255,4 +255,68 @@ public class ParserTest {
     public void parse_onWithUnreadableDay_exceptionThrown() {
         assertThrows(BillyException.class, () -> Parser.parse("on someday"));
     }
+
+    // ---------------------------------------------------------------
+    // Input Billy should refuse
+    // ---------------------------------------------------------------
+
+    @Test
+    public void parse_untrimmedLine_readNormally() throws BillyException {
+        // Both callers trim before calling, so this is not reachable from the
+        // keyboard. Left defensive because the failure it prevents is the
+        // baffling "I don't know what '' means".
+        assertInstanceOf(AddCommand.class, Parser.parse("   todo read book   "));
+    }
+
+    @Test
+    public void parse_descriptionWithTheFieldSeparator_exceptionThrown() {
+        // The important one: this used to be accepted, saved, and then dropped
+        // as a damaged line on the next run, losing the task without a word.
+        BillyException thrown = assertThrows(BillyException.class, () ->
+                Parser.parse("deadline pay rent | utilities /by 2019-12-02"));
+        assertTrue(thrown.getMessage().contains("|"), thrown.getMessage());
+    }
+
+    @Test
+    public void parse_todoDescriptionWithTheFieldSeparator_exceptionThrown() {
+        // A todo survived a round trip by luck, its description being the last
+        // field on the line. It is refused all the same, so the rule is one the
+        // user can learn rather than one that depends on the task type.
+        assertThrows(BillyException.class, () -> Parser.parse("todo buy milk | eggs"));
+    }
+
+    @Test
+    public void parse_descriptionWithOtherSymbols_accepted() throws BillyException {
+        // Only the field separator is refused. Refusing punctuation at large
+        // would be a worse bug than the one being fixed.
+        assertInstanceOf(AddCommand.class, Parser.parse("todo 50% off / half price (maybe)"));
+    }
+
+    @Test
+    public void parse_separatorGivenTwice_exceptionNamesTheRepeat() {
+        // Splitting at the first one leaves the second inside the date, where it
+        // surfaces as an unreadable date and says nothing about the real fault.
+        BillyException thrown = assertThrows(BillyException.class, () ->
+                Parser.parse("deadline essay /by 2019-12-02 /by 2019-12-03"));
+        assertTrue(thrown.getMessage().contains("more than one"), thrown.getMessage());
+    }
+
+    @Test
+    public void parse_fromGivenTwice_exceptionNamesTheRepeat() {
+        BillyException thrown = assertThrows(BillyException.class, () ->
+                Parser.parse("event m /from 2019-12-02 /from 2019-12-03 /to 2019-12-04"));
+        assertTrue(thrown.getMessage().contains("more than one"), thrown.getMessage());
+    }
+
+    @Test
+    public void parse_eventStartingAndEndingAtTheSameTime_exceptionThrown() {
+        assertThrows(BillyException.class, () ->
+                Parser.parse("event m /from 2019-12-02 1400 /to 2019-12-02 1400"));
+    }
+
+    @Test
+    public void parse_allDayEvent_stillAccepted() throws BillyException {
+        assertInstanceOf(AddCommand.class,
+                Parser.parse("event conference /from 2019-12-02 /to 2019-12-02"));
+    }
 }

@@ -163,4 +163,36 @@ public class CommandTest {
         assertTrue(said.contains("1 task on the books"), said);
         assertFalse(said.contains("last of them"), said);
     }
+
+    // ---------------------------------------------------------------
+    // Warning about a duplicate
+    // ---------------------------------------------------------------
+
+    @Test
+    public void execute_addATaskAlreadyOnTheList_warnsAndNamesTheUndo() throws BillyException {
+        TaskList tasks = listOf("read book");
+        String said = say(new AddCommand(new Todo("read book")), tasks);
+
+        assertTrue(said.contains("same as task 1"), said);
+        // The number offered must be the new task, not the original: deleting
+        // the original would leave the accidental copy sitting in its place.
+        assertTrue(said.contains("delete 2"), said);
+        // Still added. Refusing it would decide for the user that two errands
+        // worded alike cannot both be real.
+        assertEquals(2, tasks.size());
+    }
+
+    @Test
+    public void execute_addATaskMatchingSeveral_namesThemAll() throws BillyException {
+        TaskList tasks = listOf("read book", "write essay", "read book");
+        String said = say(new AddCommand(new Todo("read book")), tasks);
+        assertTrue(said.contains("same as tasks 1 and 3"), said);
+        assertTrue(said.contains("delete 4"), said);
+    }
+
+    @Test
+    public void execute_addAnUnrelatedTask_noWarning() throws BillyException {
+        TaskList tasks = listOf("read book");
+        assertFalse(say(new AddCommand(new Todo("write essay")), tasks).contains("Heads up"));
+    }
 }

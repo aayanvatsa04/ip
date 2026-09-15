@@ -228,10 +228,26 @@ Billy reacts to the state of your list as well as confirming what you asked for:
 
 ## If something goes wrong
 
-Billy explains rather than crashes. A command it does not know, a task number
-that names nothing, a date it cannot read, or an event ending before it starts
-are all answered with what to type instead, and the conversation carries on.
+Billy explains rather than crashes, and the conversation carries on. Each of
+these is answered with what to type instead:
+
+* A command Billy does not know, or one with a part missing.
+* A task number that names nothing, including `0` and negative numbers.
+* A date it cannot read, including dates that do not exist such as `2019-02-30`.
+* An event that ends before it starts, or that starts and ends at the same
+  stated time. An event covering a whole day is written `/from 2019-12-02 /to
+  2019-12-02`, with no times, and is perfectly ordinary.
+* The same marker given twice, such as two `/by` in one command.
+* A description containing `|`. Billy separates the parts of a saved task with
+  that character, so a description containing one could not be read back
+  correctly. Everything else — slashes, percent signs, brackets — is fine.
+
+If you add a task that matches one already on your list, Billy adds it anyway
+and says which task it matches and which number to delete if you did not mean
+it. Tasks you have already finished are not counted, so ticking off a chore and
+adding it again is never questioned.
 
 If the save file is damaged, Billy loads what it can, skips the lines it cannot
 understand, and tells you how many it skipped, rather than losing the rest of
-your list.
+your list. If the file cannot be written at all, Billy says so and keeps the
+change for the rest of the session.

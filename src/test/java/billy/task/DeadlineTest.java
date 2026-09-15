@@ -93,4 +93,26 @@ public class DeadlineTest {
         // However the user typed the date, the file holds one format.
         assertEquals("D | 0 | return book | 2019-12-02", dueAt("2/12/2019").toSaveFormat());
     }
+
+    @Test
+    public void isSameTask_sameWordingAndSameDueDate_true() throws BillyException {
+        assertTrue(new Deadline("essay", TaskDate.parse("2019-12-02"))
+                .isSameTask(new Deadline("essay", TaskDate.parse("2019-12-02"))));
+    }
+
+    @Test
+    public void isSameTask_sameWordingButDifferentDueDate_false() throws BillyException {
+        // Two essays due on different days are two pieces of work that happen to
+        // be worded alike, which is exactly what must not be called a duplicate.
+        assertFalse(new Deadline("essay", TaskDate.parse("2019-12-02"))
+                .isSameTask(new Deadline("essay", TaskDate.parse("2019-12-05"))));
+    }
+
+    @Test
+    public void isSameTask_oneWithATimeAndOneWithout_false() throws BillyException {
+        // A date with no time says nothing about the hour, so it is not the same
+        // commitment as one due at a stated hour that day.
+        assertFalse(new Deadline("essay", TaskDate.parse("2019-12-02"))
+                .isSameTask(new Deadline("essay", TaskDate.parse("2019-12-02 1800"))));
+    }
 }

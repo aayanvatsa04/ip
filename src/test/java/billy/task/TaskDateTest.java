@@ -218,4 +218,47 @@ public class TaskDateTest {
         assertFalse(TaskDate.parse("2019-12-02").isBefore(TaskDate.parse("2019-12-02 1000")));
         assertFalse(TaskDate.parse("2019-12-02 1000").isBefore(TaskDate.parse("2019-12-02")));
     }
+
+    // ---------------------------------------------------------------
+    // isSameInstant and hasTime
+    // ---------------------------------------------------------------
+
+    @Test
+    public void isSameInstant_sameDateAndTime_true() throws BillyException {
+        assertTrue(TaskDate.parse("2019-12-02 1800").isSameInstant(TaskDate.parse("2019-12-02 1800")));
+    }
+
+    @Test
+    public void isSameInstant_sameDateNeitherWithATime_true() throws BillyException {
+        assertTrue(TaskDate.parse("2019-12-02").isSameInstant(TaskDate.parse("2019-12-02")));
+    }
+
+    @Test
+    public void isSameInstant_oneWithATimeAndOneWithout_false() throws BillyException {
+        // A bare date is not midnight: Billy was never told an hour, and
+        // treating the two as the same would invent one.
+        assertFalse(TaskDate.parse("2019-12-02").isSameInstant(TaskDate.parse("2019-12-02 0000")));
+    }
+
+    @Test
+    public void isSameInstant_differentDates_false() throws BillyException {
+        assertFalse(TaskDate.parse("2019-12-02").isSameInstant(TaskDate.parse("2019-12-03")));
+    }
+
+    @Test
+    public void isSameInstant_sameDayWrittenBothWays_true() throws BillyException {
+        // The two accepted spellings of one day must agree, or the same date
+        // typed two ways would look like two different ones.
+        assertTrue(TaskDate.parse("2019-12-02").isSameInstant(TaskDate.parse("2/12/2019")));
+    }
+
+    @Test
+    public void hasTime_dateOnly_false() throws BillyException {
+        assertFalse(TaskDate.parse("2019-12-02").hasTime());
+    }
+
+    @Test
+    public void hasTime_dateAndTime_true() throws BillyException {
+        assertTrue(TaskDate.parse("2019-12-02 1800").hasTime());
+    }
 }

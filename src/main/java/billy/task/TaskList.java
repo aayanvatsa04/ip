@@ -3,6 +3,7 @@ package billy.task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import billy.BillyException;
 
@@ -95,6 +96,26 @@ public class TaskList {
      */
     public int size() {
         return tasks.size();
+    }
+
+    /**
+     * Returns the numbers of the outstanding tasks that describe the same thing
+     * as the given task, as the user refers to them.
+     *
+     * <p>Finished tasks are left out: ticking something off and adding it again
+     * is how a recurring chore is repeated, and warning about it would be
+     * wrong. The numbers count from 1, so they can be shown to the user and
+     * typed straight back in.
+     *
+     * @param task the task to look for matches of
+     * @return the matching task numbers, in list order, empty if there are none
+     */
+    public List<Integer> findSameTasks(Task task) {
+        return IntStream.range(0, tasks.size())
+                .filter(i -> !tasks.get(i).isDone())
+                .filter(i -> tasks.get(i).isSameTask(task))
+                .mapToObj(i -> i + 1)
+                .toList();
     }
 
     /**
