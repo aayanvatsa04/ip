@@ -235,8 +235,8 @@ public class Billy {
 
         ArrayList<String> notes = new ArrayList<>();
         if (!tasks.isEmpty()) {
-            notes.add("Welcome back! I've loaded " + Ui.describeListSize(tasks.size())
-                    + " from your last session.");
+            notes.add("Welcome back. Picked up " + Ui.describeListSize(tasks.size())
+                    + " from last time.");
         }
         int skipped = storage.getSkippedLineCount();
         if (skipped > 0) {

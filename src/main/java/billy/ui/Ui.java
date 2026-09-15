@@ -69,13 +69,13 @@ public class Ui {
 
     /**
      * Says how many tasks are now stored, e.g.
-     * {@code Now you have 3 tasks in the list.}
+     * {@code You've got 3 tasks now.}
      *
      * @param count how many tasks there are
      * @return the sentence to append to a confirmation
      */
     public static String describeNewListSize(int count) {
-        return "Now you have " + describeListSize(count) + " in the list.";
+        return "You've got " + describeListSize(count) + " now.";
     }
 
     /**
@@ -88,8 +88,8 @@ public class Ui {
      * @return the greeting, spanning two lines.
      */
     public static String getGreeting() {
-        return "Hey there! Billy here, at your service.\n"
-                + "I track todos, deadlines and events. Type 'list' to see them all.";
+        return "Hey there! Billy here. I'll remember your tasks so you don't have to.\n"
+                + "Todos, deadlines and events. Type 'list' whenever you want to see them.";
     }
 
     /**
@@ -98,7 +98,7 @@ public class Ui {
      * @return the farewell, on one line.
      */
     public static String getFarewell() {
-        return "Catch you later! Don't be a stranger.";
+        return "Catch you later! Your list will be right here when you get back.";
     }
 
     /** Prints the startup banner and welcomes the user. */

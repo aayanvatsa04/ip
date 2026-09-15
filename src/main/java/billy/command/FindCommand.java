@@ -38,9 +38,9 @@ public class FindCommand extends Command {
         List<String> found = numberMatching(tasks, task -> task.descriptionContains(keyword));
         if (found.isEmpty()) {
             // The word is quoted back, so a typo in the search is easy to spot.
-            ui.show("Nothing in your list mentions '" + keyword + "'.");
+            ui.show("Nothing here mentions '" + keyword + "'.");
             return;
         }
-        ui.show("Here are the matching tasks in your list:", String.join("\n", found));
+        ui.show("Here's what matched:", String.join("\n", found));
     }
 }

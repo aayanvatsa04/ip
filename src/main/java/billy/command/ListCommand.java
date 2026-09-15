@@ -25,6 +25,6 @@ public class ListCommand extends Command {
         }
 
         List<String> lines = numberMatching(tasks, task -> true);
-        ui.show("Here are the tasks in your list:", String.join("\n", lines));
+        ui.show("Here's what you're on the hook for:", String.join("\n", lines));
     }
 }
