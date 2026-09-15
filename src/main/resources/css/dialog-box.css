@@ -1,15 +1,42 @@
-/* One message in the conversation. The user's messages and Billy's differ only
-   in color and in which side they sit on, which is enough to tell them apart. */
+/* One message in the conversation.
+
+   The two speakers are deliberately not shown alike, because the conversation
+   is not between equals: the user types short commands, so those sit on the
+   right in a narrow colored bubble, while Billy's replies can run to many lines
+   and so take the full width of the window on the left. Errors take a third
+   form again, so a mistake cannot be skimmed past as an ordinary reply. */
 
 .label {
-    -fx-background-color: #dbe7dc;
-    -fx-background-radius: 12px;
     -fx-font-size: 13px;
-    -fx-padding: 10 14 10 14;
+    -fx-line-spacing: 2;
+    -fx-padding: 8 12 8 12;
+}
+
+/* What the user typed. The small bottom-right corner points back at the user's
+   picture, the way a speech bubble's tail points at whoever is speaking. */
+.user-label {
+    -fx-background-color: #6b8f71;
+    -fx-background-radius: 14 14 4 14;
+    -fx-text-fill: white;
+}
+
+/* Billy's replies: a plain white card, mirrored so its tail points left. Long
+   answers are easier to read on a quiet background than in a colored bubble. */
+.reply-label {
+    -fx-background-color: white;
+    -fx-background-radius: 14 14 14 4;
     -fx-text-fill: #23281f;
 }
 
-/* Billy's replies, added by DialogBox.flip(). */
-.reply-label {
-    -fx-background-color: white;
+/* Something went wrong. Two backgrounds are painted one over the other, the red
+   one showing through only along the left edge where the pink one is inset by
+   four pixels; that is what draws the bar. The bar matters as much as the
+   color: a difference in shape is still visible to a reader who cannot easily
+   tell red from green. */
+.error-label {
+    -fx-background-color: #d94f3d, #fdecea;
+    -fx-background-insets: 0, 0 0 0 4;
+    -fx-background-radius: 14 14 14 4, 0 14 14 0;
+    -fx-padding: 8 12 8 14;
+    -fx-text-fill: #8f2f24;
 }

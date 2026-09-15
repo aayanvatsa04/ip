@@ -38,8 +38,11 @@ public class Main extends Application {
 
             stage.setScene(scene);
             stage.setTitle("Billy");
-            stage.setMinHeight(220.0);
-            stage.setMinWidth(417.0);
+            // A floor rather than a fixed size: the layout is built out of
+            // anchors and a growing input row, so the window is free to be
+            // resized to anything at or above this and the content follows.
+            stage.setMinHeight(320.0);
+            stage.setMinWidth(360.0);
 
             // Handing Billy over has to wait until the layout is loaded, since
             // that is what creates the controller in the first place.

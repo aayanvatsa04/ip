@@ -69,10 +69,10 @@ public class MainWindow extends AnchorPane {
     public void setBilly(Billy billy) {
         this.billy = billy;
 
-        showBilly(Ui.getGreeting());
+        showBilly(Ui.getGreeting(), false);
         String startup = billy.getStartupMessage();
         if (startup != null) {
-            showBilly(startup);
+            showBilly(startup, billy.isStartupMessageError());
         }
     }
 
@@ -91,7 +91,8 @@ public class MainWindow extends AnchorPane {
         }
 
         dialogContainer.getChildren().add(DialogBox.getUserDialog(input, userImage));
-        showBilly(billy.getResponse(input));
+        String response = billy.getResponse(input);
+        showBilly(response, billy.isLastResponseError());
 
         if (billy.isExitRequested()) {
             // Typing `bye` closes the window, as it ends the conversation in the
@@ -107,9 +108,17 @@ public class MainWindow extends AnchorPane {
     /**
      * Adds one message from Billy to the conversation.
      *
+     * <p>A failure is shown in a form of its own, rather than in the same card
+     * as every other reply, so that a mistyped command is noticed instead of
+     * being scrolled past.
+     *
      * @param message what Billy has to say
+     * @param isError whether that message reports something going wrong
      */
-    private void showBilly(String message) {
-        dialogContainer.getChildren().add(DialogBox.getBillyDialog(message, billyImage));
+    private void showBilly(String message, boolean isError) {
+        DialogBox box = isError
+                ? DialogBox.getErrorDialog(message, billyImage)
+                : DialogBox.getBillyDialog(message, billyImage);
+        dialogContainer.getChildren().add(box);
     }
 }
