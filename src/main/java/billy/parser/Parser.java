@@ -14,6 +14,7 @@ import billy.command.MarkCommand;
 import billy.command.OnCommand;
 import billy.task.Deadline;
 import billy.task.Event;
+import billy.task.Task;
 import billy.task.TaskDate;
 import billy.task.TaskList;
 import billy.task.Todo;
@@ -37,6 +38,14 @@ import billy.task.Todo;
  * instance of.
  */
 public class Parser {
+
+    /**
+     * The one character a description may not contain.
+     *
+     * <p>Taken from {@link billy.task.Task#FIELD_SEPARATOR}, which is what a
+     * saved line is split on, so the two cannot drift apart.
+     */
+    private static final String SEPARATOR_CHARACTER = Task.FIELD_SEPARATOR.trim();
 
     /** Separates a deadline's description from its due date. */
     private static final String BY_SEPARATOR = "/by";
@@ -92,6 +101,10 @@ public class Parser {
      *                        malformed for the command it does name
      */
     public static Command parse(String line) throws BillyException {
+        // Trimmed here as well as by the callers. Both of them do trim today,
+        // so this changes nothing a user can see; it means the method cannot be
+        // made to answer "I don't know what '' means" by a caller that forgets.
+        line = line.trim();
         if (line.isEmpty()) {
             throw new BillyException("You'll have to give me something to work with!");
         }
@@ -126,7 +139,33 @@ public class Parser {
         if (argument.isBlank()) {
             throw new BillyException("The description of a todo can't be empty. " + TODO_USAGE);
         }
-        return new Todo(argument.trim());
+        return new Todo(checkDescription(argument.trim()));
+    }
+
+    /**
+     * Returns the description unchanged, having checked it can be written to the
+     * save file and read back.
+     *
+     * <p>Billy separates the fields of a saved task with
+     * {@value billy.task.Task#FIELD_SEPARATOR}, so a description containing that
+     * character splits into the wrong fields when the file is read again. A todo
+     * happens to survive it, since its description is the last field on the
+     * line, but a deadline or an event loses its date and the whole task is
+     * dropped as damaged. Refusing the character here costs the user one
+     * character; letting it through costs them the task, silently, on the next
+     * run.
+     *
+     * @param description the description as the user typed it, trimmed
+     * @return the same description
+     * @throws BillyException if it contains the field separator
+     */
+    private static String checkDescription(String description) throws BillyException {
+        if (description.contains(SEPARATOR_CHARACTER)) {
+            throw new BillyException("A description can't contain '" + SEPARATOR_CHARACTER
+                    + "', since that's what I use to separate the parts of a saved task."
+                    + " Try wording it without one.");
+        }
+        return description;
     }
 
     /**
@@ -138,7 +177,7 @@ public class Parser {
      */
     private static Deadline parseDeadline(String argument) throws BillyException {
         Halves parts = splitOn(argument, BY_SEPARATOR, "description", "due date", DEADLINE_USAGE);
-        return new Deadline(parts.before(), TaskDate.parse(parts.after()));
+        return new Deadline(checkDescription(parts.before()), TaskDate.parse(parts.after()));
     }
 
     /**
@@ -155,7 +194,7 @@ public class Parser {
         // The start and end times are still joined together, so split them apart too.
         Halves startAndEnd = splitOn(descriptionAndRest.after(), TO_SEPARATOR,
                 "start time", "end time", EVENT_USAGE);
-        return new Event(descriptionAndRest.before(), TaskDate.parse(startAndEnd.before()),
+        return new Event(checkDescription(descriptionAndRest.before()), TaskDate.parse(startAndEnd.before()),
                 TaskDate.parse(startAndEnd.after()));
     }
 
@@ -235,6 +274,14 @@ public class Parser {
         int separatorPosition = input.indexOf(separator);
         if (separatorPosition == -1) {
             throw new BillyException("I need '" + separator + "' in that command. " + usage);
+        }
+
+        // Splitting at the first one and leaving the rest in place would push a
+        // second copy into the date, where it surfaces as an unreadable date
+        // rather than as the duplicated marker it is.
+        if (input.indexOf(separator, separatorPosition + separator.length()) != -1) {
+            throw new BillyException("I found more than one '" + separator + "' in that"
+                    + " command, so I don't know which one you meant. " + usage);
         }
 
         String before = input.substring(0, separatorPosition).trim();
