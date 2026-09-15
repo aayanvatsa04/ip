@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -273,5 +274,40 @@ public class StorageTest {
         // simply echo the path back at the user.
         assertTrue(!Storage.describeFailure(new NoSuchFileException("billy.txt"))
                 .contains("billy.txt"));
+    }
+
+    // ---------------------------------------------------------------
+    // Explaining why a file could not be used
+    // ---------------------------------------------------------------
+
+    @Test
+    public void describeFailure_fileMissing_saysSo() {
+        // Phrased to read mid-sentence, since it is dropped into a message in
+        // brackets after the file name.
+        assertEquals("it isn't there", Storage.describeFailure(new NoSuchFileException("x")));
+    }
+
+    @Test
+    public void describeFailure_somethingInTheWay_saysSo() {
+        assertEquals("something that isn't a folder is in the way",
+                Storage.describeFailure(new FileAlreadyExistsException("x")));
+    }
+
+    @Test
+    public void describeFailure_permissionDenied_saysSo() {
+        assertEquals("permission was denied", Storage.describeFailure(new AccessDeniedException("x")));
+    }
+
+    @Test
+    public void describeFailure_aReasonGiven_lowercasedToReadMidSentence() {
+        // "Is a directory" is how the operating system phrases it; it has to be
+        // bent to lower case to sit inside Billy's sentence.
+        assertEquals("is a directory",
+                Storage.describeFailure(new FileSystemException("x", null, "Is a directory")));
+    }
+
+    @Test
+    public void describeFailure_anythingElse_generalWording() {
+        assertEquals("the file couldn't be opened", Storage.describeFailure(new IOException("x")));
     }
 }
