@@ -74,8 +74,8 @@ public class Parser {
     private static final String FIND_USAGE = "Try: find book";
 
     /**
-     * The two halves a command is split into, such as a description and the due
-     * date after {@value #BY_SEPARATOR}.
+     * Represents the two halves a command is split into, such as a description
+     * and the due date after {@value #BY_SEPARATOR}.
      *
      * @param before what came before the separator, trimmed
      * @param after what came after the separator, trimmed
@@ -83,7 +83,7 @@ public class Parser {
     private record Halves(String before, String after) {
     }
 
-    /** Nothing here needs an instance, so there is no way to make one. */
+    /** Prevents an instance being made, since parsing needs nothing remembered. */
     private Parser() {
     }
 

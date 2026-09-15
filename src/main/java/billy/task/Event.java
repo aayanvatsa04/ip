@@ -59,7 +59,8 @@ public class Event extends Task {
     }
 
     /**
-     * Two events are the same only if they also run over the same period.
+     * Returns whether another task is the same event, which requires the same
+     * period as well as the same wording.
      */
     @Override
     public boolean isSameTask(Task other) {
@@ -71,7 +72,8 @@ public class Event extends Task {
     }
 
     /**
-     * An event covers every day it runs across, not just the day it starts.
+     * Returns whether the given day falls within this event, which covers every
+     * day it runs across rather than only the day it starts.
      *
      * <p>Both ends count as part of it, so an event running from the 2nd to the
      * 4th is found by asking about the 2nd, the 3rd or the 4th.

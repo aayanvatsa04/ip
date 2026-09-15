@@ -32,7 +32,8 @@ public class Deadline extends Task {
     }
 
     /**
-     * Two deadlines are the same only if they also fall due at the same moment.
+     * Returns whether another task is the same deadline, which requires the same
+     * due moment as well as the same wording.
      *
      * <p>{@code essay /by Monday} and {@code essay /by Friday} are different
      * pieces of work that happen to be worded alike.
@@ -42,7 +43,7 @@ public class Deadline extends Task {
         return super.isSameTask(other) && by.isSameInstant(((Deadline) other).by);
     }
 
-    /** A deadline falls on the day it is due. */
+    /** Returns whether the given day is the day this deadline is due. */
     @Override
     public boolean occursOn(LocalDate day) {
         return by.getDate().equals(day);
