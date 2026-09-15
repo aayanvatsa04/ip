@@ -79,6 +79,16 @@ public class Billy {
     private boolean isExitRequested = false;
 
     /**
+     * Whether the last command answered through {@link #getResponse(String)}
+     * failed.
+     *
+     * <p>Kept for the same reason as {@link #isExitRequested}: the window asks
+     * about the answer after it has been handed back, so anything it needs to
+     * know about that answer has to outlive the call that produced it.
+     */
+    private boolean isLastResponseError = false;
+
+    /**
      * Builds a Billy that keeps its tasks in the usual file.
      *
      * <p>Offered for the window, which has no reason to care where the list is
@@ -183,7 +193,21 @@ public class Billy {
         } catch (BillyException e) {
             ui.showError(e.getMessage());
         }
+        isLastResponseError = ui.isErrorCollected();
         return ui.stopCollecting();
+    }
+
+    /**
+     * Returns whether the last answered command failed.
+     *
+     * <p>The window shows a failure differently from an ordinary reply, and the
+     * reply itself is only text by the time it gets there, so the difference
+     * has to be asked about separately.
+     *
+     * @return whether the last reply reports a failure.
+     */
+    public boolean isLastResponseError() {
+        return isLastResponseError;
     }
 
     /**
@@ -220,6 +244,19 @@ public class Billy {
                     + " in " + storage.getPath() + " that I couldn't understand.");
         }
         return notes.isEmpty() ? null : String.join("\n", notes);
+    }
+
+    /**
+     * Returns whether the startup message reports a failure rather than news.
+     *
+     * <p>A saved list that could not be read is a problem the user should see
+     * as one, while a list that loaded fine is not, so the window needs to tell
+     * the two apart before it shows either.
+     *
+     * @return whether reading the saved list failed.
+     */
+    public boolean isStartupMessageError() {
+        return loadError != null;
     }
 
     /**

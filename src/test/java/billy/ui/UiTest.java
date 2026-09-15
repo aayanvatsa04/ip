@@ -1,7 +1,9 @@
 package billy.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -141,6 +143,50 @@ public class UiTest {
         ui.showError("I couldn't save your list.", "The change will be lost when Billy closes.");
         assertEquals("I couldn't save your list.\nThe change will be lost when Billy closes.",
                 ui.stopCollecting());
+    }
+
+    @Test
+    public void isErrorCollected_onlyOrdinaryMessages_false() {
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.show("Here are the tasks in your list:");
+        assertFalse(ui.isErrorCollected());
+    }
+
+    @Test
+    public void isErrorCollected_errorShown_true() {
+        // This is what tells the window to show the reply as a failure, and the
+        // collected text itself no longer says so: showError and show produce
+        // exactly the same string.
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.showError("I don't know what 'blah' means.");
+        assertTrue(ui.isErrorCollected());
+    }
+
+    @Test
+    public void isErrorCollected_errorThenOrdinaryMessage_stillTrue() {
+        // A command that half worked still went wrong, so a later ordinary
+        // message must not quietly clear the mark.
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.showError("I couldn't save your list.");
+        ui.show("Now you have 1 task in the list.");
+        assertTrue(ui.isErrorCollected());
+    }
+
+    @Test
+    public void startCollecting_afterAnError_markCleared() {
+        // The mark belongs to one round of collecting. Left standing, every
+        // reply after the user's first mistake would be shown as a failure.
+        Ui ui = new Ui();
+        ui.startCollecting();
+        ui.showError("I don't know what 'blah' means.");
+        ui.stopCollecting();
+
+        ui.startCollecting();
+        ui.show("Here are the tasks in your list:");
+        assertFalse(ui.isErrorCollected());
     }
 
     @Test

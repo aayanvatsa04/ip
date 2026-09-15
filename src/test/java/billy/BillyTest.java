@@ -109,6 +109,66 @@ public class BillyTest {
     }
 
     @Test
+    public void isLastResponseError_beforeAnyCommand_false() {
+        assertFalse(billyWithEmptyList().isLastResponseError());
+    }
+
+    @Test
+    public void isLastResponseError_commandThatWorked_false() {
+        Billy billy = billyWithEmptyList();
+        billy.getResponse("todo read book");
+        assertFalse(billy.isLastResponseError());
+    }
+
+    @Test
+    public void isLastResponseError_unknownCommand_true() {
+        // The window shows a failure differently from an ordinary reply, and the
+        // answer is only text by the time it gets there, so this flag is the
+        // whole of what tells the two apart.
+        Billy billy = billyWithEmptyList();
+        billy.getResponse("blah");
+        assertTrue(billy.isLastResponseError());
+    }
+
+    @Test
+    public void isLastResponseError_badTaskNumber_true() {
+        Billy billy = billyWithEmptyList();
+        billy.getResponse("mark 1");
+        assertTrue(billy.isLastResponseError());
+    }
+
+    @Test
+    public void isLastResponseError_goodCommandAfterABadOne_false() {
+        // Left standing from the previous command, this would show every reply
+        // after the user's first typo as a failure.
+        Billy billy = billyWithEmptyList();
+        billy.getResponse("blah");
+        billy.getResponse("todo read book");
+        assertFalse(billy.isLastResponseError());
+    }
+
+    @Test
+    public void isStartupMessageError_noSavedFile_false() {
+        assertFalse(billyWithEmptyList().isStartupMessageError());
+    }
+
+    @Test
+    public void isStartupMessageError_savedTasksLoaded_false() throws IOException {
+        Path file = folder.resolve("billy.txt");
+        Files.write(file, List.of("T | 0 | read book"));
+        assertFalse(new Billy(file).isStartupMessageError());
+    }
+
+    @Test
+    public void isStartupMessageError_damagedLineSkipped_false() throws IOException {
+        // A skipped line is news, not a failure: the list did load. Reporting it
+        // as an error would greet the user with a red card over one bad line.
+        Path file = folder.resolve("billy.txt");
+        Files.write(file, List.of("T | 0 | read book", "this line is not a task"));
+        assertFalse(new Billy(file).isStartupMessageError());
+    }
+
+    @Test
     public void getStartupMessage_noSavedFile_nothingToSay() {
         assertNull(billyWithEmptyList().getStartupMessage());
     }

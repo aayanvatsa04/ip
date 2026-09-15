@@ -43,6 +43,16 @@ public class Ui {
     private StringBuilder transcript = null;
 
     /**
+     * Whether anything said since collecting started was reported as an error.
+     *
+     * <p>The console shows a mistake in the same shape as any other message, so
+     * it has never needed to remember this. The window sets errors apart, and
+     * this class is the only one that still knows which messages were errors by
+     * the time they have been flattened into a single piece of text.
+     */
+    private boolean isErrorCollected = false;
+
+    /**
      * Names a number of tasks with the matching plural, e.g. {@code 1 task} or
      * {@code 3 tasks}.
      *
@@ -113,6 +123,7 @@ public class Ui {
      */
     public void startCollecting() {
         transcript = new StringBuilder();
+        isErrorCollected = false;
     }
 
     /**
@@ -156,16 +167,30 @@ public class Ui {
     /**
      * Prints something that went wrong.
      *
-     * <p>Errors look the same as any other message today, but they are asked for
-     * by a name of their own so that the callers read honestly and so that
-     * setting them apart later — color, a prefix — is a change here and nowhere
-     * else.
+     * <p>Errors are printed exactly like any other message, since a console has
+     * no color to spend on them. What this adds over {@link #show(String...)}
+     * is the record that the message was an error, which is what lets the
+     * window show it differently.
      *
      * @param lines what went wrong, phrased for the person typing the command,
      *              one line per argument
      */
     public void showError(String... lines) {
+        isErrorCollected = true;
         show(lines);
+    }
+
+    /**
+     * Returns whether anything said since collecting started was an error.
+     *
+     * <p>Meaningful only between {@link #startCollecting()} and
+     * {@link #stopCollecting()}; outside those it reports on whichever run of
+     * collecting happened last.
+     *
+     * @return whether the collected message reports a failure.
+     */
+    public boolean isErrorCollected() {
+        return isErrorCollected;
     }
 
     /**
