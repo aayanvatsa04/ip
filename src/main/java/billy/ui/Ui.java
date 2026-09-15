@@ -28,6 +28,14 @@ public class Ui {
             + "|____/|_|_|_|\\__, |\n"
             + "             |___/ ";
 
+    /**
+     * How many tasks a list must hold before Billy remarks on its length.
+     *
+     * <p>Ten is high enough that an ordinary session never trips it by accident,
+     * and low enough that a list worth remarking on does.
+     */
+    private static final int BUSY_LIST_SIZE = 10;
+
     /** Where the user's commands are read from. */
     private final Scanner scanner = new Scanner(System.in);
 
@@ -69,13 +77,18 @@ public class Ui {
 
     /**
      * Says how many tasks are now stored, e.g.
-     * {@code You've got 3 tasks now.}
+     * {@code That's 3 tasks on the books.}
+     *
+     * <p>Past {@value #BUSY_LIST_SIZE} tasks Billy has something to say about
+     * it. The remark is here rather than in the commands so that adding and
+     * deleting cannot disagree about when a list has got long.
      *
      * @param count how many tasks there are
      * @return the sentence to append to a confirmation
      */
     public static String describeNewListSize(int count) {
-        return "You've got " + describeListSize(count) + " now.";
+        String sentence = "That's " + describeListSize(count) + " on the books.";
+        return count >= BUSY_LIST_SIZE ? sentence + " Ambitious." : sentence;
     }
 
     /**
@@ -88,8 +101,8 @@ public class Ui {
      * @return the greeting, spanning two lines.
      */
     public static String getGreeting() {
-        return "Hey there! Billy here. I'll remember your tasks so you don't have to.\n"
-                + "Todos, deadlines and events. Type 'list' whenever you want to see them.";
+        return "BILLY HERE! Keeper of lists, guardian of things you would otherwise forget.\n"
+                + "Todos, deadlines, events. Say 'list' and I'll spill it all. 'help' if you're lost.";
     }
 
     /**
@@ -98,7 +111,7 @@ public class Ui {
      * @return the farewell, on one line.
      */
     public static String getFarewell() {
-        return "Catch you later! Your list will be right here when you get back.";
+        return "Off you go! I'll be right here, guarding the list. Vigilantly.";
     }
 
     /** Prints the startup banner and welcomes the user. */

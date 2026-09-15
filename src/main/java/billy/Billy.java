@@ -235,13 +235,18 @@ public class Billy {
 
         ArrayList<String> notes = new ArrayList<>();
         if (!tasks.isEmpty()) {
-            notes.add("Welcome back. Picked up " + Ui.describeListSize(tasks.size())
-                    + " from last time.");
+            notes.add("Welcome back! Nothing moved while you were gone: "
+                    + Ui.describeListSize(tasks.size()) + " still waiting.");
         }
         int skipped = storage.getSkippedLineCount();
         if (skipped > 0) {
-            notes.add("Heads up: I skipped " + skipped + (skipped == 1 ? " line" : " lines")
-                    + " in " + storage.getPath() + " that I couldn't understand.");
+            // Both halves have to agree on the number: "1 line were gibberish"
+            // reads as a bug in Billy rather than a problem with the file.
+            String noun = skipped == 1 ? " line" : " lines";
+            String verdict = skipped == 1
+                    ? " was gibberish to me, so I skipped it."
+                    : " were gibberish to me, so I skipped them.";
+            notes.add("Heads up: " + skipped + noun + " in " + storage.getPath() + verdict);
         }
         return notes.isEmpty() ? null : String.join("\n", notes);
     }

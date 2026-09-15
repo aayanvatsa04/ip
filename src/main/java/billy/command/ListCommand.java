@@ -20,11 +20,11 @@ public class ListCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         if (tasks.isEmpty()) {
-            ui.show("Your list is empty. Nothing to do... suspicious.");
+            ui.show("Nothing. Nada. An empty list. Suspicious.");
             return;
         }
 
         List<String> lines = numberMatching(tasks, task -> true);
-        ui.show("Here's what you're on the hook for:", String.join("\n", lines));
+        ui.show("Behold, your list:", String.join("\n", lines));
     }
 }
