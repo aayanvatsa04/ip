@@ -36,7 +36,8 @@ public class Event extends Task {
      * @param description what the user wants to do
      * @param from when the event starts
      * @param to when the event ends
-     * @throws BillyException if the event would end before it starts
+     * @throws BillyException if the event would end before it starts, or would
+     *                        begin and end at the same moment
      */
     public Event(String description, TaskDate from, TaskDate to) throws BillyException {
         super(description);
@@ -44,8 +45,29 @@ public class Event extends Task {
             throw new BillyException("An event can't end before it starts, and you gave"
                     + " from: " + from + " to: " + to + ".");
         }
+        // An event that begins and ends at the same moment covers no time at
+        // all. The hour has to have been given for that to be what the user
+        // meant: "/from 2019-12-02 /to 2019-12-02" is an ordinary all-day
+        // event, and refusing that would be wrong.
+        if (from.hasTime() && from.isSameInstant(to)) {
+            throw new BillyException("An event has to last some time, and you gave"
+                    + " from: " + from + " to: " + to + ". Leave the times off if you"
+                    + " mean the whole day.");
+        }
         this.from = from;
         this.to = to;
+    }
+
+    /**
+     * Two events are the same only if they also run over the same period.
+     */
+    @Override
+    public boolean isSameTask(Task other) {
+        if (!super.isSameTask(other)) {
+            return false;
+        }
+        Event otherEvent = (Event) other;
+        return from.isSameInstant(otherEvent.from) && to.isSameInstant(otherEvent.to);
     }
 
     /**

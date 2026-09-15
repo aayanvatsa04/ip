@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
+import java.util.Objects;
 
 import billy.BillyException;
 
@@ -147,6 +148,32 @@ public class TaskDate {
             return false;
         }
         return time.isBefore(other.time);
+    }
+
+    /**
+     * Returns whether this names exactly the same point in time as another,
+     * down to whether a time of day was given at all.
+     *
+     * <p>A date with no time is not the same as the same date at midnight: the
+     * first says nothing about the hour, and Billy does not invent one. So
+     * {@code 2019-12-02} and {@code 2019-12-02 0000} are different here, which
+     * is what stops them being mistaken for duplicates of one another.
+     *
+     * @param other the point in time to compare against
+     * @return whether both name the same day and the same time, or the same day
+     *         with no time on either side
+     */
+    public boolean isSameInstant(TaskDate other) {
+        return date.equals(other.date) && Objects.equals(time, other.time);
+    }
+
+    /**
+     * Returns whether a time of day was given alongside the date.
+     *
+     * @return whether this names an hour as well as a day
+     */
+    public boolean hasTime() {
+        return time != null;
     }
 
     /**
