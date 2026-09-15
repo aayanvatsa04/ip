@@ -68,7 +68,10 @@ public class DialogBox extends HBox {
             fxmlLoader.setRoot(this);
             fxmlLoader.load();
         } catch (IOException e) {
-            e.printStackTrace();
+            // Loading is what creates the labels used just below, so carrying on
+            // would fail on a null one and report a missing label rather than the
+            // layout file that never loaded. Rethrowing keeps the real cause.
+            throw new IllegalStateException("Could not load the dialog box layout.", e);
         }
 
         dialog.setText(text);
