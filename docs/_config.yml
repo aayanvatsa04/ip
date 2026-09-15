@@ -5,3 +5,7 @@
 # the very top, above the guide's own heading.
 title: Billy
 description: A task chatbot with rather more to say about your list than it strictly needs to.
+
+# Cayman shows the title and description as a header banner, which the
+# default theme does not, and styles the tables more legibly.
+theme: jekyll-theme-cayman
