@@ -1,9 +1,17 @@
-/* The window itself: the conversation area, the input box and the send button. */
+/* The window itself: the conversation area, the input row and the send button.
+
+   The whole window is one warm, low-contrast surface, and the only saturated
+   color in it is the accent green (#6b8f71), so the eye is drawn to the two
+   things that matter: what the user just said, and the Send button. Errors add
+   the one other saturated color, in dialog-box.css. */
 
 .root {
     -fx-background-color: #f4f1ea;
+    -fx-font-family: "Segoe UI", "SF Pro Text", "Helvetica Neue", "Arial", sans-serif;
 }
 
+/* Transparent, so the window's own background shows through rather than the
+   scroll pane painting its default gray panel on top of it. */
 .scroll-pane {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
@@ -14,20 +22,69 @@
     -fx-background-color: transparent;
 }
 
-.text-field {
+/* A thin scrollbar with no end buttons. The default one is about three times
+   this wide, and in a window this narrow that width is taken away from the text
+   the user is actually reading. */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #cfc8b8;
+    -fx-background-radius: 4;
+}
+
+.scroll-bar:vertical .track,
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* An arrow with no shape and no padding takes up no room, which is how the end
+   buttons are removed without removing the scrollbar itself. */
+.scroll-bar:vertical .increment-arrow,
+.scroll-bar:vertical .decrement-arrow {
+    -fx-padding: 0;
+    -fx-shape: " ";
+}
+
+/* The input row. A hairline divides it from the conversation, which costs one
+   pixel where a gap of empty background would cost ten. */
+.input-bar {
     -fx-background-color: white;
-    -fx-border-color: #d8d2c4;
+    -fx-border-color: #e0d9cb;
     -fx-border-width: 1 0 0 0;
+    -fx-padding: 0 10 0 10;
+}
+
+.text-field {
+    -fx-background-color: #f4f1ea;
+    -fx-background-radius: 18;
     -fx-font-size: 13px;
-    -fx-padding: 10 12 10 12;
+    -fx-padding: 8 14 8 14;
+    -fx-prompt-text-fill: #9a927f;
+    -fx-text-fill: #23281f;
+}
+
+/* The box the user is typing in turns white and picks up an accent outline, so
+   it is obvious which control the keyboard is talking to. */
+.text-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #6b8f71;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
 }
 
 .button {
     -fx-background-color: #6b8f71;
-    -fx-background-radius: 0;
-    -fx-text-fill: white;
+    -fx-background-radius: 18;
+    -fx-cursor: hand;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-text-fill: white;
 }
 
 .button:hover {
