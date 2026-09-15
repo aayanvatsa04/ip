@@ -12,6 +12,7 @@ import billy.command.AddCommand;
 import billy.command.DeleteCommand;
 import billy.command.ExitCommand;
 import billy.command.FindCommand;
+import billy.command.HelpCommand;
 import billy.command.ListCommand;
 import billy.command.MarkCommand;
 import billy.command.OnCommand;
@@ -56,6 +57,25 @@ public class ParserTest {
     @Test
     public void parse_list_listCommandReturned() throws BillyException {
         assertInstanceOf(ListCommand.class, Parser.parse("list"));
+    }
+
+    @Test
+    public void parse_help_helpCommand() throws BillyException {
+        assertInstanceOf(HelpCommand.class, Parser.parse("help"));
+    }
+
+    @Test
+    public void parse_helpShortForms_helpCommand() throws BillyException {
+        // The command that advertises the short forms must answer to its own.
+        assertInstanceOf(HelpCommand.class, Parser.parse("h"));
+        assertInstanceOf(HelpCommand.class, Parser.parse("?"));
+    }
+
+    @Test
+    public void parse_helpWithSomethingAfterIt_stillHelpCommand() throws BillyException {
+        // Nothing follows `help`, so trailing words are ignored rather than
+        // refused, exactly as `list` ignores them.
+        assertInstanceOf(HelpCommand.class, Parser.parse("help me"));
     }
 
     @Test

@@ -29,34 +29,80 @@ import billy.BillyException;
  */
 public enum CommandWord {
     /** Adds a task with no date attached, e.g. {@code todo borrow book}. */
-    TODO("todo", "t"),
+    TODO(Group.ADDING, "todo", "t"),
 
     /** Adds a task with a due date, e.g. {@code deadline return book /by Sunday}. */
-    DEADLINE("deadline", "d", "dl"),
+    DEADLINE(Group.ADDING, "deadline", "d", "dl"),
 
     /** Adds a task spanning a period, e.g. {@code event meeting /from 2pm /to 4pm}. */
-    EVENT("event", "e", "ev"),
+    EVENT(Group.ADDING, "event", "e", "ev"),
 
     /** Prints every stored task. */
-    LIST("list", "l", "ls"),
+    LIST(Group.SEEING, "list", "l", "ls"),
 
     /** Prints the tasks falling on one day, e.g. {@code on 2019-12-02}. */
-    ON("on"),
+    ON(Group.SEEING, "on"),
 
     /** Prints the tasks whose description mentions a word, e.g. {@code find book}. */
-    FIND("find", "f"),
+    FIND(Group.SEEING, "find", "f"),
 
     /** Marks a task as done, e.g. {@code mark 2}. */
-    MARK("mark", "m"),
+    MARK(Group.CHANGING, "mark", "m"),
 
     /** Marks a task as not done again, e.g. {@code unmark 2}. */
-    UNMARK("unmark", "um"),
+    UNMARK(Group.CHANGING, "unmark", "um"),
 
     /** Removes a task from the list, e.g. {@code delete 3}. */
-    DELETE("delete", "del", "rm"),
+    DELETE(Group.CHANGING, "delete", "del", "rm"),
+
+    /** Lists every command, with the shorter words that also invoke it. */
+    HELP(Group.OTHER, "help", "h", "?"),
 
     /** Ends the conversation. */
-    BYE("bye", "exit", "quit", "q");
+    BYE(Group.OTHER, "bye", "exit", "quit", "q");
+
+    /**
+     * The kind of work a command does, used to group the commands when they are
+     * listed to the user.
+     *
+     * <p>This is the one thing about a command that cannot be worked out from
+     * the command itself: nothing in the word {@code delete} says it belongs
+     * with {@code mark}. It lives here beside the commands rather than as a list
+     * inside the command that prints them, so a new command is grouped where it
+     * is declared and cannot be left out of the listing by accident.
+     */
+    public enum Group {
+        /** Commands that put a new task in the list. */
+        ADDING("Adding"),
+
+        /** Commands that show tasks without changing any. */
+        SEEING("Seeing"),
+
+        /** Commands that change or remove a task that is already there. */
+        CHANGING("Changing"),
+
+        /** Everything that is not about a particular task. */
+        OTHER("Other");
+
+        /** How this group is named when the commands are listed. */
+        private final String heading;
+
+        Group(String heading) {
+            this.heading = heading;
+        }
+
+        /**
+         * Returns how this group is named when the commands are listed.
+         *
+         * @return the heading, capitalized as it is shown
+         */
+        public String getHeading() {
+            return heading;
+        }
+    }
+
+    /** The kind of work this command does, which is what it is listed under. */
+    private final Group group;
 
     /** The word the user types to invoke this command. */
     private final String keyword;
@@ -74,12 +120,15 @@ public enum CommandWord {
      * invoke it as well.
      *
      * <p>The aliases are taken as a varargs list so that a command with none is
-     * written {@code ON("on")}, exactly as it was before aliases existed.
+     * written {@code ON(Group.SEEING, "on")}, with nothing standing in for the
+     * ones it does not have.
      *
+     * @param group what kind of work the command does
      * @param keyword the word the user types, in lower case
      * @param aliases other words meaning the same thing, in lower case
      */
-    CommandWord(String keyword, String... aliases) {
+    CommandWord(Group group, String keyword, String... aliases) {
+        this.group = group;
         this.keyword = keyword;
         // List.of copies what it is given, so nothing outside can change the
         // aliases afterwards.
@@ -102,6 +151,15 @@ public enum CommandWord {
      */
     public List<String> getAliases() {
         return aliases;
+    }
+
+    /**
+     * Returns the kind of work this command does.
+     *
+     * @return the group it is listed under
+     */
+    public Group getGroup() {
+        return group;
     }
 
     /**
@@ -147,6 +205,60 @@ public enum CommandWord {
         String keywords = Arrays.stream(values())
                 .map(CommandWord::getKeyword)
                 .collect(Collectors.joining(", "));
-        return "I understand: " + keywords + ".";
+        return "I understand: " + keywords + ". Type 'help' for the short forms.";
+    }
+
+    /**
+     * Lists every command with the shorter words that also invoke it, grouped by
+     * the kind of work each does.
+     *
+     * <p>This is the long answer that {@link #describeAll()} deliberately is
+     * not. Someone reading this asked for it, so there is room to name the
+     * abbreviations; someone reading the other has just got a command wrong, and
+     * wants the right word rather than two ways of spelling it.
+     *
+     * <p>Built from the values and their aliases, so a command added later
+     * appears here without this method being touched. Only the group headings
+     * are written down, and an empty group is skipped rather than printed with
+     * nothing under it.
+     *
+     * @return one line per group, e.g. {@code Adding: todo (t), deadline (d, dl)}
+     */
+    public static String describeCommands() {
+        return Arrays.stream(Group.values())
+                .map(CommandWord::describeGroup)
+                .filter(line -> !line.isEmpty())
+                .collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * Returns one line naming every command in a group, or an empty string when
+     * the group holds none.
+     *
+     * @param group the group to describe
+     * @return the line for that group, without a trailing newline
+     */
+    private static String describeGroup(Group group) {
+        String commands = Arrays.stream(values())
+                .filter(command -> command.group == group)
+                .map(CommandWord::describeSelf)
+                .collect(Collectors.joining(", "));
+        return commands.isEmpty() ? "" : group.getHeading() + ": " + commands;
+    }
+
+    /**
+     * Returns this command's keyword, with its shorter words in brackets after
+     * it, e.g. {@code deadline (d, dl)}.
+     *
+     * <p>A command with no shorter word is named on its own rather than with an
+     * empty pair of brackets after it.
+     *
+     * @return the keyword, and the aliases if there are any
+     */
+    private String describeSelf() {
+        if (aliases.isEmpty()) {
+            return keyword;
+        }
+        return keyword + " (" + String.join(", ", aliases) + ")";
     }
 }

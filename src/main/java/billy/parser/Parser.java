@@ -8,6 +8,7 @@ import billy.command.Command;
 import billy.command.DeleteCommand;
 import billy.command.ExitCommand;
 import billy.command.FindCommand;
+import billy.command.HelpCommand;
 import billy.command.ListCommand;
 import billy.command.MarkCommand;
 import billy.command.OnCommand;
@@ -109,6 +110,7 @@ public class Parser {
             case MARK -> new MarkCommand(parseTaskNumber(argument, word), true);
             case UNMARK -> new MarkCommand(parseTaskNumber(argument, word), false);
             case DELETE -> new DeleteCommand(parseTaskNumber(argument, word));
+            case HELP -> new HelpCommand();
             case BYE -> new ExitCommand();
         };
     }
