@@ -1,6 +1,34 @@
-# Billy project template
+# Billy
 
-This is a project template for a greenfield Java project. Given below are instructions on how to use it.
+Billy is a desktop chatbot that keeps track of your tasks, and has rather more
+to say about them than it strictly needs to.
+
+![Billy](docs/Ui.png)
+
+It handles three kinds of task — **todos**, **deadlines** and **events** — and
+can list them, search them, mark them done and delete them. Your list is saved
+to `data/billy.txt` after every change and read back the next time Billy starts,
+so closing the window never loses it.
+
+The full instructions are in the [user guide](docs/README.md).
+
+## Running Billy
+
+With [JDK 25](https://www.oracle.com/java/technologies/downloads/) installed:
+
+```
+./gradlew run
+```
+
+To build the jar a grader would run instead:
+
+```
+./gradlew shadowJar
+java -jar build/libs/billy.jar
+```
+
+Billy also runs as a plain console conversation, which is what the text UI tests
+drive: `java -cp build/classes/java/main billy.Billy`.
 
 ## Setting up in Intellij
 
