@@ -1,10 +1,15 @@
 # Billy User Guide
 
-// Product screenshot goes here
+![Billy](Ui.png)
 
-Billy is a friendly chatbot that keeps track of your tasks. Tell it what you
-need to do and it remembers, including between runs: your list is saved to
-`data/billy.txt` after every change and read back the next time Billy starts.
+Billy is a laid-back chatbot that keeps track of your tasks. It is deliberately
+short with you: it confirms what it did in a few words, never nags, and stays
+out of the way otherwise. The one time Billy speaks plainly rather than casually
+is when something has gone wrong, since an error is not the place for character.
+
+Tell it what you need to do and it remembers, including between runs: your list
+is saved to `data/billy.txt` after every change and read back the next time
+Billy starts.
 
 Billy handles three kinds of task — **todos**, **deadlines** and **events** —
 and can list them, search them, mark them done and delete them.
@@ -44,9 +49,9 @@ A task with nothing attached to it.
 Example: `todo read book`
 
 ```
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ```
 
 ## Adding a deadline
@@ -56,9 +61,9 @@ A task that must be done by a particular date or time.
 Example: `deadline return book /by 2019-12-02 1800`
 
 ```
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ```
 
 ## Adding an event
@@ -69,9 +74,9 @@ before it starts is refused.
 Example: `event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600`
 
 ```
-Got it. I've added this task:
+Alright, added:
   [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ```
 
 ## Listing every task
@@ -81,7 +86,7 @@ Shows the whole list, numbered the way you refer to the tasks.
 Example: `list`
 
 ```
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] read book
 2.[D][ ] return book (by: Dec 2 2019, 6:00pm)
 3.[E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
@@ -102,7 +107,7 @@ date and so never appear here.
 Example: `on 2019-12-02`
 
 ```
-Here's what you have on Dec 2 2019:
+Here's what you've got on Dec 2 2019:
 2.[D][ ] return book (by: Dec 2 2019, 6:00pm)
 3.[E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
 ```
@@ -121,7 +126,7 @@ and part of a word counts, so `find book` also finds `textbook`.
 Example: `find book`
 
 ```
-Here are the matching tasks in your list:
+Here's what matched:
 1.[T][ ] read book
 2.[D][ ] return book (by: Dec 2 2019, 6:00pm)
 ```
@@ -132,7 +137,7 @@ can be marked or deleted straight away without running `list` first.
 If nothing matches, the word is quoted back so a typo is easy to spot:
 
 ```
-Nothing in your list mentions 'zzz'.
+Nothing here mentions 'zzz'.
 ```
 
 ## Marking a task done, or not done again
@@ -140,14 +145,14 @@ Nothing in your list mentions 'zzz'.
 Example: `mark 1`
 
 ```
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] read book
 ```
 
 Example: `unmark 1`
 
 ```
-OK, I've marked this task as not done yet:
+No worries, back to not done:
   [T][ ] read book
 ```
 
@@ -156,9 +161,9 @@ OK, I've marked this task as not done yet:
 Example: `delete 2`
 
 ```
-Noted. I've removed this task:
+Done. That one's gone:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ```
 
 ## Leaving
@@ -166,7 +171,7 @@ Now you have 2 tasks in the list.
 Example: `bye`
 
 ```
-Catch you later! Don't be a stranger.
+Catch you later! Your list will be right here when you get back.
 ```
 
 ## Shorter ways to type a command

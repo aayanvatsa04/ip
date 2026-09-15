@@ -6,6 +6,7 @@ import billy.Billy;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -38,6 +39,10 @@ public class Main extends Application {
 
             stage.setScene(scene);
             stage.setTitle("Billy");
+            // The same face the conversation uses, so Billy is recognizable in
+            // the dock and the task switcher rather than being a generic Java
+            // coffee cup there and a chatbot only once opened.
+            stage.getIcons().add(new Image(Main.class.getResourceAsStream("/images/DaBilly.png")));
             // A floor rather than a fixed size: the layout is built out of
             // anchors and a growing input row, so the window is free to be
             // resized to anything at or above this and the content follows.

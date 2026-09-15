@@ -1,13 +1,18 @@
 /* The window itself: the conversation area, the input row and the send button.
 
-   The whole window is one warm, low-contrast surface, and the only saturated
-   color in it is the accent green (#6b8f71), so the eye is drawn to the two
-   things that matter: what the user just said, and the Send button. Errors add
-   the one other saturated color, in dialog-box.css. */
+   The look is chosen to match how Billy talks: warm, unhurried and plain. The
+   neutrals are all slightly yellow rather than gray, the corners are generous,
+   and the one saturated color is a warm caramel (#96603a), which is what marks
+   whatever the user is doing right now. Errors bring the only other saturated
+   color, in dialog-box.css, and it is kept clearly apart from this one.
+
+   Trebuchet is asked for first because it is humanist and a little informal
+   without being a novelty face, and because it ships on both macOS and Windows,
+   so the window looks the same on either. */
 
 .root {
-    -fx-background-color: #f4f1ea;
-    -fx-font-family: "Segoe UI", "SF Pro Text", "Helvetica Neue", "Arial", sans-serif;
+    -fx-background-color: #f2ece1;
+    -fx-font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
 /* Transparent, so the window's own background shows through rather than the
@@ -31,7 +36,7 @@
 }
 
 .scroll-bar:vertical .thumb {
-    -fx-background-color: #cfc8b8;
+    -fx-background-color: #d5cab5;
     -fx-background-radius: 4;
 }
 
@@ -53,33 +58,35 @@
 /* The input row. A hairline divides it from the conversation, which costs one
    pixel where a gap of empty background would cost ten. */
 .input-bar {
-    -fx-background-color: white;
-    -fx-border-color: #e0d9cb;
+    -fx-background-color: #fffcf6;
+    -fx-border-color: #e3d9c6;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 0 10 0 10;
 }
 
 .text-field {
-    -fx-background-color: #f4f1ea;
-    -fx-background-radius: 18;
+    -fx-background-color: #f2ece1;
+    -fx-background-radius: 20;
     -fx-font-size: 13px;
     -fx-padding: 8 14 8 14;
-    -fx-prompt-text-fill: #9a927f;
-    -fx-text-fill: #23281f;
+    -fx-prompt-text-fill: #6f6656;
+    -fx-text-fill: #2f2a25;
 }
 
 /* The box the user is typing in turns white and picks up an accent outline, so
    it is obvious which control the keyboard is talking to. */
 .text-field:focused {
-    -fx-background-color: white;
-    -fx-border-color: #6b8f71;
-    -fx-border-radius: 18;
+    -fx-background-color: #fffcf6;
+    -fx-border-color: #96603a;
+    -fx-border-radius: 20;
     -fx-border-width: 1;
 }
 
+/* White on this caramel is 5.2:1, comfortably past the 4.5:1 that text of this
+   size needs to stay legible. The green it replaces managed only 3.6:1. */
 .button {
-    -fx-background-color: #6b8f71;
-    -fx-background-radius: 18;
+    -fx-background-color: #96603a;
+    -fx-background-radius: 20;
     -fx-cursor: hand;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
@@ -87,12 +94,13 @@
     -fx-text-fill: white;
 }
 
+/* Lightened on hover, but only as far as 4.5:1 allows. */
 .button:hover {
-    -fx-background-color: #7ba382;
+    -fx-background-color: #a26a38;
 }
 
 .button:pressed {
-    -fx-background-color: #5a7a5f;
+    -fx-background-color: #7d502f;
 }
 
 .button:disabled {

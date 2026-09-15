@@ -41,25 +41,25 @@ public class UiTest {
 
     @Test
     public void describeNewListSize_oneTask_singularSentence() {
-        assertEquals("Now you have 1 task in the list.", Ui.describeNewListSize(1));
+        assertEquals("You've got 1 task now.", Ui.describeNewListSize(1));
     }
 
     @Test
     public void describeNewListSize_severalTasks_pluralSentence() {
-        assertEquals("Now you have 2 tasks in the list.", Ui.describeNewListSize(2));
+        assertEquals("You've got 2 tasks now.", Ui.describeNewListSize(2));
     }
 
     @Test
     public void describeNewListSize_noTasks_pluralSentence() {
         // Said after deleting the last task, so it is a real case, not a spare one.
-        assertEquals("Now you have 0 tasks in the list.", Ui.describeNewListSize(0));
+        assertEquals("You've got 0 tasks now.", Ui.describeNewListSize(0));
     }
 
     @Test
     public void describeNewListSize_anyCount_wordedThroughDescribeListSize() {
         // The sentence is built from the same phrase used elsewhere, so the two
         // cannot disagree about how a count is worded.
-        assertEquals("Now you have " + Ui.describeListSize(7) + " in the list.",
+        assertEquals("You've got " + Ui.describeListSize(7) + " now.",
                 Ui.describeNewListSize(7));
     }
 
@@ -68,14 +68,15 @@ public class UiTest {
         // The window and the console open with the same words; only the banner
         // around them differs. Spelling the greeting out here is what would
         // catch the two drifting apart.
-        assertEquals("Hey there! Billy here, at your service.\n"
-                + "I track todos, deadlines and events. Type 'list' to see them all.",
+        assertEquals("Hey there! Billy here. I'll remember your tasks so you don't have to.\n"
+                + "Todos, deadlines and events. Type 'list' whenever you want to see them.",
                 Ui.getGreeting());
     }
 
     @Test
     public void getFarewell_always_matchesWhatTheConsoleSays() {
-        assertEquals("Catch you later! Don't be a stranger.", Ui.getFarewell());
+        assertEquals("Catch you later! Your list will be right here when you get back.",
+                Ui.getFarewell());
     }
 
     @Test
@@ -113,8 +114,8 @@ public class UiTest {
         // one block, exactly as if the newlines had been typed by the caller.
         Ui ui = new Ui();
         ui.startCollecting();
-        ui.show("Got it. I've added this task:", "  [T][ ] read book", "Now you have 1 task.");
-        assertEquals("Got it. I've added this task:\n  [T][ ] read book\nNow you have 1 task.",
+        ui.show("Alright, added:", "  [T][ ] read book", "You've got 1 task now.");
+        assertEquals("Alright, added:\n  [T][ ] read book\nYou've got 1 task now.",
                 ui.stopCollecting());
     }
 
@@ -149,7 +150,7 @@ public class UiTest {
     public void isErrorCollected_onlyOrdinaryMessages_false() {
         Ui ui = new Ui();
         ui.startCollecting();
-        ui.show("Here are the tasks in your list:");
+        ui.show("Here's what you're on the hook for:");
         assertFalse(ui.isErrorCollected());
     }
 
@@ -171,7 +172,7 @@ public class UiTest {
         Ui ui = new Ui();
         ui.startCollecting();
         ui.showError("I couldn't save your list.");
-        ui.show("Now you have 1 task in the list.");
+        ui.show("You've got 1 task now.");
         assertTrue(ui.isErrorCollected());
     }
 
@@ -185,7 +186,7 @@ public class UiTest {
         ui.stopCollecting();
 
         ui.startCollecting();
-        ui.show("Here are the tasks in your list:");
+        ui.show("Here's what you're on the hook for:");
         assertFalse(ui.isErrorCollected());
     }
 

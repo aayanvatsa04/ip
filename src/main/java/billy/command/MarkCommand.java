@@ -44,10 +44,10 @@ public class MarkCommand extends Command {
         String confirmation;
         if (shouldBeDone) {
             task.markAsDone();
-            confirmation = "Nice! I've marked this task as done:";
+            confirmation = "Nice one. That's done:";
         } else {
             task.markAsNotDone();
-            confirmation = "OK, I've marked this task as not done yet:";
+            confirmation = "No worries, back to not done:";
         }
         ui.show(confirmation, "  " + task);
         save(tasks, ui, storage);

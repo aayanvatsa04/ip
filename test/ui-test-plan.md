@@ -66,8 +66,8 @@ ____________________________________________________________
 | |_) | | | | |_| |
 |____/|_|_|_|\__, |
              |___/
-Hey there! Billy here, at your service.
-I track todos, deadlines and events. Type 'list' to see them all.
+Hey there! Billy here. I'll remember your tasks so you don't have to.
+Todos, deadlines and events. Type 'list' whenever you want to see them.
 ____________________________________________________________
 ```
 
@@ -76,7 +76,7 @@ ____________________________________________________________
 Billy's sign-off, printed when the conversation ends.
 
 ```text
-Catch you later! Don't be a stranger.
+Catch you later! Your list will be right here when you get back.
 ____________________________________________________________
 ```
 
@@ -111,19 +111,19 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] borrow book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -149,40 +149,40 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Jun 6 2019)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] join sports club
-Now you have 4 tasks in the list.
+You've got 4 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] join sports club
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] borrow book
-Now you have 5 tasks in the list.
+You've got 5 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][X] read book
 2.[D][ ] return book (by: Jun 6 2019)
 3.[E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
@@ -208,16 +208,16 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] pay fees (by: Dec 6 2019)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [D][X] pay fees (by: Dec 6 2019)
 ____________________________________________________________
 ____________________________________________________________
-OK, I've marked this task as not done yet:
+No worries, back to not done:
   [D][ ] pay fees (by: Dec 6 2019)
 ____________________________________________________________
 {{FAREWELL}}
@@ -239,14 +239,14 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] do homework (by: Oct 15 2019)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] call mum (by: Oct 15 2019, 9:30am)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
 I couldn't read 'no idea :-p' as a date. Use yyyy-MM-dd or d/M/yyyy, and a 24-hour time if you want one, e.g. 2019-12-02, 2/12/2019 or 2/12/2019 1800.
@@ -295,9 +295,9 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
 I need a task number, like 'mark 2'.
@@ -446,44 +446,44 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Jun 6 2019)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] join sports club
-Now you have 4 tasks in the list.
+You've got 4 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] borrow book
-Now you have 5 tasks in the list.
+You've got 5 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [D][X] return book (by: Jun 6 2019)
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] join sports club
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][X] read book
 2.[D][X] return book (by: Jun 6 2019)
 3.[E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
@@ -491,12 +491,12 @@ Here are the tasks in your list:
 5.[T][ ] borrow book
 ____________________________________________________________
 ____________________________________________________________
-Noted. I've removed this task:
+Done. That one's gone:
   [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
-Now you have 4 tasks in the list.
+You've got 4 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][X] read book
 2.[D][X] return book (by: Jun 6 2019)
 3.[T][X] join sports club
@@ -527,9 +527,9 @@ ____________________________________________________________
 Your list is empty, so there's nothing to change.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
 I need a task number, like 'delete 2'.
@@ -538,9 +538,9 @@ ____________________________________________________________
 There's no task 9 on your list. You have 1.
 ____________________________________________________________
 ____________________________________________________________
-Noted. I've removed this task:
+Done. That one's gone:
   [T][ ] read book
-Now you have 0 tasks in the list.
+You've got 0 tasks now.
 ____________________________________________________________
 ____________________________________________________________
 Your list is empty. Nothing to do... suspicious.
@@ -562,12 +562,12 @@ list
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] read book
 ____________________________________________________________
 {{FAREWELL}}
@@ -590,20 +590,20 @@ BYE
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] Read Book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] Read Book
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] Read Book
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][X] Read Book
 ____________________________________________________________
 {{FAREWELL}}
@@ -627,24 +627,24 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-OK, I've marked this task as not done yet:
+No worries, back to not done:
   [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] read book
 ____________________________________________________________
 {{FAREWELL}}
@@ -665,9 +665,9 @@ todo this must never run
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -692,31 +692,31 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [D][X] return book (by: Dec 2 2019, 6:00pm)
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Welcome back! I've loaded 3 tasks from your last session.
+Welcome back. Picked up 3 tasks from last time.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] read book
 2.[D][X] return book (by: Dec 2 2019, 6:00pm)
 3.[E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
@@ -746,39 +746,39 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] return book
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] return book
 ____________________________________________________________
 ____________________________________________________________
-Noted. I've removed this task:
+Done. That one's gone:
   [T][X] return book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-OK, I've marked this task as not done yet:
+No worries, back to not done:
   [T][ ] read book
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Welcome back! I've loaded 1 task from your last session.
+Welcome back. Picked up 1 task from last time.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] read book
 ____________________________________________________________
 {{FAREWELL}}
@@ -802,14 +802,14 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Noted. I've removed this task:
+Done. That one's gone:
   [T][ ] read book
-Now you have 0 tasks in the list.
+You've got 0 tasks now.
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
@@ -840,10 +840,10 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Welcome back! I've loaded 3 tasks from your last session.
+Welcome back. Picked up 3 tasks from last time.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][X] read book
 2.[D][ ] return book (by: Jun 6 2019)
 3.[E][X] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
@@ -876,18 +876,18 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Welcome back! I've loaded 2 tasks from your last session.
+Welcome back. Picked up 2 tasks from last time.
 Heads up: I skipped 4 lines in data/billy.txt that I couldn't understand.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][X] read book
 2.[T][ ] join sports club
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] buy milk
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -935,30 +935,30 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Dec 5 2019, 6:00pm)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] buy milk
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you have on Dec 2 2019:
+Here's what you've got on Dec 2 2019:
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 ____________________________________________________________
-Here's what you have on Dec 3 2019:
+Here's what you've got on Dec 3 2019:
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 ____________________________________________________________
-Here's what you have on Dec 5 2019:
+Here's what you've got on Dec 5 2019:
 1.[D][ ] return book (by: Dec 5 2019, 6:00pm)
 ____________________________________________________________
 {{FAREWELL}}
@@ -982,15 +982,15 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
 Nothing on Dec 5 2019. Enjoy the day off!
 ____________________________________________________________
 ____________________________________________________________
-Here's what you have on Dec 4 2019:
+Here's what you've got on Dec 4 2019:
 1.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 ____________________________________________________________
@@ -1021,27 +1021,27 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Dec 5 2019)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Welcome back! I've loaded 2 tasks from your last session.
+Welcome back. Picked up 2 tasks from last time.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[D][ ] return book (by: Dec 5 2019)
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 ____________________________________________________________
-Here's what you have on Dec 3 2019:
+Here's what you've got on Dec 3 2019:
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 {{FAREWELL}}
@@ -1069,11 +1069,11 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Welcome back! I've loaded 2 tasks from your last session.
+Welcome back. Picked up 2 tasks from last time.
 Heads up: I skipped 2 lines in data/billy.txt that I couldn't understand.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] read book
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
@@ -1098,25 +1098,25 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] pay fees (by: Dec 2 2019)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] call mum (by: Feb 12 2019)
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ____________________________________________________________
 ____________________________________________________________
 I couldn't read '31/2/2019' as a date. Use yyyy-MM-dd or d/M/yyyy, and a 24-hour time if you want one, e.g. 2019-12-02, 2/12/2019 or 2/12/2019 1800.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[D][ ] return book (by: Dec 2 2019, 6:00pm)
 2.[D][ ] pay fees (by: Dec 2 2019)
 3.[D][ ] call mum (by: Feb 12 2019)
@@ -1143,27 +1143,27 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] slashes (by: Feb 12 2019, 9:30am)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] dashes (by: Feb 12 2019, 9:30am)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Welcome back! I've loaded 2 tasks from your last session.
+Welcome back. Picked up 2 tasks from last time.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[D][ ] slashes (by: Feb 12 2019, 9:30am)
 2.[D][ ] dashes (by: Feb 12 2019, 9:30am)
 ____________________________________________________________
 ____________________________________________________________
-Here's what you have on Feb 12 2019:
+Here's what you've got on Feb 12 2019:
 1.[D][ ] slashes (by: Feb 12 2019, 9:30am)
 2.[D][ ] dashes (by: Feb 12 2019, 9:30am)
 ____________________________________________________________
@@ -1194,17 +1194,17 @@ ____________________________________________________________
 An event can't end before it starts, and you gave from: Dec 2 2019, 2:00pm to: Dec 2 2019, 10:00am.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] same day (from: Dec 2 2019, 10:00am to: Dec 2 2019, 2:00pm)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [E][ ] open end (from: Dec 2 2019, 10:00am to: Dec 2 2019)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[E][ ] same day (from: Dec 2 2019, 10:00am to: Dec 2 2019, 2:00pm)
 2.[E][ ] open end (from: Dec 2 2019, 10:00am to: Dec 2 2019)
 ____________________________________________________________
@@ -1232,11 +1232,11 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Welcome back! I've loaded 2 tasks from your last session.
+Welcome back. Picked up 2 tasks from last time.
 Heads up: I skipped 1 line in data/billy.txt that I couldn't understand.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] read book
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
@@ -1264,27 +1264,27 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Jun 6 2019)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] buy milk
-Now you have 3 tasks in the list.
+You've got 3 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the matching tasks in your list:
+Here's what matched:
 1.[T][ ] read book
 2.[D][ ] return book (by: Jun 6 2019)
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [D][X] return book (by: Jun 6 2019)
 ____________________________________________________________
 {{FAREWELL}}
@@ -1310,17 +1310,17 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] Read Textbook
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] buy milk
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the matching tasks in your list:
+Here's what matched:
 1.[T][ ] Read Textbook
 ____________________________________________________________
 {{FAREWELL}}
@@ -1345,15 +1345,15 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Nothing in your list mentions 'milk'.
+Nothing here mentions 'milk'.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Nothing in your list mentions 'zzz'.
+Nothing here mentions 'zzz'.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -1377,9 +1377,9 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
 What should I look for? Try: find book
@@ -1411,28 +1411,28 @@ q
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] read book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [D][ ] return book (by: Dec 2 2019)
-Now you have 2 tasks in the list.
+You've got 2 tasks now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] read book
 2.[D][ ] return book (by: Dec 2 2019)
 ____________________________________________________________
 ____________________________________________________________
-Nice! I've marked this task as done:
+Nice one. That's done:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Noted. I've removed this task:
+Done. That one's gone:
   [D][ ] return book (by: Dec 2 2019)
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -1456,12 +1456,12 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Got it. I've added this task:
+Alright, added:
   [T][ ] borrow book
-Now you have 1 task in the list.
+You've got 1 task now.
 ____________________________________________________________
 ____________________________________________________________
-Here are the tasks in your list:
+Here's what you're on the hook for:
 1.[T][ ] borrow book
 ____________________________________________________________
 ____________________________________________________________
