@@ -26,6 +26,16 @@ and can list them, search them, mark them done and delete them.
 5. Type a command into the box at the bottom and press Enter. Try `help` to see
    everything Billy understands, or go straight to `todo read book`.
 
+Java prints a few lines beginning `WARNING: A restricted method...` as Billy
+starts. Nothing is wrong: JavaFX has to load the graphics libraries your
+operating system draws windows with, and Java 24 onwards mentions it whenever
+that happens. The window opens normally and you can ignore them. To start
+without them:
+
+```
+java --enable-native-access=javafx.graphics -jar billy.jar
+```
+
 ## Quick reference
 
 | What you want | Type |
