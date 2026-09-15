@@ -1,5 +1,7 @@
 package billy.command;
 
+import java.util.List;
+
 import billy.storage.Storage;
 import billy.task.Task;
 import billy.task.TaskList;
@@ -35,10 +37,26 @@ public class AddCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
+        // Looked for before the task is added, so the new one does not count as
+        // a match of itself.
+        List<Integer> alreadyThere = tasks.findSameTasks(task);
         tasks.add(task);
-        ui.show("Consider it written down:",
-                "  " + task,
-                Ui.describeNewListSize(tasks.size()));
+
+        if (alreadyThere.isEmpty()) {
+            ui.show("Consider it written down:",
+                    "  " + task,
+                    Ui.describeNewListSize(tasks.size()));
+        } else {
+            // The task is still added: two tasks worded alike can be two real
+            // errands, and refusing the second would be Billy deciding that for
+            // the user. Saying which number to delete makes undoing it one
+            // command, which is cheaper than being asked to confirm every time.
+            ui.show("Consider it written down:",
+                    "  " + task,
+                    Ui.describeNewListSize(tasks.size()),
+                    "Heads up: that's the same as " + Ui.describeTaskNumbers(alreadyThere)
+                            + ". Type 'delete " + tasks.size() + "' if you didn't mean it.");
+        }
         save(tasks, ui, storage);
     }
 }

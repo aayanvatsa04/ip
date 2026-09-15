@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -224,5 +226,31 @@ public class UiTest {
         // NullPointerException from inside Ui with nothing to say which caller
         // forgot to start.
         assertThrows(AssertionError.class, () -> new Ui().stopCollecting());
+    }
+
+    // ---------------------------------------------------------------
+    // Naming task numbers
+    // ---------------------------------------------------------------
+
+    @Test
+    public void describeTaskNumbers_oneNumber_singular() {
+        assertEquals("task 1", Ui.describeTaskNumbers(List.of(1)));
+    }
+
+    @Test
+    public void describeTaskNumbers_twoNumbers_joinedWithAnd() {
+        assertEquals("tasks 1 and 2", Ui.describeTaskNumbers(List.of(1, 2)));
+    }
+
+    @Test
+    public void describeTaskNumbers_severalNumbers_commasThenAnd() {
+        // The last separator is "and" rather than a comma, or the phrase reads
+        // as though it had been cut off.
+        assertEquals("tasks 1, 2 and 5", Ui.describeTaskNumbers(List.of(1, 2, 5)));
+    }
+
+    @Test
+    public void describeTaskNumbers_none_assertionFails() {
+        assertThrows(AssertionError.class, () -> Ui.describeTaskNumbers(List.of()));
     }
 }

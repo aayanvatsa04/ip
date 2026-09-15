@@ -1,5 +1,6 @@
 package billy.ui;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -73,6 +74,27 @@ public class Ui {
      */
     public static String describeListSize(int count) {
         return count + (count == 1 ? " task" : " tasks");
+    }
+
+    /**
+     * Names a set of task numbers the way a person would, e.g. {@code task 1},
+     * {@code tasks 1 and 2} or {@code tasks 1, 2 and 5}.
+     *
+     * <p>Wording, so it lives here rather than in the command that happens to
+     * need it. The last separator is "and" rather than a comma, which is what
+     * stops the longest form reading as a fragment of a list.
+     *
+     * @param numbers the task numbers to name, in the order they should be read
+     * @return the phrase naming them, with the right singular or plural
+     */
+    public static String describeTaskNumbers(List<Integer> numbers) {
+        assert !numbers.isEmpty() : "There is nothing to name if no task matched.";
+        if (numbers.size() == 1) {
+            return "task " + numbers.get(0);
+        }
+        List<String> written = numbers.stream().map(String::valueOf).toList();
+        String allButLast = String.join(", ", written.subList(0, written.size() - 1));
+        return "tasks " + allButLast + " and " + written.get(written.size() - 1);
     }
 
     /**

@@ -50,6 +50,33 @@ public class Task {
     }
 
     /**
+     * Returns whether another task describes the same thing as this one.
+     *
+     * <p>Sameness is what the user typed, not what Billy has done with it: the
+     * type and the description, compared without regard to capitalization,
+     * since nobody retypes a description with the same capitals by accident.
+     * Whether either task is done is deliberately not part of it, because a
+     * finished task and a new one with the same wording are a chore being
+     * repeated rather than a mistake.
+     *
+     * <p>Not {@code equals}, on purpose. Two tasks that describe the same thing
+     * are still two separate entries in the list, and the user may legitimately
+     * want both; this answers "did you mean to type that twice?", which is a
+     * weaker question than identity.
+     *
+     * <p>Subclasses that carry dates widen this, since two deadlines worded
+     * alike but due on different days are not the same task.
+     *
+     * @param other the task to compare against
+     * @return whether the two describe the same thing
+     */
+    public boolean isSameTask(Task other) {
+        return other != null
+                && getClass() == other.getClass()
+                && description.equalsIgnoreCase(other.description);
+    }
+
+    /**
      * Returns whether this task has been completed.
      *
      * <p>Asked for by the commands that remark on the state of the whole list,

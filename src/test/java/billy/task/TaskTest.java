@@ -9,6 +9,8 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
+import billy.BillyException;
+
 /**
  * Tests {@link Task}, the parts every kind of task has in common.
  *
@@ -149,5 +151,50 @@ public class TaskTest {
         // task, so reaching here with one means a caller skipped those checks.
         // A task with nothing in it would list and save as an empty line.
         assertThrows(AssertionError.class, () -> new Task("   "));
+    }
+
+    // ---------------------------------------------------------------
+    // isSameTask
+    // ---------------------------------------------------------------
+
+    @Test
+    public void isSameTask_sameDescription_true() {
+        assertTrue(new Todo("read book").isSameTask(new Todo("read book")));
+    }
+
+    @Test
+    public void isSameTask_descriptionInADifferentCase_true() {
+        // The common double entry: the same errand typed again, capitalized
+        // however it fell out that time. A case-sensitive check would miss it.
+        assertTrue(new Todo("Read Book").isSameTask(new Todo("read book")));
+    }
+
+    @Test
+    public void isSameTask_differentDescription_false() {
+        assertFalse(new Todo("read book").isSameTask(new Todo("write essay")));
+    }
+
+    @Test
+    public void isSameTask_oneDoneOneNot_stillTrue() {
+        // Sameness is about what the user typed, not what Billy has done with
+        // it. Which of the two gets warned about is the caller's business.
+        Todo done = new Todo("read book");
+        done.markAsDone();
+        assertTrue(done.isSameTask(new Todo("read book")));
+    }
+
+    @Test
+    public void isSameTask_null_false() {
+        assertFalse(new Todo("read book").isSameTask(null));
+    }
+
+    @Test
+    public void isSameTask_differentTypeSameWording_false() throws BillyException {
+        // A todo and a deadline worded alike are different commitments: one has
+        // a date to meet and the other does not.
+        Todo todo = new Todo("read book");
+        Deadline deadline = new Deadline("read book", TaskDate.parse("2019-12-02"));
+        assertFalse(todo.isSameTask(deadline));
+        assertFalse(deadline.isSameTask(todo));
     }
 }

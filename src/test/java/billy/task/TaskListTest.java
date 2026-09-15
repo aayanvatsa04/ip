@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -260,5 +261,56 @@ public class TaskListTest {
 
         only.markAsNotDone();
         assertFalse(tasks.isAllDone());
+    }
+
+    // ---------------------------------------------------------------
+    // findSameTasks
+    // ---------------------------------------------------------------
+
+    @Test
+    public void findSameTasks_noMatch_empty() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+        assertTrue(tasks.findSameTasks(new Todo("write essay")).isEmpty());
+    }
+
+    @Test
+    public void findSameTasks_oneMatch_itsNumberReturned() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("write essay"));
+        tasks.add(new Todo("read book"));
+        // Counted from 1, as the user refers to them, so the number can be shown
+        // and typed straight back in.
+        assertEquals(List.of(2), tasks.findSameTasks(new Todo("read book")));
+    }
+
+    @Test
+    public void findSameTasks_severalMatches_allNumbersInListOrder() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+        tasks.add(new Todo("write essay"));
+        tasks.add(new Todo("READ BOOK"));
+        assertEquals(List.of(1, 3), tasks.findSameTasks(new Todo("read book")));
+    }
+
+    @Test
+    public void findSameTasks_matchingTaskAlreadyDone_notReturned() {
+        // Finishing a chore and adding it again is how a repeat is done, so a
+        // finished task must not be reported as a duplicate.
+        TaskList tasks = new TaskList();
+        Todo finished = new Todo("water the plants");
+        finished.markAsDone();
+        tasks.add(finished);
+        assertTrue(tasks.findSameTasks(new Todo("water the plants")).isEmpty());
+    }
+
+    @Test
+    public void findSameTasks_oneDoneOneNot_onlyTheOutstandingOne() {
+        TaskList tasks = new TaskList();
+        Todo finished = new Todo("read book");
+        finished.markAsDone();
+        tasks.add(finished);
+        tasks.add(new Todo("read book"));
+        assertEquals(List.of(2), tasks.findSameTasks(new Todo("read book")));
     }
 }
