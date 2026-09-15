@@ -50,6 +50,20 @@ public class Task {
     }
 
     /**
+     * Returns whether this task has been completed.
+     *
+     * <p>Asked for by the commands that remark on the state of the whole list,
+     * which need the flag itself rather than the symbol standing for it. Reading
+     * {@link #getStatusIcon()} and comparing it to {@code "X"} would work, but
+     * would tie those commands to how a task is drawn.
+     *
+     * @return whether the task is done
+     */
+    public boolean isDone() {
+        return isDone;
+    }
+
+    /**
      * Returns the symbol shown inside the status box.
      *
      * @return {@code "X"} if the task is done, or a single space if it is not

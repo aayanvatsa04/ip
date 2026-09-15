@@ -33,9 +33,15 @@ public class DeleteCommand extends Command {
     public void execute(TaskList tasks, Ui ui, Storage storage) throws BillyException {
         // remove returns the task it took out, so it can be shown in the confirmation.
         Task removed = tasks.remove(taskNumber);
-        ui.show("Done. That one's gone:",
-                "  " + removed,
-                Ui.describeNewListSize(tasks.size()));
+        if (tasks.isEmpty()) {
+            // Deleting the last task empties the list, which is worth saying
+            // outright rather than reporting as a count of zero.
+            ui.show("Gone. Vanished. No trace:", "  " + removed,
+                    "And that was the last of them. Empty list. Savor it.");
+        } else {
+            ui.show("Gone. Vanished. No trace:", "  " + removed,
+                    Ui.describeNewListSize(tasks.size()));
+        }
         save(tasks, ui, storage);
     }
 }

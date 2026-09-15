@@ -36,7 +36,7 @@ public class AddCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         tasks.add(task);
-        ui.show("Alright, added:",
+        ui.show("Consider it written down:",
                 "  " + task,
                 Ui.describeNewListSize(tasks.size()));
         save(tasks, ui, storage);

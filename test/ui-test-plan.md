@@ -66,8 +66,8 @@ ____________________________________________________________
 | |_) | | | | |_| |
 |____/|_|_|_|\__, |
              |___/
-Hey there! Billy here. I'll remember your tasks so you don't have to.
-Todos, deadlines and events. Type 'list' whenever you want to see them.
+BILLY HERE! Keeper of lists, guardian of things you would otherwise forget.
+Todos, deadlines, events. Say 'list' and I'll spill it all. 'help' if you're lost.
 ____________________________________________________________
 ```
 
@@ -76,7 +76,7 @@ ____________________________________________________________
 Billy's sign-off, printed when the conversation ends.
 
 ```text
-Catch you later! Your list will be right here when you get back.
+Off you go! I'll be right here, guarding the list. Vigilantly.
 ____________________________________________________________
 ```
 
@@ -111,19 +111,19 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] borrow book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -149,40 +149,40 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Jun 6 2019)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] join sports club
-You've got 4 tasks now.
+That's 4 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] join sports club
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] borrow book
-You've got 5 tasks now.
+That's 5 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][X] read book
 2.[D][ ] return book (by: Jun 6 2019)
 3.[E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
@@ -208,16 +208,17 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] pay fees (by: Dec 6 2019)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [D][X] pay fees (by: Dec 6 2019)
+And that's your whole list conquered. Take a bow.
 ____________________________________________________________
 ____________________________________________________________
-No worries, back to not done:
+Un-done! We've all been there:
   [D][ ] pay fees (by: Dec 6 2019)
 ____________________________________________________________
 {{FAREWELL}}
@@ -239,14 +240,14 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] do homework (by: Oct 15 2019)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] call mum (by: Oct 15 2019, 9:30am)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
 I couldn't read 'no idea :-p' as a date. Use yyyy-MM-dd or d/M/yyyy, and a 24-hour time if you want one, e.g. 2019-12-02, 2/12/2019 or 2/12/2019 1800.
@@ -269,7 +270,7 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Your list is empty. Nothing to do... suspicious.
+Nothing. Nada. An empty list. Suspicious.
 ____________________________________________________________
 ____________________________________________________________
 You'll have to give me something to work with!
@@ -295,9 +296,9 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
 I need a task number, like 'mark 2'.
@@ -357,13 +358,13 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-I don't know what 'blah' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, bye.
+I don't know what 'blah' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, help, bye. Type 'help' for the short forms.
 ____________________________________________________________
 ____________________________________________________________
-I don't know what 'buy' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, bye.
+I don't know what 'buy' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, help, bye. Type 'help' for the short forms.
 ____________________________________________________________
 ____________________________________________________________
-Your list is empty. Nothing to do... suspicious.
+Nothing. Nada. An empty list. Suspicious.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -446,44 +447,44 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Jun 6 2019)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] join sports club
-You've got 4 tasks now.
+That's 4 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] borrow book
-You've got 5 tasks now.
+That's 5 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [D][X] return book (by: Jun 6 2019)
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] join sports club
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][X] read book
 2.[D][X] return book (by: Jun 6 2019)
 3.[E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
@@ -491,12 +492,12 @@ Here's what you're on the hook for:
 5.[T][ ] borrow book
 ____________________________________________________________
 ____________________________________________________________
-Done. That one's gone:
+Gone. Vanished. No trace:
   [E][ ] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
-You've got 4 tasks now.
+That's 4 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][X] read book
 2.[D][X] return book (by: Jun 6 2019)
 3.[T][X] join sports club
@@ -527,9 +528,9 @@ ____________________________________________________________
 Your list is empty, so there's nothing to change.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
 I need a task number, like 'delete 2'.
@@ -538,12 +539,12 @@ ____________________________________________________________
 There's no task 9 on your list. You have 1.
 ____________________________________________________________
 ____________________________________________________________
-Done. That one's gone:
+Gone. Vanished. No trace:
   [T][ ] read book
-You've got 0 tasks now.
+And that was the last of them. Empty list. Savor it.
 ____________________________________________________________
 ____________________________________________________________
-Your list is empty. Nothing to do... suspicious.
+Nothing. Nada. An empty list. Suspicious.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -562,12 +563,12 @@ list
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] read book
 ____________________________________________________________
 {{FAREWELL}}
@@ -590,20 +591,21 @@ BYE
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] Read Book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] Read Book
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] Read Book
+And that's your whole list conquered. Take a bow.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][X] Read Book
 ____________________________________________________________
 {{FAREWELL}}
@@ -627,24 +629,26 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] read book
+And that's your whole list conquered. Take a bow.
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] read book
+And that's your whole list conquered. Take a bow.
 ____________________________________________________________
 ____________________________________________________________
-No worries, back to not done:
+Un-done! We've all been there:
   [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] read book
 ____________________________________________________________
 {{FAREWELL}}
@@ -665,9 +669,9 @@ todo this must never run
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -692,31 +696,31 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [D][X] return book (by: Dec 2 2019, 6:00pm)
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Welcome back. Picked up 3 tasks from last time.
+Welcome back! Nothing moved while you were gone: 3 tasks still waiting.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] read book
 2.[D][X] return book (by: Dec 2 2019, 6:00pm)
 3.[E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
@@ -746,39 +750,40 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] return book
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] return book
+And that's your whole list conquered. Take a bow.
 ____________________________________________________________
 ____________________________________________________________
-Done. That one's gone:
+Gone. Vanished. No trace:
   [T][X] return book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-No worries, back to not done:
+Un-done! We've all been there:
   [T][ ] read book
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Welcome back. Picked up 1 task from last time.
+Welcome back! Nothing moved while you were gone: 1 task still waiting.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] read book
 ____________________________________________________________
 {{FAREWELL}}
@@ -802,19 +807,19 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Done. That one's gone:
+Gone. Vanished. No trace:
   [T][ ] read book
-You've got 0 tasks now.
+And that was the last of them. Empty list. Savor it.
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Your list is empty. Nothing to do... suspicious.
+Nothing. Nada. An empty list. Suspicious.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -840,10 +845,10 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Welcome back. Picked up 3 tasks from last time.
+Welcome back! Nothing moved while you were gone: 3 tasks still waiting.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][X] read book
 2.[D][ ] return book (by: Jun 6 2019)
 3.[E][X] project meeting (from: Aug 6 2019, 2:00pm to: Aug 6 2019, 4:00pm)
@@ -876,18 +881,18 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Welcome back. Picked up 2 tasks from last time.
-Heads up: I skipped 4 lines in data/billy.txt that I couldn't understand.
+Welcome back! Nothing moved while you were gone: 2 tasks still waiting.
+Heads up: 4 lines in data/billy.txt were gibberish to me, so I skipped them.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][X] read book
 2.[T][ ] join sports club
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] buy milk
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -911,7 +916,7 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Your list is empty. Nothing to do... suspicious.
+Nothing. Nada. An empty list. Suspicious.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -935,30 +940,30 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Dec 5 2019, 6:00pm)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] buy milk
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you've got on Dec 2 2019:
+Here's what Dec 2 2019 has in store:
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 ____________________________________________________________
-Here's what you've got on Dec 3 2019:
+Here's what Dec 3 2019 has in store:
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 ____________________________________________________________
-Here's what you've got on Dec 5 2019:
+Here's what Dec 5 2019 has in store:
 1.[D][ ] return book (by: Dec 5 2019, 6:00pm)
 ____________________________________________________________
 {{FAREWELL}}
@@ -982,15 +987,15 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
 Nothing on Dec 5 2019. Enjoy the day off!
 ____________________________________________________________
 ____________________________________________________________
-Here's what you've got on Dec 4 2019:
+Here's what Dec 4 2019 has in store:
 1.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 ____________________________________________________________
@@ -1021,27 +1026,27 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Dec 5 2019)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Welcome back. Picked up 2 tasks from last time.
+Welcome back! Nothing moved while you were gone: 2 tasks still waiting.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[D][ ] return book (by: Dec 5 2019)
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 ____________________________________________________________
-Here's what you've got on Dec 3 2019:
+Here's what Dec 3 2019 has in store:
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
 {{FAREWELL}}
@@ -1069,11 +1074,11 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Welcome back. Picked up 2 tasks from last time.
-Heads up: I skipped 2 lines in data/billy.txt that I couldn't understand.
+Welcome back! Nothing moved while you were gone: 2 tasks still waiting.
+Heads up: 2 lines in data/billy.txt were gibberish to me, so I skipped them.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] read book
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
@@ -1098,25 +1103,25 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] pay fees (by: Dec 2 2019)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] call mum (by: Feb 12 2019)
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
 I couldn't read '31/2/2019' as a date. Use yyyy-MM-dd or d/M/yyyy, and a 24-hour time if you want one, e.g. 2019-12-02, 2/12/2019 or 2/12/2019 1800.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[D][ ] return book (by: Dec 2 2019, 6:00pm)
 2.[D][ ] pay fees (by: Dec 2 2019)
 3.[D][ ] call mum (by: Feb 12 2019)
@@ -1143,27 +1148,27 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] slashes (by: Feb 12 2019, 9:30am)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] dashes (by: Feb 12 2019, 9:30am)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 {{FAREWELL}}
 {{GREETING}}
 ____________________________________________________________
-Welcome back. Picked up 2 tasks from last time.
+Welcome back! Nothing moved while you were gone: 2 tasks still waiting.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[D][ ] slashes (by: Feb 12 2019, 9:30am)
 2.[D][ ] dashes (by: Feb 12 2019, 9:30am)
 ____________________________________________________________
 ____________________________________________________________
-Here's what you've got on Feb 12 2019:
+Here's what Feb 12 2019 has in store:
 1.[D][ ] slashes (by: Feb 12 2019, 9:30am)
 2.[D][ ] dashes (by: Feb 12 2019, 9:30am)
 ____________________________________________________________
@@ -1194,17 +1199,17 @@ ____________________________________________________________
 An event can't end before it starts, and you gave from: Dec 2 2019, 2:00pm to: Dec 2 2019, 10:00am.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] same day (from: Dec 2 2019, 10:00am to: Dec 2 2019, 2:00pm)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [E][ ] open end (from: Dec 2 2019, 10:00am to: Dec 2 2019)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[E][ ] same day (from: Dec 2 2019, 10:00am to: Dec 2 2019, 2:00pm)
 2.[E][ ] open end (from: Dec 2 2019, 10:00am to: Dec 2 2019)
 ____________________________________________________________
@@ -1232,11 +1237,11 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Welcome back. Picked up 2 tasks from last time.
-Heads up: I skipped 1 line in data/billy.txt that I couldn't understand.
+Welcome back! Nothing moved while you were gone: 2 tasks still waiting.
+Heads up: 1 line in data/billy.txt was gibberish to me, so I skipped it.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] read book
 2.[E][ ] conference (from: Dec 2 2019, 9:00am to: Dec 4 2019, 5:00pm)
 ____________________________________________________________
@@ -1264,27 +1269,27 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Jun 6 2019)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] buy milk
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what matched:
+Found these lurking in your list:
 1.[T][ ] read book
 2.[D][ ] return book (by: Jun 6 2019)
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [D][X] return book (by: Jun 6 2019)
 ____________________________________________________________
 {{FAREWELL}}
@@ -1310,17 +1315,17 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] Read Textbook
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] buy milk
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what matched:
+Found these lurking in your list:
 1.[T][ ] Read Textbook
 ____________________________________________________________
 {{FAREWELL}}
@@ -1345,15 +1350,15 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Nothing here mentions 'milk'.
+Searched high and low. Nothing mentions 'milk'.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Nothing here mentions 'zzz'.
+Searched high and low. Nothing mentions 'zzz'.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -1377,9 +1382,9 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
 What should I look for? Try: find book
@@ -1411,28 +1416,28 @@ q
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Dec 2 2019)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] read book
 2.[D][ ] return book (by: Dec 2 2019)
 ____________________________________________________________
 ____________________________________________________________
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Done. That one's gone:
+Gone. Vanished. No trace:
   [D][ ] return book (by: Dec 2 2019)
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 {{FAREWELL}}
 ```
@@ -1456,16 +1461,163 @@ bye
 ```text
 {{GREETING}}
 ____________________________________________________________
-Alright, added:
+Consider it written down:
   [T][ ] borrow book
-You've got 1 task now.
+That's 1 task on the books.
 ____________________________________________________________
 ____________________________________________________________
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] borrow book
 ____________________________________________________________
 ____________________________________________________________
-I don't know what 'tt' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, bye.
+I don't know what 'tt' means. I understand: todo, deadline, event, list, on, find, mark, unmark, delete, help, bye. Type 'help' for the short forms.
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-38 Help names every command and its shorter words
+
+**Aim:** Verify that `help` lists every command Billy accepts, grouped by the kind of work it does, and names the shorter words alongside each. This is the only place inside Billy where the abbreviations are advertised, since the message shown for an unknown command deliberately leaves them out.
+
+**Input:**
+```text
+help
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Everything I know how to do. Short forms in brackets, for the impatient.
+Adding: todo (t), deadline (d, dl), event (e, ev)
+Seeing: list (l, ls), on, find (f)
+Changing: mark (m), unmark (um), delete (del, rm)
+Other: help (h, ?), bye (exit, quit, q)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-39 Help answers to its own shorter words
+
+**Aim:** Verify that `h` and `?` show the same listing as `help`. A command that advertises abbreviations but does not answer to its own would be a poor advertisement for them.
+
+**Input:**
+```text
+h
+?
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Everything I know how to do. Short forms in brackets, for the impatient.
+Adding: todo (t), deadline (d, dl), event (e, ev)
+Seeing: list (l, ls), on, find (f)
+Changing: mark (m), unmark (um), delete (del, rm)
+Other: help (h, ?), bye (exit, quit, q)
+____________________________________________________________
+____________________________________________________________
+Everything I know how to do. Short forms in brackets, for the impatient.
+Adding: todo (t), deadline (d, dl), event (e, ev)
+Seeing: list (l, ls), on, find (f)
+Changing: mark (m), unmark (um), delete (del, rm)
+Other: help (h, ?), bye (exit, quit, q)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-40 Help leaves the task list alone
+
+**Aim:** Verify that asking for help neither changes the list nor disturbs what is saved. `help` is the one command that touches neither, so the list must read back exactly as it did before, including across a restart.
+
+**Data file:**
+```text
+T | 0 | read book
+D | 1 | return book | 2019-12-02 1800
+```
+
+**Input:**
+```text
+help
+list
+--- restart ---
+list
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Welcome back! Nothing moved while you were gone: 2 tasks still waiting.
+____________________________________________________________
+____________________________________________________________
+Everything I know how to do. Short forms in brackets, for the impatient.
+Adding: todo (t), deadline (d, dl), event (e, ev)
+Seeing: list (l, ls), on, find (f)
+Changing: mark (m), unmark (um), delete (del, rm)
+Other: help (h, ?), bye (exit, quit, q)
+____________________________________________________________
+____________________________________________________________
+Behold, your list:
+1.[T][ ] read book
+2.[D][X] return book (by: Dec 2 2019, 6:00pm)
+____________________________________________________________
+{{FAREWELL}}
+{{GREETING}}
+____________________________________________________________
+Welcome back! Nothing moved while you were gone: 2 tasks still waiting.
+____________________________________________________________
+____________________________________________________________
+Behold, your list:
+1.[T][ ] read book
+2.[D][X] return book (by: Dec 2 2019, 6:00pm)
+____________________________________________________________
+{{FAREWELL}}
+```
+
+## TC-41 Billy remarks on a list that has got long
+
+**Aim:** Verify that passing ten tasks earns a remark, and that dropping back below ten loses it again. The threshold is worth pinning end to end because it is the one piece of Billy's character that depends on arithmetic rather than on which command was typed. Nine tasks are loaded from the save file so the case can reach the boundary in one command.
+
+**Data file:**
+```text
+T | 0 | task one
+T | 0 | task two
+T | 0 | task three
+T | 0 | task four
+T | 0 | task five
+T | 0 | task six
+T | 0 | task seven
+T | 0 | task eight
+T | 0 | task nine
+```
+
+**Input:**
+```text
+todo task ten
+delete 10
+bye
+```
+
+**Expected output:**
+```text
+{{GREETING}}
+____________________________________________________________
+Welcome back! Nothing moved while you were gone: 9 tasks still waiting.
+____________________________________________________________
+____________________________________________________________
+Consider it written down:
+  [T][ ] task ten
+That's 10 tasks on the books. Ambitious.
+____________________________________________________________
+____________________________________________________________
+Gone. Vanished. No trace:
+  [T][ ] task ten
+That's 9 tasks on the books.
 ____________________________________________________________
 {{FAREWELL}}
 ```

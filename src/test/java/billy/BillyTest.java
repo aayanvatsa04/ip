@@ -43,8 +43,8 @@ public class BillyTest {
     @Test
     public void getResponse_addATask_confirmationReturned() {
         String response = billyWithEmptyList().getResponse("todo read book");
-        assertEquals("Alright, added:\n  [T][ ] read book\n"
-                + "You've got 1 task now.", response);
+        assertEquals("Consider it written down:\n  [T][ ] read book\n"
+                + "That's 1 task on the books.", response);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class BillyTest {
         Billy billy = billyWithEmptyList();
         billy.getResponse("todo read book");
         billy.getResponse("todo write essay");
-        assertEquals("Here's what you're on the hook for:\n1.[T][ ] read book\n2.[T][ ] write essay",
+        assertEquals("Behold, your list:\n1.[T][ ] read book\n2.[T][ ] write essay",
                 billy.getResponse("list"));
     }
 
@@ -83,7 +83,7 @@ public class BillyTest {
         // A second answer must not repeat the first: each call starts collecting
         // afresh, so the window shows one reply per command rather than a growing
         // transcript.
-        assertFalse(billy.getResponse("list").contains("Alright, added:"));
+        assertFalse(billy.getResponse("list").contains("Consider it written down:"));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class BillyTest {
         assertTrue(billy.isExitRequested());
         // The console says goodbye after its loop ends. The window has no loop,
         // so the farewell has to come back with the answer or never be seen.
-        assertEquals("Catch you later! Your list will be right here when you get back.", response);
+        assertEquals("Off you go! I'll be right here, guarding the list. Vigilantly.", response);
     }
 
     @Test
@@ -177,7 +177,7 @@ public class BillyTest {
     public void getStartupMessage_savedTasks_saysHowManyWereLoaded() throws IOException {
         Path file = folder.resolve("billy.txt");
         Files.write(file, List.of("T | 0 | read book", "T | 1 | write essay"));
-        assertEquals("Welcome back. Picked up 2 tasks from last time.",
+        assertEquals("Welcome back! Nothing moved while you were gone: 2 tasks still waiting.",
                 new Billy(file).getStartupMessage());
     }
 
@@ -186,7 +186,21 @@ public class BillyTest {
         Path file = folder.resolve("billy.txt");
         Files.write(file, List.of("T | 0 | read book", "this line is not a task"));
         String message = new Billy(file).getStartupMessage();
-        assertTrue(message.contains("Picked up 1 task"), message);
-        assertTrue(message.contains("skipped 1 line"), message);
+        assertTrue(message.contains("1 task still waiting"), message);
+        assertTrue(message.contains("1 line"), message);
+        // Singular throughout: "1 line were gibberish" would read as a fault in
+        // Billy rather than in the file it is complaining about.
+        assertTrue(message.contains("was gibberish"), message);
+        assertTrue(message.contains("skipped it"), message);
+    }
+
+    @Test
+    public void getStartupMessage_severalDamagedLines_wordedInThePlural() throws IOException {
+        Path file = folder.resolve("billy.txt");
+        Files.write(file, List.of("T | 0 | read book", "not a task", "also not a task"));
+        String message = new Billy(file).getStartupMessage();
+        assertTrue(message.contains("2 lines"), message);
+        assertTrue(message.contains("were gibberish"), message);
+        assertTrue(message.contains("skipped them"), message);
     }
 }

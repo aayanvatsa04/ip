@@ -2,10 +2,11 @@
 
 ![Billy](Ui.png)
 
-Billy is a laid-back chatbot that keeps track of your tasks. It is deliberately
-short with you: it confirms what it did in a few words, never nags, and stays
-out of the way otherwise. The one time Billy speaks plainly rather than casually
-is when something has gone wrong, since an error is not the place for character.
+Billy is a chatbot that keeps track of your tasks and has rather more to say
+about them than it strictly needs to. It announces, it congratulates, and it
+will comment on the state of your list if you let it get long. The one time
+Billy drops the act is when something has gone wrong: errors are worded plainly,
+because an error is not the place for a personality.
 
 Tell it what you need to do and it remembers, including between runs: your list
 is saved to `data/billy.txt` after every change and read back the next time
@@ -26,6 +27,7 @@ and can list them, search them, mark them done and delete them.
 | Search descriptions | `find <word>` |
 | Mark done / not done | `mark <number>` / `unmark <number>` |
 | Remove a task | `delete <number>` |
+| See every command | `help` |
 | Leave | `bye` |
 
 Commands are not case sensitive, so `LIST` works as well as `list`.
@@ -49,9 +51,9 @@ A task with nothing attached to it.
 Example: `todo read book`
 
 ```
-Alright, added:
+Consider it written down:
   [T][ ] read book
-You've got 1 task now.
+That's 1 task on the books.
 ```
 
 ## Adding a deadline
@@ -61,9 +63,9 @@ A task that must be done by a particular date or time.
 Example: `deadline return book /by 2019-12-02 1800`
 
 ```
-Alright, added:
+Consider it written down:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ```
 
 ## Adding an event
@@ -74,9 +76,9 @@ before it starts is refused.
 Example: `event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600`
 
 ```
-Alright, added:
+Consider it written down:
   [E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
-You've got 3 tasks now.
+That's 3 tasks on the books.
 ```
 
 ## Listing every task
@@ -86,7 +88,7 @@ Shows the whole list, numbered the way you refer to the tasks.
 Example: `list`
 
 ```
-Here's what you're on the hook for:
+Behold, your list:
 1.[T][ ] read book
 2.[D][ ] return book (by: Dec 2 2019, 6:00pm)
 3.[E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
@@ -95,7 +97,7 @@ Here's what you're on the hook for:
 An empty list says so rather than showing a heading with nothing under it:
 
 ```
-Your list is empty. Nothing to do... suspicious.
+Nothing. Nada. An empty list. Suspicious.
 ```
 
 ## Seeing one day
@@ -107,7 +109,7 @@ date and so never appear here.
 Example: `on 2019-12-02`
 
 ```
-Here's what you've got on Dec 2 2019:
+Here's what Dec 2 2019 has in store:
 2.[D][ ] return book (by: Dec 2 2019, 6:00pm)
 3.[E][ ] project meeting (from: Dec 2 2019, 2:00pm to: Dec 2 2019, 4:00pm)
 ```
@@ -126,7 +128,7 @@ and part of a word counts, so `find book` also finds `textbook`.
 Example: `find book`
 
 ```
-Here's what matched:
+Found these lurking in your list:
 1.[T][ ] read book
 2.[D][ ] return book (by: Dec 2 2019, 6:00pm)
 ```
@@ -137,7 +139,7 @@ can be marked or deleted straight away without running `list` first.
 If nothing matches, the word is quoted back so a typo is easy to spot:
 
 ```
-Nothing here mentions 'zzz'.
+Searched high and low. Nothing mentions 'zzz'.
 ```
 
 ## Marking a task done, or not done again
@@ -145,14 +147,14 @@ Nothing here mentions 'zzz'.
 Example: `mark 1`
 
 ```
-Nice one. That's done:
+BOOM. Done and dusted:
   [T][X] read book
 ```
 
 Example: `unmark 1`
 
 ```
-No worries, back to not done:
+Un-done! We've all been there:
   [T][ ] read book
 ```
 
@@ -161,9 +163,9 @@ No worries, back to not done:
 Example: `delete 2`
 
 ```
-Done. That one's gone:
+Gone. Vanished. No trace:
   [D][ ] return book (by: Dec 2 2019, 6:00pm)
-You've got 2 tasks now.
+That's 2 tasks on the books.
 ```
 
 ## Leaving
@@ -171,8 +173,26 @@ You've got 2 tasks now.
 Example: `bye`
 
 ```
-Catch you later! Your list will be right here when you get back.
+Off you go! I'll be right here, guarding the list. Vigilantly.
 ```
+
+## Asking what Billy understands
+
+`help` lists every command, grouped by what it does, with the shorter words in
+brackets.
+
+Example: `help`
+
+```
+Everything I know how to do. Short forms in brackets, for the impatient.
+Adding: todo (t), deadline (d, dl), event (e, ev)
+Seeing: list (l, ls), on, find (f)
+Changing: mark (m), unmark (um), delete (del, rm)
+Other: help (h, ?), bye (exit, quit, q)
+```
+
+The listing is built from the commands themselves, so it always matches what
+Billy actually accepts.
 
 ## Shorter ways to type a command
 
@@ -191,10 +211,20 @@ deletes the second task.
 | `mark` | `m` |
 | `unmark` | `um` |
 | `delete` | `del`, `rm` |
+| `help` | `h`, `?` |
 | `bye` | `exit`, `quit`, `q` |
 
 These are read the same way as the full keywords, so `LS` works as well as `ls`.
 `on` has none, being short already.
+
+## Things Billy will say unprompted
+
+Billy reacts to the state of your list as well as confirming what you asked for:
+
+* Finishing the last task you had outstanding earns a line of its own.
+* Deleting your last remaining task is announced as an empty list, rather than
+  reported as a count of zero.
+* Once the list reaches ten tasks, Billy has a word to say about that too.
 
 ## If something goes wrong
 

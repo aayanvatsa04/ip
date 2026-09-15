@@ -98,7 +98,22 @@ public class TaskList {
     }
 
     /**
-     * Returns whether there are no tasks at all.
+     * Returns whether every task in the list is done.
+     *
+     * <p>Used by the commands that remark on finishing the last outstanding
+     * task. Kept here rather than in those commands because the list is what
+     * knows what it holds.
+     *
+     * @return whether the list holds tasks and all of them are done
+     */
+    public boolean isAllDone() {
+        // An empty list is not "all done": there was nothing to finish, and
+        // congratulating the user for it would be absurd.
+        return !tasks.isEmpty() && tasks.stream().allMatch(Task::isDone);
+    }
+
+    /**
+     * Returns whether the list holds no tasks at all.
      *
      * @return whether the list is empty
      */

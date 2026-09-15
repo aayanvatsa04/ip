@@ -41,15 +41,20 @@ public class MarkCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws BillyException {
         Task task = tasks.get(taskNumber);
-        String confirmation;
         if (shouldBeDone) {
             task.markAsDone();
-            confirmation = "Nice one. That's done:";
+            // Finishing the last outstanding task is the one moment in a session
+            // worth making something of, so it gets a line the others do not.
+            if (tasks.isAllDone()) {
+                ui.show("BOOM. Done and dusted:", "  " + task,
+                        "And that's your whole list conquered. Take a bow.");
+            } else {
+                ui.show("BOOM. Done and dusted:", "  " + task);
+            }
         } else {
             task.markAsNotDone();
-            confirmation = "No worries, back to not done:";
+            ui.show("Un-done! We've all been there:", "  " + task);
         }
-        ui.show(confirmation, "  " + task);
         save(tasks, ui, storage);
     }
 }

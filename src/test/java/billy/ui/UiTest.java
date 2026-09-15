@@ -41,26 +41,45 @@ public class UiTest {
 
     @Test
     public void describeNewListSize_oneTask_singularSentence() {
-        assertEquals("You've got 1 task now.", Ui.describeNewListSize(1));
+        assertEquals("That's 1 task on the books.", Ui.describeNewListSize(1));
     }
 
     @Test
     public void describeNewListSize_severalTasks_pluralSentence() {
-        assertEquals("You've got 2 tasks now.", Ui.describeNewListSize(2));
+        assertEquals("That's 2 tasks on the books.", Ui.describeNewListSize(2));
     }
 
     @Test
     public void describeNewListSize_noTasks_pluralSentence() {
         // Said after deleting the last task, so it is a real case, not a spare one.
-        assertEquals("You've got 0 tasks now.", Ui.describeNewListSize(0));
+        assertEquals("That's 0 tasks on the books.", Ui.describeNewListSize(0));
     }
 
     @Test
     public void describeNewListSize_anyCount_wordedThroughDescribeListSize() {
         // The sentence is built from the same phrase used elsewhere, so the two
         // cannot disagree about how a count is worded.
-        assertEquals("You've got " + Ui.describeListSize(7) + " now.",
+        assertEquals("That's " + Ui.describeListSize(7) + " on the books.",
                 Ui.describeNewListSize(7));
+    }
+
+    @Test
+    public void describeNewListSize_shortList_noRemark() {
+        // Below the threshold Billy says nothing about the length, so an
+        // ordinary session is not commented on every single time.
+        assertEquals("That's 9 tasks on the books.", Ui.describeNewListSize(9));
+    }
+
+    @Test
+    public void describeNewListSize_listJustLongEnough_remarked() {
+        // Ten is the first count worth a remark. Testing the boundary is the
+        // point: an off-by-one here would remark at nine or stay silent at ten.
+        assertEquals("That's 10 tasks on the books. Ambitious.", Ui.describeNewListSize(10));
+    }
+
+    @Test
+    public void describeNewListSize_longList_remarked() {
+        assertEquals("That's 25 tasks on the books. Ambitious.", Ui.describeNewListSize(25));
     }
 
     @Test
@@ -68,14 +87,14 @@ public class UiTest {
         // The window and the console open with the same words; only the banner
         // around them differs. Spelling the greeting out here is what would
         // catch the two drifting apart.
-        assertEquals("Hey there! Billy here. I'll remember your tasks so you don't have to.\n"
-                + "Todos, deadlines and events. Type 'list' whenever you want to see them.",
+        assertEquals("BILLY HERE! Keeper of lists, guardian of things you would otherwise forget.\n"
+                + "Todos, deadlines, events. Say 'list' and I'll spill it all. 'help' if you're lost.",
                 Ui.getGreeting());
     }
 
     @Test
     public void getFarewell_always_matchesWhatTheConsoleSays() {
-        assertEquals("Catch you later! Your list will be right here when you get back.",
+        assertEquals("Off you go! I'll be right here, guarding the list. Vigilantly.",
                 Ui.getFarewell());
     }
 
@@ -114,8 +133,8 @@ public class UiTest {
         // one block, exactly as if the newlines had been typed by the caller.
         Ui ui = new Ui();
         ui.startCollecting();
-        ui.show("Alright, added:", "  [T][ ] read book", "You've got 1 task now.");
-        assertEquals("Alright, added:\n  [T][ ] read book\nYou've got 1 task now.",
+        ui.show("Consider it written down:", "  [T][ ] read book", "That's 1 task on the books.");
+        assertEquals("Consider it written down:\n  [T][ ] read book\nThat's 1 task on the books.",
                 ui.stopCollecting());
     }
 
@@ -150,7 +169,7 @@ public class UiTest {
     public void isErrorCollected_onlyOrdinaryMessages_false() {
         Ui ui = new Ui();
         ui.startCollecting();
-        ui.show("Here's what you're on the hook for:");
+        ui.show("Behold, your list:");
         assertFalse(ui.isErrorCollected());
     }
 
@@ -172,7 +191,7 @@ public class UiTest {
         Ui ui = new Ui();
         ui.startCollecting();
         ui.showError("I couldn't save your list.");
-        ui.show("You've got 1 task now.");
+        ui.show("That's 1 task on the books.");
         assertTrue(ui.isErrorCollected());
     }
 
@@ -186,7 +205,7 @@ public class UiTest {
         ui.stopCollecting();
 
         ui.startCollecting();
-        ui.show("Here's what you're on the hook for:");
+        ui.show("Behold, your list:");
         assertFalse(ui.isErrorCollected());
     }
 

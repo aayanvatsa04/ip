@@ -1,7 +1,9 @@
 package billy.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -92,7 +94,16 @@ public class CommandWordTest {
     @Test
     public void describeAll_always_readsAsASentenceInTheDeclaredOrder() {
         assertEquals("I understand: todo, deadline, event, list, on, find, mark, unmark,"
-                + " delete, bye.", CommandWord.describeAll());
+                + " delete, help, bye. Type 'help' for the short forms.",
+                CommandWord.describeAll());
+    }
+
+    @Test
+    public void describeAll_always_pointsAtTheCommandThatNamesTheShortForms() {
+        // The short forms are left out of this sentence on purpose, so it has to
+        // say where they can be found, or they are undiscoverable from inside
+        // Billy.
+        assertTrue(CommandWord.describeAll().contains("help"));
     }
 
     // ---------------------------------------------------------------
@@ -171,6 +182,73 @@ public class CommandWordTest {
                 assertTrue(!described.contains(" " + alias + ",") && !described.contains(" " + alias + "."),
                         "the alias " + alias + " should not be advertised");
             }
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // The full listing shown by `help`
+    // ---------------------------------------------------------------
+
+    @Test
+    public void describeCommands_always_namesEveryCommandThatExists() {
+        // Built from the same values used to match what the user types, so the
+        // listing cannot quietly stop mentioning a command that still works.
+        String described = CommandWord.describeCommands();
+        for (CommandWord command : CommandWord.values()) {
+            assertTrue(described.contains(command.getKeyword()),
+                    "the keyword " + command.getKeyword() + " should be listed");
+        }
+    }
+
+    @Test
+    public void describeCommands_always_namesEveryShorterWord() {
+        // The whole reason this listing exists: an alias that works but is named
+        // nowhere may as well not exist.
+        String described = CommandWord.describeCommands();
+        for (CommandWord command : CommandWord.values()) {
+            for (String alias : command.getAliases()) {
+                assertTrue(described.contains(alias),
+                        "the alias " + alias + " should be listed");
+            }
+        }
+    }
+
+    @Test
+    public void describeCommands_always_groupsEveryCommandUnderAHeading() {
+        // A command whose group were somehow missed would vanish from the
+        // listing entirely, since the lines are built per group rather than per
+        // command.
+        String described = CommandWord.describeCommands();
+        long headings = described.lines()
+                .filter(line -> line.contains(":"))
+                .count();
+        assertEquals(CommandWord.Group.values().length, headings);
+    }
+
+    @Test
+    public void describeCommands_commandWithNoShorterWord_namedWithoutBrackets() {
+        // `on` has no alias. Naming it "on ()" would read as a mistake.
+        String described = CommandWord.describeCommands();
+        assertTrue(described.contains("on,") || described.contains("on\n")
+                        || described.endsWith("on"),
+                "`on` should be named on its own, not with empty brackets: " + described);
+        assertFalse(described.contains("()"));
+    }
+
+    @Test
+    public void describeCommands_always_readsAsOneLinePerGroup() {
+        assertEquals("Adding: todo (t), deadline (d, dl), event (e, ev)\n"
+                + "Seeing: list (l, ls), on, find (f)\n"
+                + "Changing: mark (m), unmark (um), delete (del, rm)\n"
+                + "Other: help (h, ?), bye (exit, quit, q)",
+                CommandWord.describeCommands());
+    }
+
+    @Test
+    public void getGroup_everyCommand_hasOne() {
+        for (CommandWord command : CommandWord.values()) {
+            assertNotNull(command.getGroup(),
+                    command.getKeyword() + " should belong to a group");
         }
     }
 

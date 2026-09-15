@@ -212,4 +212,53 @@ public class TaskListTest {
         // happened to be running rather than where the list was built.
         assertThrows(AssertionError.class, () -> new TaskList(null));
     }
+
+    // ---------------------------------------------------------------
+    // isAllDone
+    // ---------------------------------------------------------------
+
+    @Test
+    public void isAllDone_emptyList_false() {
+        // Nothing was finished, because there was nothing to finish.
+        // Congratulating the user here would be absurd.
+        assertFalse(new TaskList().isAllDone());
+    }
+
+    @Test
+    public void isAllDone_everyTaskDone_true() {
+        TaskList tasks = new TaskList();
+        Todo first = new Todo("read book");
+        Todo second = new Todo("write essay");
+        first.markAsDone();
+        second.markAsDone();
+        tasks.add(first);
+        tasks.add(second);
+        assertTrue(tasks.isAllDone());
+    }
+
+    @Test
+    public void isAllDone_oneTaskStillOutstanding_false() {
+        // The case that matters: all but one done is not all done, and saying so
+        // would congratulate the user too early.
+        TaskList tasks = new TaskList();
+        Todo done = new Todo("read book");
+        done.markAsDone();
+        tasks.add(done);
+        tasks.add(new Todo("write essay"));
+        assertFalse(tasks.isAllDone());
+    }
+
+    @Test
+    public void isAllDone_taskUnmarkedAgain_falseOnceMore() {
+        // Unmarking has to take the list back out of the finished state, or the
+        // congratulation would stand after the user said they were not done.
+        TaskList tasks = new TaskList();
+        Todo only = new Todo("read book");
+        only.markAsDone();
+        tasks.add(only);
+        assertTrue(tasks.isAllDone());
+
+        only.markAsNotDone();
+        assertFalse(tasks.isAllDone());
+    }
 }

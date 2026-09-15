@@ -1,14 +1,21 @@
 package billy.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import billy.BillyException;
+import billy.parser.CommandWord;
+import billy.storage.Storage;
 import billy.task.TaskList;
 import billy.task.Todo;
+import billy.ui.Ui;
 
 /**
  * Tests the numbering {@link Command} shares with the commands that show part of
@@ -72,5 +79,88 @@ public class CommandTest {
     @Test
     public void numberMatching_emptyList_noLines() {
         assertTrue(Command.numberMatching(new TaskList(), task -> true).isEmpty());
+    }
+
+    // ---------------------------------------------------------------
+    // help
+    // ---------------------------------------------------------------
+
+    @Test
+    public void execute_help_showsEveryCommandAndShorterWord() {
+        // Worth testing through the command rather than only through
+        // CommandWord, since a HelpCommand that built the listing and forgot to
+        // show it would pass every test over there.
+        Ui ui = new Ui();
+        ui.startCollecting();
+        new HelpCommand().execute(new TaskList(), ui, new Storage(Path.of("unused.txt")));
+        String shown = ui.stopCollecting();
+
+        for (CommandWord command : CommandWord.values()) {
+            assertTrue(shown.contains(command.getKeyword()), command.getKeyword() + " should be shown");
+            for (String alias : command.getAliases()) {
+                assertTrue(shown.contains(alias), alias + " should be shown");
+            }
+        }
+    }
+
+    @Test
+    public void execute_help_touchesNeitherTheListNorTheSaveFile() {
+        // The only command that does neither. Storage points at a file that does
+        // not exist and must stay that way: writing to it would be a bug the
+        // user would only find when it overwrote something.
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+        Path unwritten = Path.of("build", "should-not-be-written.txt");
+
+        Ui ui = new Ui();
+        ui.startCollecting();
+        new HelpCommand().execute(tasks, ui, new Storage(unwritten));
+        ui.stopCollecting();
+
+        assertEquals(1, tasks.size());
+        assertFalse(Files.exists(unwritten), "help must not write a save file");
+    }
+
+    // ---------------------------------------------------------------
+    // What Billy remarks on
+    // ---------------------------------------------------------------
+
+    /** Runs a command against a list and returns everything Billy said. */
+    private static String say(Command command, TaskList tasks) throws BillyException {
+        Ui ui = new Ui();
+        ui.startCollecting();
+        command.execute(tasks, ui, new Storage(Path.of("build", "command-test.txt")));
+        return ui.stopCollecting();
+    }
+
+    @Test
+    public void execute_markTheLastOutstandingTask_saysSoOutright() throws BillyException {
+        TaskList tasks = listOf("read book");
+        assertTrue(say(new MarkCommand(1, true), tasks).contains("whole list conquered"));
+    }
+
+    @Test
+    public void execute_markOneOfSeveral_noSuchRemark() throws BillyException {
+        // The remark must wait for the last one. Firing on every mark would make
+        // it meaningless, which is the easy way to get this wrong.
+        TaskList tasks = listOf("read book", "write essay");
+        assertFalse(say(new MarkCommand(1, true), tasks).contains("whole list conquered"));
+    }
+
+    @Test
+    public void execute_deleteTheLastTask_saysTheListIsEmpty() throws BillyException {
+        TaskList tasks = listOf("read book");
+        String said = say(new DeleteCommand(1), tasks);
+        assertTrue(said.contains("last of them"), said);
+        // A count of zero would be the wrong thing to report here.
+        assertFalse(said.contains("0 tasks"), said);
+    }
+
+    @Test
+    public void execute_deleteOneOfSeveral_reportsTheCountInstead() throws BillyException {
+        TaskList tasks = listOf("read book", "write essay");
+        String said = say(new DeleteCommand(1), tasks);
+        assertTrue(said.contains("1 task on the books"), said);
+        assertFalse(said.contains("last of them"), said);
     }
 }
