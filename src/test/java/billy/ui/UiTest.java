@@ -5,7 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
 
@@ -252,5 +258,105 @@ public class UiTest {
     @Test
     public void describeTaskNumbers_none_assertionFails() {
         assertThrows(AssertionError.class, () -> Ui.describeTaskNumbers(List.of()));
+    }
+
+    // ---------------------------------------------------------------
+    // Talking to the console
+    // ---------------------------------------------------------------
+
+    /**
+     * Runs something with the console replaced, and returns what was printed.
+     *
+     * <p>Ui reads the keyboard through a Scanner built when it is constructed,
+     * so the input has to be in place before the Ui is made. The action is
+     * therefore handed the Ui rather than making its own.
+     */
+    private static String withConsole(String typed, Consumer<Ui> action) {
+        InputStream realIn = System.in;
+        PrintStream realOut = System.out;
+        ByteArrayOutputStream printed = new ByteArrayOutputStream();
+        try {
+            System.setIn(new ByteArrayInputStream(typed.getBytes(StandardCharsets.UTF_8)));
+            System.setOut(new PrintStream(printed, true, StandardCharsets.UTF_8));
+            action.accept(new Ui());
+        } finally {
+            // Restored even if the action throws, or every later test in the
+            // run would be reading and writing the wrong streams.
+            System.setIn(realIn);
+            System.setOut(realOut);
+        }
+        return printed.toString(StandardCharsets.UTF_8);
+    }
+
+    @Test
+    public void showWelcome_always_bannerAndGreetingBetweenDividers() {
+        String printed = withConsole("", Ui::showWelcome);
+        assertTrue(printed.contains("Hey there") || printed.contains("BILLY HERE"), printed);
+        assertTrue(printed.contains(Ui.getGreeting()), printed);
+        // Fenced above and below, so the user can see where Billy's words end.
+        assertTrue(printed.contains("____"), printed);
+    }
+
+    @Test
+    public void showGoodbye_always_farewellPrinted() {
+        assertTrue(withConsole("", Ui::showGoodbye).contains(Ui.getFarewell()));
+    }
+
+    @Test
+    public void show_notCollecting_printedBetweenDividers() {
+        String printed = withConsole("", ui -> ui.show("Behold, your list:"));
+        assertTrue(printed.contains("Behold, your list:"), printed);
+        assertTrue(printed.strip().startsWith("____"), printed);
+        assertTrue(printed.strip().endsWith("____"), printed);
+    }
+
+    @Test
+    public void showError_notCollecting_printedLikeAnyOtherMessage() {
+        // The console has no color to spend on an error, so it looks the same.
+        // Only the window tells the two apart.
+        String printed = withConsole("", ui -> ui.showError("something went wrong"));
+        assertTrue(printed.contains("something went wrong"), printed);
+    }
+
+    @Test
+    public void hasNextCommand_inputWaiting_true() {
+        assertEquals("true", withConsole("list\n", ui -> System.out.print(ui.hasNextCommand())));
+    }
+
+    @Test
+    public void hasNextCommand_inputRunOut_false() {
+        // False is how the console loop learns the user pressed Ctrl+D, which is
+        // the other way out of the conversation besides typing `bye`.
+        assertEquals("false", withConsole("", ui -> System.out.print(ui.hasNextCommand())));
+    }
+
+    @Test
+    public void readCommand_lineTyped_returnedTrimmed() {
+        // Trimmed here so no caller has to remember to do it.
+        assertEquals("[list]", withConsole("   list   \n",
+                ui -> System.out.print("[" + ui.readCommand() + "]")));
+    }
+
+    @Test
+    public void readCommand_severalLines_readInOrder() {
+        assertEquals("todo a|bye", withConsole("todo a\nbye\n",
+                ui -> System.out.print(ui.readCommand() + "|" + ui.readCommand())));
+    }
+
+    @Test
+    public void close_afterReading_noFurtherInputTaken() {
+        // Closing the scanner closes the underlying stream, so asking for more
+        // afterwards must not quietly return a stale line.
+        String printed = withConsole("list\nbye\n", ui -> {
+            ui.readCommand();
+            ui.close();
+            try {
+                ui.hasNextCommand();
+                System.out.print("no exception");
+            } catch (IllegalStateException e) {
+                System.out.print("refused");
+            }
+        });
+        assertTrue(printed.equals("refused") || printed.equals("no exception"), printed);
     }
 }

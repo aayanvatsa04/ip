@@ -184,4 +184,23 @@ public class EventTest {
                 .isSameTask(new Event("meeting", TaskDate.parse("2019-12-02 1400"),
                         TaskDate.parse("2019-12-02 1700"))));
     }
+
+    @Test
+    public void isSameTask_differentDescription_false() throws BillyException {
+        // Stops at the description without ever looking at the dates.
+        assertFalse(new Event("meeting", TaskDate.parse("2019-12-02 1400"),
+                        TaskDate.parse("2019-12-02 1600"))
+                .isSameTask(new Event("standup", TaskDate.parse("2019-12-02 1400"),
+                        TaskDate.parse("2019-12-02 1600"))));
+    }
+
+    @Test
+    public void isSameTask_sameWordingButADifferentStart_false() throws BillyException {
+        // The start is checked as well as the end. Comparing only the end would
+        // call two differently scheduled meetings the same event.
+        assertFalse(new Event("meeting", TaskDate.parse("2019-12-02 1400"),
+                        TaskDate.parse("2019-12-02 1600"))
+                .isSameTask(new Event("meeting", TaskDate.parse("2019-12-02 1500"),
+                        TaskDate.parse("2019-12-02 1600"))));
+    }
 }

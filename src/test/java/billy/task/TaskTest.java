@@ -197,4 +197,13 @@ public class TaskTest {
         assertFalse(todo.isSameTask(deadline));
         assertFalse(deadline.isSameTask(todo));
     }
+
+    @Test
+    public void constructor_nullDescription_assertionFails() {
+        // Parser refuses an empty description and Storage refuses an empty
+        // field, so null here means a task was built from somewhere that skipped
+        // both checks. The assertion says so at the point of the mistake rather
+        // than letting a null surface later as a bare NullPointerException.
+        assertThrows(AssertionError.class, () -> new Todo(null));
+    }
 }

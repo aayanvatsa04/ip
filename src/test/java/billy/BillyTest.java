@@ -5,7 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -202,5 +207,96 @@ public class BillyTest {
         assertTrue(message.contains("2 lines"), message);
         assertTrue(message.contains("were gibberish"), message);
         assertTrue(message.contains("skipped them"), message);
+    }
+
+    // ---------------------------------------------------------------
+    // The console conversation
+    // ---------------------------------------------------------------
+
+    /**
+     * Runs a whole console conversation and returns everything printed.
+     *
+     * <p>Billy builds its Ui, and so its Scanner, in its own constructor, so the
+     * input has to be in place before the Billy is made.
+     */
+    private String converse(String typed) {
+        InputStream realIn = System.in;
+        PrintStream realOut = System.out;
+        ByteArrayOutputStream printed = new ByteArrayOutputStream();
+        try {
+            System.setIn(new ByteArrayInputStream(typed.getBytes(StandardCharsets.UTF_8)));
+            System.setOut(new PrintStream(printed, true, StandardCharsets.UTF_8));
+            new Billy(folder.resolve("billy.txt")).run();
+        } finally {
+            System.setIn(realIn);
+            System.setOut(realOut);
+        }
+        return printed.toString(StandardCharsets.UTF_8);
+    }
+
+    @Test
+    public void run_aShortConversation_greetsAnswersAndSignsOff() {
+        String printed = converse("todo read book\nlist\nbye\n");
+        assertTrue(printed.contains(billy.ui.Ui.getGreeting()), printed);
+        assertTrue(printed.contains("Consider it written down:"), printed);
+        assertTrue(printed.contains("1.[T][ ] read book"), printed);
+        assertTrue(printed.contains(billy.ui.Ui.getFarewell()), printed);
+    }
+
+    @Test
+    public void run_badCommand_conversationCarriesOn() {
+        // The whole point of catching the exception in the loop: one mistake
+        // must not end the session.
+        String printed = converse("blah\ntodo read book\nbye\n");
+        assertTrue(printed.contains("I don't know what 'blah' means"), printed);
+        assertTrue(printed.contains("Consider it written down:"), printed);
+    }
+
+    @Test
+    public void run_inputRunsOutWithoutBye_stillSignsOff() {
+        // What happens when the user presses Ctrl+D rather than typing `bye`.
+        assertTrue(converse("todo read book\n").contains(billy.ui.Ui.getFarewell()));
+    }
+
+    @Test
+    public void run_noInputAtAll_greetsAndSignsOff() {
+        String printed = converse("");
+        assertTrue(printed.contains(billy.ui.Ui.getGreeting()), printed);
+        assertTrue(printed.contains(billy.ui.Ui.getFarewell()), printed);
+    }
+
+    @Test
+    public void run_tasksFromAnEarlierRun_reportedOnStartup() throws IOException {
+        Files.write(folder.resolve("billy.txt"), List.of("T | 0 | read book"));
+        assertTrue(converse("bye\n").contains("1 task still waiting"));
+    }
+
+    @Test
+    public void run_savedListUnreadable_reportedAndSessionCarriesOn() throws IOException {
+        // Bytes that are not valid UTF-8, so reading the file throws rather than
+        // producing lines. A damaged *line* is skipped; a file that cannot be
+        // read at all is a different path, and this is the one that exercises it.
+        Files.write(folder.resolve("billy.txt"), new byte[] {(byte) 0xC3, (byte) 0x28, 0x0A});
+        String printed = converse("todo read book\nbye\n");
+        assertTrue(printed.contains("couldn't read"), printed);
+        // Billy is still usable afterwards: the cost is the old list, not the session.
+        assertTrue(printed.contains("Consider it written down:"), printed);
+    }
+
+    @Test
+    public void constructor_savedListUnreadable_startupMessageIsAnError() throws IOException {
+        Files.write(folder.resolve("billy.txt"), new byte[] {(byte) 0xC3, (byte) 0x28, 0x0A});
+        Billy billy = new Billy(folder.resolve("billy.txt"));
+        // The window paints this one differently from ordinary news, so the two
+        // have to be distinguishable.
+        assertTrue(billy.isStartupMessageError());
+        assertTrue(billy.getStartupMessage().contains("couldn't read"));
+    }
+
+    @Test
+    public void constructor_savedListUnreadable_billyStillUsable() throws IOException {
+        Files.write(folder.resolve("billy.txt"), new byte[] {(byte) 0xC3, (byte) 0x28, 0x0A});
+        Billy billy = new Billy(folder.resolve("billy.txt"));
+        assertTrue(billy.getResponse("todo read book").contains("Consider it written down"));
     }
 }
